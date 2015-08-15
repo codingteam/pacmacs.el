@@ -22,7 +22,6 @@
   (interactive)
   (when (string= pacman-buffer-name
                  (buffer-name (current-buffer)))
-    (message (format "Buffer name: %s" (buffer-name (current-buffer))))
     (pacman-destroy)))
 
 (defun pacman-destroy ()
