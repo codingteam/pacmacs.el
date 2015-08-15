@@ -9,7 +9,7 @@
   (define-key pacman-mode-map (kbd "<left>") 'pacman-left)
   (define-key pacman-mode-map (kbd "<right>") 'pacman-right)
   (define-key pacman-mode-map (kbd "q") 'pacman-quit)
-  (add-hook 'kill-buffer-hook 'pacman-destroy))
+  (add-hook 'kill-buffer-hook 'pacman-kill-buffer-hook))
 
 (defun pacman-start ()
   (interactive)
@@ -17,6 +17,13 @@
   (pacman-mode)
   (unless pacman-timer
     (setq pacman-timer (run-at-time nil 0.1 'pacman-tick))))
+
+(defun pacman-kill-buffer-hook ()
+  (interactive)
+  (when (string= pacman-buffer-name
+                 (buffer-name (current-buffer)))
+    (message (format "Buffer name: %s" (buffer-name (current-buffer))))
+    (pacman-destroy)))
 
 (defun pacman-destroy ()
   (when pacman-timer
