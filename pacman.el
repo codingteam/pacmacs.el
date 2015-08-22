@@ -1,6 +1,6 @@
 ;;; pacman.el --- Pacman for Emacs
 
-;; Copyright (C) 2014 Codingteam
+;; Copyright (C) 2015 Codingteam
 
 ;; Author: Codingteam <codingteam@conference.jabber.ru>
 ;; Maintainer: Alexey Kutepov <reximkut@gmail.com>
