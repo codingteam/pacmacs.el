@@ -5,6 +5,14 @@
 (defvar pacman-timer nil)
 (defvar pacman-counter 0)
 
+(defvar pacman-board-width 10)
+(defvar pacman-board-height 10)
+(defvar pacman-player-state
+  (list :row 0
+        :column 0
+        :direction 'right))
+(defvar pacman-resource (pacman-load-resource "pacman10-hp-sprite.png"))
+
 (define-derived-mode pacman-mode special-mode "pacman-mode"
   (define-key pacman-mode-map (kbd "<up>") 'pacman-up)
   (define-key pacman-mode-map (kbd "<down>") 'pacman-down)
@@ -35,8 +43,17 @@
   (with-current-buffer pacman-buffer-name
     (let ((inhibit-read-only t))
       (erase-buffer)
-      (insert (format "%d" pacman-counter))
-      (setq pacman-counter (+ pacman-counter 1)))))
+      (pacman-render-state))))
+
+(defun pacman-render-state ()
+  (let ((player-vector '(0 0 20 20)))
+    (dotimes (row pacman-board-height)
+      (dotimes (column pacman-board-width)
+        (if (and (equal row (plist-get pacman-player-state :row))
+                 (equal column (plist-get pacman-player-state :column)))
+            (pacman-insert-image pacman-resource player-vector)
+          (pacman-insert-image pacman-resource player-vector)))
+      (insert "\n"))))
 
 (defun pacman-up ()
   (interactive)
