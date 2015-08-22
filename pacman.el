@@ -1,3 +1,5 @@
+(require 'pacman-resources)
+
 (defconst pacman-buffer-name "*Pacman*")
 
 (defvar pacman-timer nil)
@@ -9,7 +11,7 @@
   (define-key pacman-mode-map (kbd "<left>") 'pacman-left)
   (define-key pacman-mode-map (kbd "<right>") 'pacman-right)
   (define-key pacman-mode-map (kbd "q") 'pacman-quit)
-  (add-hook 'kill-buffer-hook 'pacman-destroy :local t))
+  (add-hook 'kill-buffer-hook 'pacman-destroy nil t))
 
 (defun pacman-start ()
   (interactive)
@@ -51,3 +53,5 @@
 (defun pacman-right ()
   (interactive)
   )
+
+(provide 'pacman)
