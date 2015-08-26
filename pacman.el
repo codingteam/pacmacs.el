@@ -28,6 +28,7 @@
 ;; SOFTWARE.
 
 (require 'pacman-anim)
+(require 'pacman-resources)
 
 (defconst pacman-buffer-name "*Pacman*")
 
@@ -46,10 +47,6 @@
                                            '(40 0 20 20))
                              :current-frame 0)))
 
-(defun pacman-load-resource (filename)
-  (create-image (concat default-directory filename)
-                'png nil :heuristic-mask t))
-
 (defvar pacman-resource (pacman-load-resource "pacman10-hp-sprite.png"))
 
 (define-derived-mode pacman-mode special-mode "pacman-mode"
@@ -59,9 +56,6 @@
   (define-key pacman-mode-map (kbd "<right>") 'pacman-right)
   (define-key pacman-mode-map (kbd "q") 'pacman-quit)
   (add-hook 'kill-buffer-hook 'pacman-destroy nil t))
-
-(defun pacman-insert-image (resource resource-vector)
-  (insert-image resource " " nil resource-vector))
 
 (defun pacman-start ()
   (interactive)
