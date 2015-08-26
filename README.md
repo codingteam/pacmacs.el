@@ -12,6 +12,7 @@
         - `20 0 20 20`
         - `0  0 20 20`
         - `40 0 20 20`
-3. Open `pacman.el` file in Emacs
-4. Eval entire file: `M-x eval-buffer`
-5. Start the game: `M-x pacman-start`
+3. Add game folder to the `load-path`
+4. Open `pacman.el` file in Emacs
+5. Eval entire file: `M-x eval-buffer`
+6. Start the game: `M-x pacman-start`
