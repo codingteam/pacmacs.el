@@ -27,6 +27,9 @@
 ;; CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;; SOFTWARE.
 
+(require 'pacman-anim)
+(require 'pacman-resources)
+
 (defconst pacman-buffer-name "*Pacman*")
 
 (defvar pacman-timer nil)
@@ -44,10 +47,6 @@
                                            '(40 0 20 20))
                              :current-frame 0)))
 
-(defun pacman-load-resource (filename)
-  (create-image (concat default-directory filename)
-                'png nil :heuristic-mask t))
-
 (defvar pacman-resource (pacman-load-resource "pacman10-hp-sprite.png"))
 
 (define-derived-mode pacman-mode special-mode "pacman-mode"
@@ -57,27 +56,6 @@
   (define-key pacman-mode-map (kbd "<right>") 'pacman-right)
   (define-key pacman-mode-map (kbd "q") 'pacman-quit)
   (add-hook 'kill-buffer-hook 'pacman-destroy nil t))
-
-(defun pacman-insert-image (resource resource-vector)
-  (insert-image resource " " nil resource-vector))
-
-;;;###autoload
-(defun pacman-anim-get-frame (anim)
-  (let ((frames (plist-get anim :frames))
-        (current-frame (plist-get anim :current-frame)))
-    (nth current-frame frames)))
-
-(defun pacman-anim-next-frame (anim)
-  (let* ((frames (plist-get anim :frames))
-         (current-frame (plist-get anim :current-frame))
-         (new-current-frame (mod (+ current-frame 1)
-                                 (length frames))))
-    (plist-put anim :current-frame new-current-frame)))
-
-(defun pacman-anim-object-next-frame (anim-object)
-  (let ((anim (plist-get anim-object :animation)))
-    (plist-put anim-object :animation
-               (pacman-anim-next-frame anim))))
 
 (defun pacman-start ()
   (interactive)

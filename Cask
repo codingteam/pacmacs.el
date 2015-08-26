@@ -1,9 +1,9 @@
 (source gnu)
 (source melpa)
 
-(package-file "pacman.el")
+(package "pacman" "0.0.1" "Pacman for Emacs")
 
-(files ".el")
+(files "*.el")
 
 (development
  (depends-on "el-mock")
