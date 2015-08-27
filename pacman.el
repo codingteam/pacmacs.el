@@ -42,12 +42,15 @@
       (list :row 0
             :column 0
             :direction 'right
-            :animation (list :frames (list '(20 0 20 20)
-                                           '(0 0 20 20)
-                                           '(40 0 20 20))
+            :animation (list :frames (list '(0   0 40 40)
+                                           '(40  0 40 40)
+                                           '(80  0 40 40)
+                                           '(120 0 40 40))
                              :current-frame 0)))
 
-(defvar pacman-resource (pacman-load-resource "pacman10-hp-sprite.png"))
+(defvar pacman-resource nil)
+(setq pacman-resource
+      (pacman-load-resource "sprites/Pacman-Chomping-Right.png"))
 
 (define-derived-mode pacman-mode special-mode "pacman-mode"
   (define-key pacman-mode-map (kbd "<up>") 'pacman-up)
