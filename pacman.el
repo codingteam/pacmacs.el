@@ -75,7 +75,10 @@
 (defun pacman-quit ()
   (interactive)
   (when (get-buffer pacman-buffer-name)
-    (kill-buffer pacman-buffer-name)))
+    (with-current-buffer pacman-buffer-name
+      (if (get-buffer-window pacman-buffer-name)
+          (kill-buffer-and-window)
+        (kill-buffer pacman-buffer-name)))))
 
 (defun pacman-tick ()
   (interactive)
