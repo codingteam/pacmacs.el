@@ -42,15 +42,11 @@
       (list :row 0
             :column 0
             :direction 'right
-            :animation (list :frames (list '(0   0 40 40)
-                                           '(40  0 40 40)
-                                           '(80  0 40 40)
-                                           '(120 0 40 40))
-                             :current-frame 0)))
+            :animation (pacman-load-anim "sprites/Red-Ghost-Down.json")))
 
 (defvar pacman-resource nil)
 (setq pacman-resource
-      (pacman-load-resource "sprites/Pacman-Chomping-Right.png"))
+      (pacman-load-resource "sprites/Red-Ghost-Down.png"))
 
 (define-derived-mode pacman-mode special-mode "pacman-mode"
   (define-key pacman-mode-map (kbd "<up>") 'pacman-up)
