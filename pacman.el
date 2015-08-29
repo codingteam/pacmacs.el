@@ -58,7 +58,8 @@
   (define-key pacman-mode-map (kbd "<left>") 'pacman-left)
   (define-key pacman-mode-map (kbd "<right>") 'pacman-right)
   (define-key pacman-mode-map (kbd "q") 'pacman-quit)
-  (add-hook 'kill-buffer-hook 'pacman-destroy nil t))
+  (add-hook 'kill-buffer-hook 'pacman-destroy nil t)
+  (setq cursor-type nil))
 
 (defun pacman-start ()
   (interactive)
