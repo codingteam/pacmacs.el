@@ -31,3 +31,13 @@
         (expected-frame (list 1 2 4 3)))
     (should (equal expected-frame
                    (pacman-convert-aseprite-frame aseprite-frame)))))
+
+(ert-deftest pacman-aseprite-frame-get-order-test ()
+  (let ((aseprite-frame '(khooy42.ase
+                          (foo . bar)
+                          (frame
+                           (x . 1)
+                           (y . 2)
+                           (h . 3)
+                           (w . 4)))))
+    (should (equal 42 (pacman-aseprite-frame-get-order aseprite-frame)))))
