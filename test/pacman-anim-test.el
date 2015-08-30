@@ -19,3 +19,15 @@
      (pacman-anim-object-next-frame anim-object)
      (should (equal '(:animation 42)
                     anim-object)))))
+
+(ert-deftest pacman-convert-aseprite-frame-test ()
+  (let ((aseprite-frame '(khooy
+                          (foo . bar)
+                          (frame
+                           (x . 1)
+                           (y . 2)
+                           (h . 3)
+                           (w . 4))))
+        (expected-frame (list 1 2 4 3)))
+    (should (equal expected-frame
+                   (pacman-convert-aseprite-frame aseprite-frame)))))
