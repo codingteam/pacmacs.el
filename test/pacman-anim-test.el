@@ -1,3 +1,6 @@
+(require 'cl)                           ;el-mock doesn't work without
+                                        ;this
+
 (ert-deftest pacman-anim-get-frame-test ()
   (let ((anim (list :frames (number-sequence 1 5)
                     :current-frame 2)))
@@ -41,3 +44,21 @@
                            (h . 3)
                            (w . 4)))))
     (should (equal 42 (pacman-aseprite-frame-get-order aseprite-frame)))))
+
+(ert-deftest pacman-compare-aseprite-frames-test ()
+  (let ((aseprite-frame1 '(khooy42.ase
+                           (foo . bar)
+                           (frame
+                            (x . 1)
+                            (y . 2)
+                            (h . 3)
+                            (w . 4))))
+        (aseprite-frame2 '(khooy43.ase
+                           (foo . bar)
+                           (frame
+                            (x . 1)
+                            (y . 2)
+                            (h . 3)
+                            (w . 4)))))
+    (should (pacman-compare-aseprite-frames aseprite-frame1 aseprite-frame2))
+    (should (not (pacman-compare-aseprite-frames aseprite-frame2 aseprite-frame1)))))

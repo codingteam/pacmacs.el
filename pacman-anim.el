@@ -9,19 +9,18 @@
          (aseprite-frames (cdr (assoc 'frames aseprite-json))))
     (pacman-make-anim
      (mapcar 'pacman-convert-aseprite-frame
-             (pacman-aseprite-sort-frame-hack aseprite-frames)))))
+             (sort aseprite-frames
+                   'pacman-compare-aseprite-frames)))))
 
 (defun pacman-aseprite-frame-get-order (aseprite-frame)
   (let ((frame-name (symbol-name (car aseprite-frame))))
     (string-match "\\([0-9]+\\)\\.ase$" frame-name)
     (string-to-number (match-string 1 frame-name))))
 
-(defun pacman-aseprite-sort-frame-hack (aseprite-frames)
-  (sort aseprite-frames
-        #'(lambda (f1 f2)
-            (let ((o1 (pacman-aseprite-frame-get-order f1))
-                  (o2 (pacman-aseprite-frame-get-order f2)))
-              (< o1 o2)))))
+(defun pacman-compare-aseprite-frames (aseprite-frame1 aseprite-frame2)
+  (let ((order1 (pacman-aseprite-frame-get-order aseprite-frame1))
+        (order2 (pacman-aseprite-frame-get-order aseprite-frame2)))
+    (< order1 order2)))
 
 (defun pacman-convert-aseprite-frame (aseprite-frame)
   (let* ((frame (cdr (assoc 'frame (cdr aseprite-frame))))
