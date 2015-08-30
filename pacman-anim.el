@@ -1,3 +1,4 @@
+(require 'json)
 
 (defun pacman-make-anim (frames)
   (list :frames frames
@@ -17,10 +18,10 @@
 
 (defun pacman-aseprite-sort-frame-hack (aseprite-frames)
   (sort aseprite-frames
-        '(lambda (f1 f2)
-           (let ((o1 (pacman-aseprite-frame-get-order f1))
-                 (o2 (pacman-aseprite-frame-get-order f2)))
-             (< o1 o2)))))
+        #'(lambda (f1 f2)
+            (let ((o1 (pacman-aseprite-frame-get-order f1))
+                  (o2 (pacman-aseprite-frame-get-order f2)))
+              (< o1 o2)))))
 
 (defun pacman-convert-aseprite-frame (aseprite-frame)
   (let* ((frame (cdr (assoc 'frame (cdr aseprite-frame))))
