@@ -11,3 +11,11 @@
 
     (pacman-anim-next-frame anim)
     (should (equal 0 (plist-get anim :current-frame)))))
+
+(ert-deftest pacman-anim-object-next-frame-test ()
+  (with-mock
+   (stub pacman-anim-next-frame => 42)
+   (let ((anim-object '(:animation 41)))
+     (pacman-anim-object-next-frame anim-object)
+     (should (equal '(:animation 42)
+                    anim-object)))))
