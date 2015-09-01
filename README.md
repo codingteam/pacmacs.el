@@ -5,11 +5,11 @@
 
 ## Usage ##
 
-1. clone the repo somewhere and cd to it: `$ git clone git://github.com/rexim/pacman.el.git && cd pacman.el`;
-2. open `pacman.el` file in Emacs;
-3. add game folder to the Load Path: `M-x eval-expression RET (add-to-list 'load-path default-directory) RET`;
-4. eval entire buffer: `M-x eval-buffer RET`;
-5. start the game: `M-x pacman-start RET`.
+1. `$ git clone git://github.com/rexim/pacman.el.git && cd pacman.el`;
+2. `M-x find-file RET /path/to/pacman.el/pacman.el RET`
+3. `M-x eval-expression RET (add-to-list 'load-path default-directory) RET`;
+4. `M-x eval-buffer RET`;
+5. `M-x pacman-start RET`.
 
 ## Unit Tests ##
 
