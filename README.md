@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/rexim/pacman.el.svg?branch=master)](https://travis-ci.org/rexim/pacman.el)
+[![Coverage Status](https://coveralls.io/repos/rexim/pacman.el/badge.svg?branch=master&service=github)](https://coveralls.io/github/rexim/pacman.el?branch=master)
 
 # Pacman for Emacs #
 
