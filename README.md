@@ -5,8 +5,16 @@
 
 ## Usage ##
 
-1. Clone the repo somewhere and cd to it: `$ git clone git://github.com/rexim/pacman.el.git && cd pacman.el`
-2. Add game folder to the `load-path`
-3. Open `pacman.el` file in Emacs
-4. Eval entire file: `M-x eval-buffer`
-5. Start the game: `M-x pacman-start`
+1. clone the repo somewhere and cd to it: `$ git clone git://github.com/rexim/pacman.el.git && cd pacman.el`;
+2. open `pacman.el` file in Emacs;
+3. add game folder to the Load Path: `M-x eval-expression RET (add-to-list 'load-path default-directory)`;
+4. eval entire buffer: `M-x eval-buffer`;
+5. start the game: `M-x pacman-start`.
+
+## Unit Tests ##
+
+For Unit Tests you need to install [Cask](http://cask.readthedocs.org/en/latest/) first. To run unit tests:
+
+    $ cask # only once to download development dependencies
+    $ cask exec ert-runner
+
