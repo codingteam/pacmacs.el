@@ -25,3 +25,6 @@ tests:
 All the source code of this game is distributed under the MIT
 license. All the work in the `sprites/` directory is distributed under
 [CC-BY](https://creativecommons.org/licenses/by/4.0/).
+
+Check `LICENSE.md` and `sprites/LICENSE.md` files for more
+information.
