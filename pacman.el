@@ -27,6 +27,12 @@
 ;; CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;; SOFTWARE.
 
+;;; Commentary:
+
+;; Pacman game for Emacs
+
+;;; Code:
+
 (require 'pacman-anim)
 (require 'pacman-resources)
 
