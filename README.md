@@ -13,8 +13,15 @@
 
 ## Unit Tests ##
 
-For Unit Tests you need to install [Cask](http://cask.readthedocs.org/en/latest/) first. To run unit tests:
+For Unit Tests you need to install
+[Cask](http://cask.readthedocs.org/en/latest/) first. To run unit
+tests:
 
     $ cask # only once to download development dependencies
     $ cask exec ert-runner
 
+## Licensing ##
+
+All the source code of this game is distributed under the MIT
+license. All the work in the `sprites/` directory is distributed under
+[CC-BY](https://creativecommons.org/licenses/by/4.0/).
