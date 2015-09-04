@@ -1,6 +1,11 @@
 (require 'cl)                           ;el-mock doesn't work without
                                         ;this
 
+(ert-deftest pacman-make-anim-test ()
+  (should (equal (list :frames (list 1 2 3 4 5)
+                       :current-frame 0)
+                 (pacman-make-anim (number-sequence 1 5)))))
+
 (ert-deftest pacman-anim-get-frame-test ()
   (let ((anim (list :frames (number-sequence 1 5)
                     :current-frame 2)))
