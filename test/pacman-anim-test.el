@@ -1,5 +1,6 @@
 (require 'cl)                           ;el-mock doesn't work without
                                         ;this
+(require 'json)
 
 (ert-deftest pacman-make-anim-test ()
   (should (equal (list :frames (list 1 2 3 4 5)
@@ -67,3 +68,18 @@
                             (w . 4)))))
     (should (pacman-compare-aseprite-frames aseprite-frame1 aseprite-frame2))
     (should (not (pacman-compare-aseprite-frames aseprite-frame2 aseprite-frame1)))))
+
+(ert-deftest pacman-load-anim-test ()
+  (let ((input '((frames
+                  (frame-3\.ase (frame (h . 3) (w . 3) (y . 3) (x . 3)))
+                  (frame-2\.ase (frame (h . 2) (w . 2) (y . 2) (x . 2)))
+                  (frame-1\.ase (frame (h . 1) (w . 1) (y . 1) (x . 1)))
+                  (frame-0\.ase (frame (h . 0) (w . 0) (y . 0) (x . 0))))))
+        (expected-output (pacman-make-anim
+                          (mapcar #'(lambda (x)
+                                      (make-list 4 x))
+                                  (number-sequence 0 3)))))
+    (with-mock
+     (mock (json-read-file *) => input)
+     (should (equal expected-output
+                    (pacman-load-anim "khooy"))))))
