@@ -4,8 +4,9 @@
 
 (ert-deftest pacman-make-anim-test ()
   (should (equal (list :frames (list 1 2 3 4 5)
-                       :current-frame 0)
-                 (pacman-make-anim (number-sequence 1 5)))))
+                       :current-frame 0
+                       :sprite-sheet 42)
+                 (pacman-make-anim (number-sequence 1 5) 42))))
 
 (ert-deftest pacman-anim-get-frame-test ()
   (let ((anim (list :frames (number-sequence 1 5)
@@ -70,16 +71,19 @@
     (should (not (pacman-compare-aseprite-frames aseprite-frame2 aseprite-frame1)))))
 
 (ert-deftest pacman-load-anim-test ()
-  (let ((input '((frames
-                  (frame-3\.ase (frame (h . 3) (w . 3) (y . 3) (x . 3)))
-                  (frame-2\.ase (frame (h . 2) (w . 2) (y . 2) (x . 2)))
-                  (frame-1\.ase (frame (h . 1) (w . 1) (y . 1) (x . 1)))
-                  (frame-0\.ase (frame (h . 0) (w . 0) (y . 0) (x . 0))))))
-        (expected-output (pacman-make-anim
-                          (mapcar #'(lambda (x)
-                                      (make-list 4 x))
-                                  (number-sequence 0 3)))))
+  (let* ((input-aseprite-format '((frames
+                                   (frame-3\.ase (frame (h . 3) (w . 3) (y . 3) (x . 3)))
+                                   (frame-2\.ase (frame (h . 2) (w . 2) (y . 2) (x . 2)))
+                                   (frame-1\.ase (frame (h . 1) (w . 1) (y . 1) (x . 1)))
+                                   (frame-0\.ase (frame (h . 0) (w . 0) (y . 0) (x . 0))))))
+         (input-sprite-sheet 42)
+         (expected-output (pacman-make-anim
+                           (mapcar #'(lambda (x)
+                                       (make-list 4 x))
+                                   (number-sequence 0 3))
+                           input-sprite-sheet)))
     (with-mock
-     (mock (json-read-file *) => input)
+     (mock (json-read-file *) => input-aseprite-format)
+     (mock (pacman-load-resource *) => input-sprite-sheet)
      (should (equal expected-output
-                    (pacman-load-anim "khooy"))))))
+                    (pacman-load-anim "foo" "bar"))))))
