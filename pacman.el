@@ -52,8 +52,25 @@
       (list :row 0
             :column 0
             :direction 'right
-            :animation (pacman-load-anim "sprites/Red-Ghost-Up.json"
-                                         "sprites/Red-Ghost-Up.png")))
+            :animation (pacman-load-anim "sprites/Pacman-Chomping-Right.json"
+                                         "sprites/Pacman-Chomping-Right.png")))
+(defvar pacman-empty-cell nil)
+(setq pacman-empty-cell
+      (list :animation (pacman-make-anim '((0 0 40 40))
+                                         (create-image
+                                          (make-vector 40 (make-bool-vector 40 nil)) 'xbm t :width 40 :height 40))))
+
+(defun pacman-init-board (width height player-state)
+  (let ((board (make-vector height nil)))
+    (dotimes (row height)
+      (aset board row (make-vector width pacman-empty-cell)))
+    (aset (aref board 0) 0 player-state)
+    board))
+
+(defvar pacman-board nil)
+(setq pacman-board (pacman-init-board pacman-board-width
+                                      pacman-board-height
+                                      pacman-player-state))
 
 (define-derived-mode pacman-mode special-mode "pacman-mode"
   (define-key pacman-mode-map (kbd "<up>") 'pacman-up)
@@ -93,17 +110,18 @@
             (pacman-anim-object-next-frame pacman-player-state))
       (pacman-render-state))))
 
+(defun pacman-render-object (anim-object)
+  (let* ((anim (plist-get anim-object :animation))
+         (sprite-sheet (plist-get anim :sprite-sheet))
+         (current-frame (pacman-anim-get-frame anim)))
+    (pacman-insert-image sprite-sheet current-frame)))
+
 (defun pacman-render-state ()
-  (let* ((player-anim (plist-get pacman-player-state :animation))
-         (player-vector (pacman-anim-get-frame player-anim))
-         (player-sprite-sheet (plist-get player-anim :sprite-sheet)))
-    (dotimes (row pacman-board-height)
-      (dotimes (column pacman-board-width)
-        (if (and (equal row (plist-get pacman-player-state :row))
-                 (equal column (plist-get pacman-player-state :column)))
-            (pacman-insert-image player-sprite-sheet player-vector)
-          (pacman-insert-image player-sprite-sheet player-vector)))
-      (insert "\n"))))
+  (dotimes (row pacman-board-height)
+    (dotimes (column pacman-board-width)
+      (let ((anim-object (aref (aref pacman-board row) column)))
+        (pacman-render-object anim-object)))
+    (insert "\n")))
 
 (defun pacman-up ()
   (interactive)
