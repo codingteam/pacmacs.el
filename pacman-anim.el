@@ -34,17 +34,22 @@
 
 (require 'json)
 
-(defun pacman-make-anim (frames)
-  (list :frames frames
-        :current-frame 0))
+(require 'pacman-resources)
 
-(defun pacman-load-anim (aseprite-json-file)
+(defun pacman-make-anim (frames sprite-sheet)
+  (list :frames frames
+        :current-frame 0
+        :sprite-sheet sprite-sheet))
+
+(defun pacman-load-anim (aseprite-json-file sprite-sheet-file)
   (let* ((aseprite-json (json-read-file aseprite-json-file))
-         (aseprite-frames (cdr (assoc 'frames aseprite-json))))
+         (aseprite-frames (cdr (assoc 'frames aseprite-json)))
+         (sprite-sheet (pacman-load-resource sprite-sheet-file)))
     (pacman-make-anim
      (mapcar 'pacman-convert-aseprite-frame
              (sort aseprite-frames
-                   'pacman-compare-aseprite-frames)))))
+                   'pacman-compare-aseprite-frames))
+     sprite-sheet)))
 
 (defun pacman-aseprite-frame-get-order (aseprite-frame)
   (let ((frame-name (symbol-name (car aseprite-frame))))

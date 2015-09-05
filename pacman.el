@@ -52,11 +52,8 @@
       (list :row 0
             :column 0
             :direction 'right
-            :animation (pacman-load-anim "sprites/Red-Ghost-Down.json")))
-
-(defvar pacman-resource nil)
-(setq pacman-resource
-      (pacman-load-resource "sprites/Red-Ghost-Down.png"))
+            :animation (pacman-load-anim "sprites/Red-Ghost-Up.json"
+                                         "sprites/Red-Ghost-Up.png")))
 
 (define-derived-mode pacman-mode special-mode "pacman-mode"
   (define-key pacman-mode-map (kbd "<up>") 'pacman-up)
@@ -98,13 +95,14 @@
 
 (defun pacman-render-state ()
   (let* ((player-anim (plist-get pacman-player-state :animation))
-         (player-vector (pacman-anim-get-frame player-anim)))
+         (player-vector (pacman-anim-get-frame player-anim))
+         (player-sprite-sheet (plist-get player-anim :sprite-sheet)))
     (dotimes (row pacman-board-height)
       (dotimes (column pacman-board-width)
         (if (and (equal row (plist-get pacman-player-state :row))
                  (equal column (plist-get pacman-player-state :column)))
-            (pacman-insert-image pacman-resource player-vector)
-          (pacman-insert-image pacman-resource player-vector)))
+            (pacman-insert-image player-sprite-sheet player-vector)
+          (pacman-insert-image player-sprite-sheet player-vector)))
       (insert "\n"))))
 
 (defun pacman-up ()
