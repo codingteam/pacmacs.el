@@ -30,6 +30,10 @@
 ;;; Commentary:
 
 ;; Pacman game for Emacs
+;;
+;; 8oLKDH2gw2g
+;; Yfk7eh0azc0
+;; LyFeiSI2pB4
 
 ;;; Code:
 
