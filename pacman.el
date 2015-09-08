@@ -31,10 +31,7 @@
 
 ;; Pacman game for Emacs
 ;;
-;; 8oLKDH2gw2g
-;; Yfk7eh0azc0
-;; LyFeiSI2pB4
-;; ygAqqjyfFDY
+;; PLiOAioBxutV6QXPjBczSu7Xb_5kj-3KYA
 
 ;;; Code:
 
