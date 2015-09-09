@@ -84,7 +84,7 @@
   (switch-to-buffer-other-window pacman-buffer-name)
   (pacman-mode)
   (unless pacman-timer
-    (setq pacman-timer (run-at-time nil 0.1 'pacman-tick))))
+    (setq pacman-timer (run-at-time nil 0.05 'pacman-tick))))
 
 (defun pacman-destroy ()
   (when pacman-timer
@@ -99,14 +99,67 @@
           (kill-buffer-and-window)
         (kill-buffer pacman-buffer-name)))))
 
+(setq square-width 40)
+(setq square-height 30)
+(setq square-x 150)
+(setq square-y 10)
+(setq square-dx 1)
+(setq square-dy 1)
+(setq canvas-width 200)
+(setq canvas-height 200)
+
+(defvar frame nil)
+(setq frame (make-vector canvas-height nil))
+(dotimes (i canvas-height)
+  (aset frame i (make-string canvas-width ?\s)))
+
+(defun fits-frame (x y)
+  (and (<= 0 x (1- canvas-width))
+       (<= 0 y (1- canvas-height))))
+
 (defun pacman-tick ()
   (interactive)
   (with-current-buffer pacman-buffer-name
     (let ((inhibit-read-only t))
+      ;; Check borders
+      (when (or (> (+ square-x square-width) canvas-width)
+                (< square-x 0))
+        (setq square-dx (- square-dx)))
+      (when (or (> (+ square-y square-height) canvas-height)
+                (< square-y 0))
+        (setq square-dy (- square-dy)))
+
+      ;; Move square
+      (setq square-x (+ square-x square-dx))
+      (setq square-y (+ square-y square-dy))
+
+      ;; Render frame
+      (dotimes (x canvas-width)
+        (dotimes (y canvas-height)
+          (aset (aref frame y) x ?\s)))
+      (dotimes (x square-width)
+        (dotimes (y square-height)
+          (when (fits-frame (+ square-x x) (+ square-y y))
+            (aset (aref frame (+ square-y y)) (+ square-x x) ?\.))))
       (erase-buffer)
-      (setq pacman-player-state
-            (pacman-anim-object-next-frame pacman-player-state))
-      (pacman-render-state))))
+      (insert-image
+       (create-image
+        (concat
+         "/* XPM */\n"
+         "static char *square[] = {\n"
+         "/**/\n"
+         (format "\"%d %d 2 1\",\n" canvas-width canvas-height)
+         "\"  c #000000\",\n"
+         "\". c #ffff00\",\n"
+         "/* pixels */\n"
+         (mapconcat
+          (lambda (row)
+            (format "\"%s\"" row))
+          frame
+          ",\n")
+         "\n};")
+        'xpm
+        t)))))
 
 (defun pacman-render-object (anim-object)
   (let* ((anim (plist-get anim-object :animation))
