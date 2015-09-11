@@ -56,19 +56,19 @@
 (setq pacman-empty-cell
       (list :animation (pacman-make-anim '((0 0 40 40))
                                          (create-image
-                                          (make-vector 40 (make-bool-vector 40 nil)) 'xbm t :width 40 :height 40))))
+                                          (make-vector
+                                           40 (make-bool-vector 40 nil))
+                                          'xbm t :width 40 :height 40))))
 
-(defun pacman-init-board (width height player-state)
+(defun pacman-init-board (width height)
   (let ((board (make-vector height nil)))
     (dotimes (row height)
-      (aset board row (make-vector width pacman-empty-cell)))
-    (aset (aref board 0) 0 player-state)
+      (aset board row (make-vector width nil)))
     board))
 
 (defvar pacman-board nil)
 (setq pacman-board (pacman-init-board pacman-board-width
-                                      pacman-board-height
-                                      pacman-player-state))
+                                      pacman-board-height))
 
 (define-derived-mode pacman-mode special-mode "pacman-mode"
   (define-key pacman-mode-map (kbd "<up>") 'pacman-up)
@@ -114,7 +114,20 @@
          (current-frame (pacman-anim-get-frame anim)))
     (pacman-insert-image sprite-sheet current-frame)))
 
+(defun pacman-clear-board ()
+  (dotimes (row pacman-board-height)
+    (dotimes (column pacman-board-width)
+      (aset (aref pacman-board row) column pacman-empty-cell))))
+
+(defun pacman-put-object (anim-object)
+  (let* ((row (plist-get anim-object :row))
+         (column (plist-get anim-object :column)))
+    (aset (aref pacman-board row) column anim-object)))
+
 (defun pacman-render-state ()
+  (pacman-clear-board)
+  (pacman-put-object pacman-player-state)
+
   (dotimes (row pacman-board-height)
     (dotimes (column pacman-board-width)
       (let ((anim-object (aref (aref pacman-board row) column)))
