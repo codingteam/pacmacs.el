@@ -46,6 +46,20 @@
 (defvar pacman-board-width 10)
 (defvar pacman-board-height 10)
 (defvar pacman-player-state nil)
+(defvar pacman-direction-table
+  (list 'left  (cons -1 0)
+        'right (cons 1 0)
+        'up    (cons 0 -1)
+        'down  (cons 0 1)))
+(defvar pacman-direction-animation-table
+  (list 'left  (pacman-load-anim "sprites/Pacman-Chomping-Left.json"
+                                 "sprites/Pacman-Chomping-Left.png")
+        'right (pacman-load-anim "sprites/Pacman-Chomping-Right.json"
+                                 "sprites/Pacman-Chomping-Right.png")
+        'up    (pacman-load-anim "sprites/Pacman-Chomping-Up.json"
+                                 "sprites/Pacman-Chomping-Up.png")
+        'down  (pacman-load-anim "sprites/Pacman-Chomping-Down.json"
+                                 "sprites/Pacman-Chomping-Down.png")))
 (setq pacman-player-state
       (list :row 0
             :column 0
@@ -99,13 +113,31 @@
           (kill-buffer-and-window)
         (kill-buffer pacman-buffer-name)))))
 
+(defun pacman-step-object (game-object)
+  (let* ((row (plist-get game-object :row))
+         (column (plist-get game-object :column))
+         (direction (plist-get game-object :direction))
+         (velocity (plist-get pacman-direction-table direction))
+         (new-row (+ row (cdr velocity)))
+         (new-column (+ column (car velocity))))
+    (when (and (<= 0 new-row (1- pacman-board-height))
+               (<= 0 new-column (1- pacman-board-width)))
+      (plist-put game-object :row new-row)
+      (plist-put game-object :column new-column))))
+
+
 (defun pacman-tick ()
   (interactive)
   (with-current-buffer pacman-buffer-name
     (let ((inhibit-read-only t))
-      (erase-buffer)
       (setq pacman-player-state
             (pacman-anim-object-next-frame pacman-player-state))
+      (pacman-step-object pacman-player-state)
+      (let* ((direction (plist-get pacman-player-state :direction))
+             (animation (plist-get pacman-direction-animation-table direction)))
+        (plist-put pacman-player-state :animation animation))
+
+      (erase-buffer)
       (pacman-render-state))))
 
 (defun pacman-render-object (anim-object)
@@ -136,19 +168,19 @@
 
 (defun pacman-up ()
   (interactive)
-  )
+  (plist-put pacman-player-state :direction 'up))
 
 (defun pacman-down ()
   (interactive)
-  )
+   (plist-put pacman-player-state :direction 'down))
 
 (defun pacman-left ()
   (interactive)
-  )
+  (plist-put pacman-player-state :direction 'left))
 
 (defun pacman-right ()
   (interactive)
-  )
+  (plist-put pacman-player-state :direction 'right))
 
 (provide 'pacman)
 
