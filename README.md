@@ -20,6 +20,11 @@ tests:
     $ cask # only once to download development dependencies
     $ cask exec ert-runner
 
+## Limitations ##
+
+- Emacs should be compiled with displaying images support
+- Emacs should have the [XPM](https://en.wikipedia.org/wiki/X_PixMap) image format support
+
 ## Licensing ##
 
 All the source code of this game is distributed under the MIT
