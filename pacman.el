@@ -105,13 +105,18 @@
     (cancel-timer pacman-timer)
     (setq pacman-timer nil)))
 
+(defun pacman--kill-buffer-and-its-window (buffer-or-name)
+  (let ((buffer-window (get-buffer-window buffer-or-name)))
+    (if (and buffer-window
+             (window-parent buffer-window))
+        (with-current-buffer buffer-or-name
+          (kill-buffer-and-window))
+      (kill-buffer buffer-or-name))))
+
 (defun pacman-quit ()
   (interactive)
   (when (get-buffer pacman-buffer-name)
-    (with-current-buffer pacman-buffer-name
-      (if (get-buffer-window pacman-buffer-name)
-          (kill-buffer-and-window)
-        (kill-buffer pacman-buffer-name)))))
+    (pacman--kill-buffer-and-its-window pacman-buffer-name)))
 
 (defun pacman-step-object (game-object)
   (let* ((row (plist-get game-object :row))
