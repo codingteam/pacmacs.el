@@ -35,7 +35,7 @@
  "meta": {
   "app": "http://www.aseprite.org/",
   "version": "1.1.0-dev",
-  "image": "Pacman-Chomping-Left.png",
+  "image": "Pacman-Chomping-Left.xpm",
   "format": "RGBA8888",
   "size": { "w": 160, "h": 40 },
   "scale": "1"

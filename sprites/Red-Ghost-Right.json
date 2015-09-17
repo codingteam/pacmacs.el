@@ -19,7 +19,7 @@
  "meta": {
   "app": "http://www.aseprite.org/",
   "version": "1.1.0-dev",
-  "image": "Red-Ghost-Right.png",
+  "image": "Red-Ghost-Right.xpm",
   "format": "RGBA8888",
   "size": { "w": 80, "h": 40 },
   "scale": "1"

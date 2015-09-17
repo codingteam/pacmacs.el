@@ -53,19 +53,19 @@
         'down  (cons 0 1)))
 (defvar pacman-direction-animation-table
   (list 'left  (pacman-load-anim "sprites/Pacman-Chomping-Left.json"
-                                 "sprites/Pacman-Chomping-Left.png")
+                                 "sprites/Pacman-Chomping-Left.xpm")
         'right (pacman-load-anim "sprites/Pacman-Chomping-Right.json"
-                                 "sprites/Pacman-Chomping-Right.png")
+                                 "sprites/Pacman-Chomping-Right.xpm")
         'up    (pacman-load-anim "sprites/Pacman-Chomping-Up.json"
-                                 "sprites/Pacman-Chomping-Up.png")
+                                 "sprites/Pacman-Chomping-Up.xpm")
         'down  (pacman-load-anim "sprites/Pacman-Chomping-Down.json"
-                                 "sprites/Pacman-Chomping-Down.png")))
+                                 "sprites/Pacman-Chomping-Down.xpm")))
 (setq pacman-player-state
       (list :row 0
             :column 0
             :direction 'right
             :animation (pacman-load-anim "sprites/Pacman-Chomping-Right.json"
-                                         "sprites/Pacman-Chomping-Right.png")))
+                                         "sprites/Pacman-Chomping-Right.xpm")))
 (defvar pacman-empty-cell nil)
 (setq pacman-empty-cell
       (list :animation (pacman-make-anim '((0 0 40 40))
