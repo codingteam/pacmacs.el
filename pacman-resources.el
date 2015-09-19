@@ -32,7 +32,7 @@
 
 ;;; Code:
 
-(defun pacman-load-resource (filename)
+(defun pacman-load-image (filename)
   (create-image (concat default-directory filename)
                 'xpm nil :heuristic-mask t))
 
