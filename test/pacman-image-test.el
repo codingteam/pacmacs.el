@@ -20,10 +20,11 @@
         (create-image-result 44))
     (with-mock
      (mock (make-bool-vector height t) => bool-vector-result :times 1)
-     (mock (make-vector width bool-vector-result 'xbm t
-                        :width width :height height
-                        :foreground color) => make-vector-result :times 1)
-     (mock (create-image make-vector-result) => create-image-result :times 1)
+     (mock (make-vector width bool-vector-result) => make-vector-result :times 1)
+     (mock (create-image make-vector-result
+                         'xbm t
+                         :width width :height height
+                         :foreground color) => create-image-result :times 1)
      (should (equal create-image-result
                     (pacman-create-color-block width height color))))))
 
@@ -35,8 +36,10 @@
         (create-image-result 44))
     (with-mock
      (mock (make-bool-vector height nil) => bool-vector-result :times 1)
-     (mock (make-vector width bool-vector-result 'xbm t
-                        :width width :height height) => make-vector-result :times 1)
-     (mock (create-image make-vector-result) => create-image-result :times 1)
+     (mock (make-vector width bool-vector-result) => make-vector-result :times 1)
+     (mock (create-image make-vector-result
+                         'xbm t
+                         :width width
+                         :height height) => create-image-result :times 1)
      (should (equal create-image-result
                     (pacman-create-transparent-block width height))))))
