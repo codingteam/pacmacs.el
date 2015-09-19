@@ -36,7 +36,7 @@
 ;;; Code:
 
 (require 'pacman-anim)
-(require 'pacman-resources)
+(require 'pacman-image)
 (require 'pacman-utils)
 
 (defconst pacman-buffer-name "*Pacman*")
@@ -69,19 +69,13 @@
                                          "sprites/Pacman-Chomping-Right.xpm")))
 (defvar pacman-empty-cell nil)
 (setq pacman-empty-cell
-      (list :animation (pacman-make-anim '((0 0 40 40))
-                                         (create-image
-                                          (make-vector
-                                           40 (make-bool-vector 40 nil))
-                                          'xbm t :width 40 :height 40))))
+      (list :animation
+            (pacman-make-anim '((0 0 40 40))
+                              (pacman-create-transparent-block 40 40))))
 
 (defun pacman--make-wall-cell (row column)
   (list :animation (pacman-make-anim '((0 0 40 40))
-                                     (create-image
-                                      (make-vector
-                                       40 (make-bool-vector 40 t))
-                                      'xbm t :width 40 :height 40
-                                      :foreground "red"))
+                                     (pacman-create-color-block 40 40 "red"))
         :row row
         :column column))
 

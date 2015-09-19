@@ -34,7 +34,7 @@
 
 (require 'json)
 
-(require 'pacman-resources)
+(require 'pacman-image)
 
 (defun pacman-make-anim (frames sprite-sheet)
   (list :frames frames
@@ -44,7 +44,7 @@
 (defun pacman-load-anim (aseprite-json-file sprite-sheet-file)
   (let* ((aseprite-json (json-read-file aseprite-json-file))
          (aseprite-frames (cdr (assoc 'frames aseprite-json)))
-         (sprite-sheet (pacman-load-resource sprite-sheet-file)))
+         (sprite-sheet (pacman-load-image sprite-sheet-file)))
     (pacman-make-anim
      (mapcar 'pacman-convert-aseprite-frame
              (sort aseprite-frames

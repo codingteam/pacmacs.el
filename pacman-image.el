@@ -1,4 +1,4 @@
-;;; pacman-resources.el --- Pacman for Emacs
+;;; pacman-image.el --- Pacman for Emacs
 
 ;; Copyright (C) 2015 Codingteam
 
@@ -32,13 +32,26 @@
 
 ;;; Code:
 
-(defun pacman-load-resource (filename)
+(defun pacman-load-image (filename)
   (create-image (concat default-directory filename)
                 'xpm nil :heuristic-mask t))
 
 (defun pacman-insert-image (resource resource-vector)
   (insert-image resource " " nil resource-vector))
 
-(provide 'pacman-resources)
+(defun pacman-create-color-block (width height color)
+  (create-image
+   (make-vector
+    width (make-bool-vector height t))
+   'xbm t :width width :height height
+   :foreground color))
+
+(defun pacman-create-transparent-block (width height)
+  (create-image
+   (make-vector
+    width (make-bool-vector height nil))
+   'xbm t :width width :height height))
+
+(provide 'pacman-image)
 
 ;;; pacman-anim.el ends here

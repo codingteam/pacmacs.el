@@ -84,6 +84,6 @@
                            input-sprite-sheet)))
     (with-mock
      (mock (json-read-file *) => input-aseprite-format)
-     (mock (pacman-load-resource *) => input-sprite-sheet)
+     (mock (pacman-load-image *) => input-sprite-sheet)
      (should (equal expected-output
                     (pacman-load-anim "foo" "bar"))))))
