@@ -1,4 +1,4 @@
-;;; pacman-resources.el --- Pacman for Emacs
+;;; pacman-image.el --- Pacman for Emacs
 
 ;; Copyright (C) 2015 Codingteam
 
@@ -52,6 +52,6 @@
     width (make-bool-vector height nil))
    'xbm t :width width :height height))
 
-(provide 'pacman-resources)
+(provide 'pacman-image)
 
 ;;; pacman-anim.el ends here

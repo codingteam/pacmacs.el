@@ -34,7 +34,7 @@
 
 (require 'json)
 
-(require 'pacman-resources)
+(require 'pacman-image)
 
 (defun pacman-make-anim (frames sprite-sheet)
   (list :frames frames

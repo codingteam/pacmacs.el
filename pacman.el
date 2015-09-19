@@ -36,7 +36,7 @@
 ;;; Code:
 
 (require 'pacman-anim)
-(require 'pacman-resources)
+(require 'pacman-image)
 (require 'pacman-utils)
 
 (defconst pacman-buffer-name "*Pacman*")
