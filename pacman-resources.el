@@ -39,6 +39,19 @@
 (defun pacman-insert-image (resource resource-vector)
   (insert-image resource " " nil resource-vector))
 
+(defun pacman-create-color-block (width height color)
+  (create-image
+   (make-vector
+    width (make-bool-vector height t))
+   'xbm t :width width :height height
+   :foreground color))
+
+(defun pacman-create-transparent-block (width height)
+  (create-image
+   (make-vector
+    width (make-bool-vector height nil))
+   'xbm t :width width :height height))
+
 (provide 'pacman-resources)
 
 ;;; pacman-anim.el ends here
