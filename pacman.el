@@ -37,6 +37,7 @@
 
 (require 'pacman-anim)
 (require 'pacman-resources)
+(require 'pacman-utils)
 
 (defconst pacman-buffer-name "*Pacman*")
 
@@ -73,6 +74,22 @@
                                           (make-vector
                                            40 (make-bool-vector 40 nil))
                                           'xbm t :width 40 :height 40))))
+
+(defun pacman--make-wall-cell (row column)
+  (list :animation (pacman-make-anim '((0 0 40 40))
+                                     (create-image
+                                      (make-vector
+                                       40 (make-bool-vector 40 t))
+                                      'xbm t :width 40 :height 40
+                                      :foreground "red"))
+        :row row
+        :column column))
+
+(defvar pacman-wall-cells nil)
+(setq pacman-wall-cells
+      (mapcar (lambda (n)
+                (pacman--make-wall-cell n n))
+              (number-sequence 1 9)))
 
 (defun pacman-init-board (width height)
   (let ((board (make-vector height nil)))
@@ -113,23 +130,33 @@
           (kill-buffer-and-window))
       (kill-buffer buffer-or-name))))
 
+(defun pacman--wall-at-p (row column)
+  (member (cons row column)
+          (mapcar (lambda (wall)
+                    (plist-bind ((row :row)
+                                 (column :column))
+                        wall
+                      (cons row column)))
+                  pacman-wall-cells)))
+
 (defun pacman-quit ()
   (interactive)
   (when (get-buffer pacman-buffer-name)
     (pacman--kill-buffer-and-its-window pacman-buffer-name)))
 
 (defun pacman-step-object (game-object)
-  (let* ((row (plist-get game-object :row))
-         (column (plist-get game-object :column))
-         (direction (plist-get game-object :direction))
-         (velocity (plist-get pacman-direction-table direction))
-         (new-row (+ row (cdr velocity)))
-         (new-column (+ column (car velocity))))
-    (when (and (<= 0 new-row (1- pacman-board-height))
-               (<= 0 new-column (1- pacman-board-width)))
-      (plist-put game-object :row new-row)
-      (plist-put game-object :column new-column))))
-
+  (plist-bind ((row :row)
+               (column :column)
+               (direction :direction))
+      game-object
+    (let* ((velocity (plist-get pacman-direction-table direction))
+           (new-row (+ row (cdr velocity)))
+           (new-column (+ column (car velocity))))
+      (when (and (<= 0 new-row (1- pacman-board-height))
+                 (<= 0 new-column (1- pacman-board-width))
+                 (not (pacman--wall-at-p new-row new-column)))
+        (plist-put game-object :row new-row)
+        (plist-put game-object :column new-column)))))
 
 (defun pacman-tick ()
   (interactive)
@@ -157,13 +184,16 @@
       (aset (aref pacman-board row) column pacman-empty-cell))))
 
 (defun pacman-put-object (anim-object)
-  (let* ((row (plist-get anim-object :row))
-         (column (plist-get anim-object :column)))
+  (plist-bind ((row :row) (column :column))
+      anim-object
     (aset (aref pacman-board row) column anim-object)))
 
 (defun pacman-render-state ()
   (pacman-clear-board)
   (pacman-put-object pacman-player-state)
+
+  (dolist (wall pacman-wall-cells)
+    (pacman-put-object wall))
 
   (dotimes (row pacman-board-height)
     (dotimes (column pacman-board-width)
