@@ -1,7 +1,3 @@
-(require 'cl)                           ;el-mock doesn't work without
-                                        ;this
-(require 'json)
-
 (ert-deftest pacman-make-anim-test ()
   (should (equal (list :frames (list 1 2 3 4 5)
                        :current-frame 0

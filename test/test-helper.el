@@ -1,3 +1,5 @@
+(require 'cl)                           ;el-mock doesn't work without
+                                        ;this
 (require 'el-mock)
 (require 'undercover)
 
@@ -5,3 +7,4 @@
 
 (add-to-list 'load-path ".")
 (load "pacman-anim.el")
+(load "pacman-image.el")
