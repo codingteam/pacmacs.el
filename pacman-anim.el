@@ -41,8 +41,10 @@
         :current-frame 0
         :sprite-sheet sprite-sheet))
 
-(defun pacman-load-anim (aseprite-json-file sprite-sheet-file)
-  (let* ((aseprite-json (json-read-file aseprite-json-file))
+(defun pacman-load-anim (animation-name)
+  (let* ((aseprite-json-file (format "sprites/%s.json" animation-name))
+         (sprite-sheet-file (format "sprites/%s.xpm" animation-name))
+         (aseprite-json (json-read-file aseprite-json-file))
          (aseprite-frames (cdr (assoc 'frames aseprite-json)))
          (sprite-sheet (pacman-load-image sprite-sheet-file)))
     (pacman-make-anim
