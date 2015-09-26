@@ -35,6 +35,7 @@
 (require 'json)
 
 (require 'pacman-image)
+(require 'pacman-utils)
 
 (defun pacman-make-anim (frames sprite-sheet)
   (list :frames frames
@@ -64,29 +65,27 @@
     (< order1 order2)))
 
 (defun pacman-convert-aseprite-frame (aseprite-frame)
-  (let* ((frame (cdr (assoc 'frame (cdr aseprite-frame))))
-         (x (cdr (assoc 'x frame)))
-         (y (cdr (assoc 'y frame)))
-         (w (cdr (assoc 'w frame)))
-         (h (cdr (assoc 'h frame))))
-    (list x y w h)))
+  (let* ((frame (cdr (assoc 'frame (cdr aseprite-frame)))))
+    (mapcar (lambda (n)
+              (cdr (assoc n frame)))
+            '(x y w h))))
 
 (defun pacman-anim-get-frame (anim)
-  (let ((frames (plist-get anim :frames))
-        (current-frame (plist-get anim :current-frame)))
+  (plist-bind ((frames :frames)
+               (current-frame :current-frame))
+      anim
     (nth current-frame frames)))
 
 (defun pacman-anim-next-frame (anim)
-  (let* ((frames (plist-get anim :frames))
-         (current-frame (plist-get anim :current-frame))
-         (new-current-frame (mod (+ current-frame 1)
-                                 (length frames))))
-    (plist-put anim :current-frame new-current-frame)))
+  (plist-bind ((frames :frames)
+               (current-frame :current-frame))
+      anim
+    (let ((new-current-frame (mod (+ current-frame 1)
+                                  (length frames))))
+      (plist-put anim :current-frame new-current-frame))))
 
 (defun pacman-anim-object-next-frame (anim-object)
-  (let ((anim (plist-get anim-object :animation)))
-    (plist-put anim-object :animation
-               (pacman-anim-next-frame anim))))
+  (plist-map anim-object :animation #'pacman-anim-next-frame))
 
 (provide 'pacman-anim)
 
