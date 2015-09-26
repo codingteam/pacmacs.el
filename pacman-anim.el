@@ -85,7 +85,8 @@
       (plist-put anim :current-frame new-current-frame))))
 
 (defun pacman-anim-object-next-frame (anim-object)
-  (let ((anim (plist-get anim-object :animation)))
+  (plist-bind ((anim :animation))
+      anim-object
     (plist-put anim-object :animation
                (pacman-anim-next-frame anim))))
 
