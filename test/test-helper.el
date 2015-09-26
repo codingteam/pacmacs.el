@@ -8,3 +8,4 @@
 (add-to-list 'load-path ".")
 (load "pacman-anim.el")
 (load "pacman-image.el")
+(load "pacman-utils.el")
