@@ -64,12 +64,10 @@
     (< order1 order2)))
 
 (defun pacman-convert-aseprite-frame (aseprite-frame)
-  (let* ((frame (cdr (assoc 'frame (cdr aseprite-frame))))
-         (x (cdr (assoc 'x frame)))
-         (y (cdr (assoc 'y frame)))
-         (w (cdr (assoc 'w frame)))
-         (h (cdr (assoc 'h frame))))
-    (list x y w h)))
+  (let* ((frame (cdr (assoc 'frame (cdr aseprite-frame)))))
+    (mapcar (lambda (n)
+              (cdr (assoc n frame)))
+            '(x y w h))))
 
 (defun pacman-anim-get-frame (anim)
   (let ((frames (plist-get anim :frames))
