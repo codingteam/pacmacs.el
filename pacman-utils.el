@@ -42,6 +42,14 @@
                       keys))
        ,@body)))
 
+(defun plist-map (plist property transformer)
+  "Transform the value of PROPERTY in PLIST with TRANSFORMER.
+This function modifies plist with plist-put. So it does the same
+side-effects."
+  (plist-bind ((value property)) plist
+    (plist-put plist property
+               (funcall transformer value))))
+
 (provide 'pacman-utils)
 
 ;;; pacman.el ends here
