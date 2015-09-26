@@ -46,27 +46,33 @@
 
 (defvar pacman-board-width 10)
 (defvar pacman-board-height 10)
+
 (defvar pacman-player-state nil)
-(defvar pacman-direction-table
-  (list 'left  (cons -1 0)
-        'right (cons 1 0)
-        'up    (cons 0 -1)
-        'down  (cons 0 1)))
-(defvar pacman-direction-animation-table
-  (list 'left  (pacman-load-anim "Pacman-Chomping-Left")
-        'right (pacman-load-anim "Pacman-Chomping-Right")
-        'up    (pacman-load-anim "Pacman-Chomping-Up")
-        'down  (pacman-load-anim "Pacman-Chomping-Down")))
 (setq pacman-player-state
       (list :row 0
             :column 0
             :direction 'right
             :animation (pacman-load-anim "Pacman-Chomping-Right")))
+
+(defvar pacman-direction-table
+  (list 'left  (cons -1 0)
+        'right (cons 1 0)
+        'up    (cons 0 -1)
+        'down  (cons 0 1)))
+
+(defvar pacman-direction-animation-table
+  (list 'left  (pacman-load-anim "Pacman-Chomping-Left")
+        'right (pacman-load-anim "Pacman-Chomping-Right")
+        'up    (pacman-load-anim "Pacman-Chomping-Up")
+        'down  (pacman-load-anim "Pacman-Chomping-Down")))
+
 (defvar pacman-empty-cell nil)
 (setq pacman-empty-cell
       (list :animation
             (pacman-make-anim '((0 0 40 40))
                               (pacman-create-transparent-block 40 40))))
+
+(defvar pacman-score 0)
 
 (defun pacman--make-wall-cell (row column)
   (list :animation (pacman-make-anim '((0 0 40 40))
@@ -79,6 +85,18 @@
       (mapcar (lambda (n)
                 (pacman--make-wall-cell n n))
               (number-sequence 1 9)))
+
+
+(defun pacman--make-pill (row column)
+  (list :animation (pacman-load-anim "Pill")
+        :row row
+        :column column))
+
+(defvar pacman-pills nil)
+(setq pacman-pills
+      (mapcar (lambda (n)
+                (pacman--make-pill n (1+ n)))
+              (number-sequence 1 8)))
 
 (defun pacman-init-board (width height)
   (let ((board (make-vector height nil)))
@@ -119,14 +137,20 @@
           (kill-buffer-and-window))
       (kill-buffer buffer-or-name))))
 
-(defun pacman--wall-at-p (row column)
+(defun pacman--object-at-p (row column objects)
   (member (cons row column)
-          (mapcar (lambda (wall)
+          (mapcar (lambda (object)
                     (plist-bind ((row :row)
                                  (column :column))
-                        wall
+                        object
                       (cons row column)))
-                  pacman-wall-cells)))
+                  objects)))
+
+(defun pacman--wall-at-p (row column)
+  (pacman--object-at-p row column pacman-wall-cells))
+
+(defun pacman--pill-at-p (row column)
+  (pacman--object-at-p row column pacman-pills))
 
 (defun pacman-quit ()
   (interactive)
@@ -151,12 +175,29 @@
   (interactive)
   (with-current-buffer pacman-buffer-name
     (let ((inhibit-read-only t))
-      (setq pacman-player-state
-            (pacman-anim-object-next-frame pacman-player-state))
+      (pacman-anim-object-next-frame pacman-player-state)
+      (dolist (pill pacman-pills)
+        (pacman-anim-object-next-frame pill))
+      
       (pacman-step-object pacman-player-state)
       (let* ((direction (plist-get pacman-player-state :direction))
              (animation (plist-get pacman-direction-animation-table direction)))
         (plist-put pacman-player-state :animation animation))
+
+      (plist-bind ((row :row)
+                   (column :column))
+          pacman-player-state
+        (let ((pill (pacman--pill-at-p row column)))
+          (when pill
+            (setq pacman-score (+ pacman-score 10))
+            (setq pacman-pills
+                  (remove-if (lambda (pill)
+                               (plist-bind ((p-row :row)
+                                            (p-column :column))
+                                   pill
+                                 (and (= row p-row)
+                                      (= column p-column))))
+                             pacman-pills)))))
 
       (erase-buffer)
       (pacman-render-state))))
@@ -173,13 +214,21 @@
       (aset (aref pacman-board row) column pacman-empty-cell))))
 
 (defun pacman-put-object (anim-object)
-  (plist-bind ((row :row) (column :column))
+  (plist-bind ((row :row)
+               (column :column))
       anim-object
-    (aset (aref pacman-board row) column anim-object)))
+    (when (and (<= 0 row (1- pacman-board-height))
+               (<= 0 column (1- pacman-board-width)))
+      (aset (aref pacman-board row) column anim-object))))
 
 (defun pacman-render-state ()
+  (insert (format "Score: %d\n" pacman-score))
+
   (pacman-clear-board)
   (pacman-put-object pacman-player-state)
+
+  (dolist (pill pacman-pills)
+    (pacman-put-object pill))
 
   (dolist (wall pacman-wall-cells)
     (pacman-put-object wall))
