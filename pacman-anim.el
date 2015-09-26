@@ -35,6 +35,7 @@
 (require 'json)
 
 (require 'pacman-image)
+(require 'pacman-utils)
 
 (defun pacman-make-anim (frames sprite-sheet)
   (list :frames frames
@@ -70,8 +71,9 @@
             '(x y w h))))
 
 (defun pacman-anim-get-frame (anim)
-  (let ((frames (plist-get anim :frames))
-        (current-frame (plist-get anim :current-frame)))
+  (plist-bind ((frames :frames)
+               (current-frame :current-frame))
+      anim
     (nth current-frame frames)))
 
 (defun pacman-anim-next-frame (anim)
