@@ -77,11 +77,12 @@
     (nth current-frame frames)))
 
 (defun pacman-anim-next-frame (anim)
-  (let* ((frames (plist-get anim :frames))
-         (current-frame (plist-get anim :current-frame))
-         (new-current-frame (mod (+ current-frame 1)
-                                 (length frames))))
-    (plist-put anim :current-frame new-current-frame)))
+  (plist-bind ((frames :frames)
+               (current-frame :current-frame))
+      anim
+    (let ((new-current-frame (mod (+ current-frame 1)
+                                  (length frames))))
+      (plist-put anim :current-frame new-current-frame))))
 
 (defun pacman-anim-object-next-frame (anim-object)
   (let ((anim (plist-get anim-object :animation)))
