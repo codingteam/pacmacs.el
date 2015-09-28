@@ -40,7 +40,12 @@
 (defun pacman-make-anim (frames sprite-sheet)
   (list :frames frames
         :current-frame 0
+        :duration-counter 0
         :sprite-sheet sprite-sheet))
+
+(defun pacman-make-frame (frame duration)
+  (list :frame frame
+        :duration duration))
 
 (defun pacman-load-anim (animation-name)
   (let* ((aseprite-json-file (format "sprites/%s.json" animation-name))
@@ -65,10 +70,12 @@
     (< order1 order2)))
 
 (defun pacman-convert-aseprite-frame (aseprite-frame)
-  (let* ((frame (cdr (assoc 'frame (cdr aseprite-frame)))))
-    (mapcar (lambda (n)
-              (cdr (assoc n frame)))
-            '(x y w h))))
+  (let* ((frame (cdr (assoc 'frame (cdr aseprite-frame))))
+         (duration (cdr (assoc 'duration (cdr aseprite-frame)))))
+    (pacman-make-frame (mapcar (lambda (n)
+                                 (cdr (assoc n frame)))
+                               '(x y w h))
+                       duration)))
 
 (defun pacman-anim-get-frame (anim)
   (plist-bind ((frames :frames)
@@ -76,16 +83,23 @@
       anim
     (nth current-frame frames)))
 
-(defun pacman-anim-next-frame (anim)
+(defun pacman-anim-next-frame (anim time)
   (plist-bind ((frames :frames)
-               (current-frame :current-frame))
+               (current-frame :current-frame)
+               (duration-counter :duration-counter))
       anim
-    (let ((new-current-frame (mod (+ current-frame 1)
-                                  (length frames))))
-      (plist-put anim :current-frame new-current-frame))))
+    (let ((duration (plist-get (pacman-anim-get-frame anim) :duration)))
+      (if (<= duration (+ duration-counter time))
+          (let ((new-current-frame (mod (+ current-frame 1)
+                                        (length frames))))
+            (plist-put anim :duration-counter 0)
+            (plist-put anim :current-frame new-current-frame))
+        (plist-put anim :duration-counter (+ duration-counter time))))))
 
-(defun pacman-anim-object-next-frame (anim-object)
-  (plist-map anim-object :animation #'pacman-anim-next-frame))
+(defun pacman-anim-object-next-frame (anim-object time)
+  (plist-map anim-object :animation
+             #'(lambda (anim)
+                 (pacman-anim-next-frame anim time))))
 
 (provide 'pacman-anim)
 

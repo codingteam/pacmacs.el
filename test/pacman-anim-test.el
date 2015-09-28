@@ -1,6 +1,7 @@
 (ert-deftest pacman-make-anim-test ()
   (should (equal (list :frames (list 1 2 3 4 5)
                        :current-frame 0
+                       :duration-counter 0
                        :sprite-sheet 42)
                  (pacman-make-anim (number-sequence 1 5) 42))))
 
@@ -10,19 +11,22 @@
     (should (equal 3 (pacman-anim-get-frame anim)))))
 
 (ert-deftest pacman-anim-next-frame-test ()
-  (let ((anim (list :frames (number-sequence 1 4)
-                    :current-frame 2)))
-    (pacman-anim-next-frame anim)
+  (let ((anim (list :frames (mapcar (lambda (x)
+                                      (pacman-make-frame (+ 41 x) 100))
+                                    (number-sequence 1 4)) 
+                    :current-frame 2
+                    :duration-counter 0)))
+    (pacman-anim-next-frame anim 100)
     (should (equal 3 (plist-get anim :current-frame)))
 
-    (pacman-anim-next-frame anim)
+    (pacman-anim-next-frame anim 100)
     (should (equal 0 (plist-get anim :current-frame)))))
 
 (ert-deftest pacman-anim-object-next-frame-test ()
   (with-mock
    (stub pacman-anim-next-frame => 42)
    (let ((anim-object '(:animation 41)))
-     (pacman-anim-object-next-frame anim-object)
+     (pacman-anim-object-next-frame anim-object 100)
      (should (equal '(:animation 42)
                     anim-object)))))
 
@@ -33,8 +37,10 @@
                            (x . 1)
                            (y . 2)
                            (h . 3)
-                           (w . 4))))
-        (expected-frame (list 1 2 4 3)))
+                           (w . 4))
+                          (duration . 100)))
+        (expected-frame (list :frame (list 1 2 4 3)
+                              :duration 100)))
     (should (equal expected-frame
                    (pacman-convert-aseprite-frame aseprite-frame)))))
 
@@ -68,14 +74,19 @@
 
 (ert-deftest pacman-load-anim-test ()
   (let* ((input-aseprite-format '((frames
-                                   (frame-3\.ase (frame (h . 3) (w . 3) (y . 3) (x . 3)))
-                                   (frame-2\.ase (frame (h . 2) (w . 2) (y . 2) (x . 2)))
-                                   (frame-1\.ase (frame (h . 1) (w . 1) (y . 1) (x . 1)))
-                                   (frame-0\.ase (frame (h . 0) (w . 0) (y . 0) (x . 0))))))
+                                   (frame-3\.ase (frame (h . 3) (w . 3) (y . 3) (x . 3))
+                                                 (duration . 400))
+                                   (frame-2\.ase (frame (h . 2) (w . 2) (y . 2) (x . 2))
+                                                 (duration . 300))
+                                   (frame-1\.ase (frame (h . 1) (w . 1) (y . 1) (x . 1))
+                                                 (duration . 200))
+                                   (frame-0\.ase (frame (h . 0) (w . 0) (y . 0) (x . 0))
+                                                 (duration . 100)))))
          (input-sprite-sheet 42)
          (expected-output (pacman-make-anim
                            (mapcar #'(lambda (x)
-                                       (make-list 4 x))
+                                       (pacman-make-frame (make-list 4 x)
+                                                          (* (1+ x) 100)))
                                    (number-sequence 0 3))
                            input-sprite-sheet)))
     (with-mock

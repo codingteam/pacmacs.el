@@ -40,6 +40,7 @@
 (require 'pacman-utils)
 
 (defconst pacman-buffer-name "*Pacman*")
+(defconst pacman-tick-duration-ms 100)
 
 (defvar pacman-timer nil)
 (defvar pacman-counter 0)
@@ -52,19 +53,21 @@
       (list :row 0
             :column 0
             :direction 'right
-            :animation (pacman-load-anim "Pacman-Chomping-Right")))
+            :animation (pacman-load-anim "Red-Ghost-Right")))
 
-(defvar pacman-direction-table
-  (list 'left  (cons -1 0)
-        'right (cons 1 0)
-        'up    (cons 0 -1)
-        'down  (cons 0 1)))
+(defvar pacman-direction-table nil)
+(setq pacman-direction-table
+      (list 'left  (cons -1 0)
+            'right (cons 1 0)
+            'up    (cons 0 -1)
+            'down  (cons 0 1)))
 
-(defvar pacman-direction-animation-table
-  (list 'left  (pacman-load-anim "Pacman-Chomping-Left")
-        'right (pacman-load-anim "Pacman-Chomping-Right")
-        'up    (pacman-load-anim "Pacman-Chomping-Up")
-        'down  (pacman-load-anim "Pacman-Chomping-Down")))
+(defvar pacman-direction-animation-table nil)
+(setq pacman-direction-animation-table
+      (list 'left  (pacman-load-anim "Red-Ghost-Left")
+            'right (pacman-load-anim "Red-Ghost-Right")
+            'up    (pacman-load-anim "Red-Ghost-Up")
+            'down  (pacman-load-anim "Red-Ghost-Down")))
 
 (defvar pacman-empty-cell nil)
 (setq pacman-empty-cell
@@ -122,7 +125,7 @@
   (switch-to-buffer-other-window pacman-buffer-name)
   (pacman-mode)
   (unless pacman-timer
-    (setq pacman-timer (run-at-time nil 0.1 'pacman-tick))))
+    (setq pacman-timer (run-at-time nil (* pacman-tick-duration-ms 0.001) 'pacman-tick))))
 
 (defun pacman-destroy ()
   (when pacman-timer
@@ -175,9 +178,9 @@
   (interactive)
   (with-current-buffer pacman-buffer-name
     (let ((inhibit-read-only t))
-      (pacman-anim-object-next-frame pacman-player-state)
+      (pacman-anim-object-next-frame pacman-player-state pacman-tick-duration-ms)
       (dolist (pill pacman-pills)
-        (pacman-anim-object-next-frame pill))
+        (pacman-anim-object-next-frame pill pacman-tick-duration-ms))
       
       (pacman-step-object pacman-player-state)
       (let* ((direction (plist-get pacman-player-state :direction))
@@ -205,7 +208,7 @@
 (defun pacman-render-object (anim-object)
   (let* ((anim (plist-get anim-object :animation))
          (sprite-sheet (plist-get anim :sprite-sheet))
-         (current-frame (pacman-anim-get-frame anim)))
+         (current-frame (plist-get (pacman-anim-get-frame anim) :frame)))
     (pacman-insert-image sprite-sheet current-frame)))
 
 (defun pacman-clear-board ()
