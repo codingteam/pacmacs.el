@@ -49,11 +49,11 @@
 (defvar pacman-board-height 10)
 
 (defvar pacman-player-state nil)
-(setq pacman-player-state
-      (list :row 0
-            :column 0
-            :direction 'right
-            :animation (pacman-load-anim "Red-Ghost-Right")))
+(list :row (setq pacman-player-state
+                 0
+                 :column 0
+                 :direction 'right
+                 :animation (pacman-load-anim "Pacman-Chomping-Right")))
 
 (defvar pacman-direction-table nil)
 (setq pacman-direction-table
@@ -64,10 +64,10 @@
 
 (defvar pacman-direction-animation-table nil)
 (setq pacman-direction-animation-table
-      (list 'left  (pacman-load-anim "Red-Ghost-Left")
-            'right (pacman-load-anim "Red-Ghost-Right")
-            'up    (pacman-load-anim "Red-Ghost-Up")
-            'down  (pacman-load-anim "Red-Ghost-Down")))
+      (list 'left  (pacman-load-anim "Pacman-Chomping-Left")
+            'right (pacman-load-anim "Pacman-Chomping-Right")
+            'up    (pacman-load-anim "Pacman-Chomping-Up")
+            'down  (pacman-load-anim "Pacman-Chomping-Down")))
 
 (defvar pacman-empty-cell nil)
 (setq pacman-empty-cell
@@ -248,7 +248,7 @@
 
 (defun pacman-down ()
   (interactive)
-   (plist-put pacman-player-state :direction 'down))
+  (plist-put pacman-player-state :direction 'down))
 
 (defun pacman-left ()
   (interactive)
@@ -257,6 +257,39 @@
 (defun pacman-right ()
   (interactive)
   (plist-put pacman-player-state :direction 'right))
+
+(defun pacman--file-content (filename)
+  (with-temp-buffer
+    (insert-file-contents filename)
+    (buffer-string)))
+
+(defun pacman-load-map (map-name)
+  (let* ((lines (split-string (pacman--file-content (format "maps/%s.txt" map-name)) "\n" t))
+         (board-width (apply 'max (mapcar #'length lines)))
+         (board-height (length lines)))
+    (setq pacman-board-width board-width)
+    (setq pacman-board-height board-height)
+
+    (setq pacman-board (pacman-init-board pacman-board-width
+                                          pacman-board-height))
+
+    (setq pacman-wall-cells nil)
+    (setq pacman-pills nil)
+
+    (loop
+     for line being the element of lines using (index row)
+     do (loop for x being the element of line using (index column)
+              do (cond ((char-equal x ?#)
+                        (add-to-list 'pacman-wall-cells (pacman--make-wall-cell row column)))
+
+                       ((char-equal x ?.)
+                        (add-to-list 'pacman-pills (pacman--make-pill row column)))
+
+                       ((char-equal x ?o)
+                        (plist-put pacman-player-state :row row)
+                        (plist-put pacman-player-state :column column)))))))
+
+(pacman-load-map "map01")
 
 (provide 'pacman)
 
