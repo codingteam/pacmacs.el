@@ -97,7 +97,7 @@
         (plist-put anim :duration-counter (+ duration-counter time))))))
 
 (defun pacman-anim-object-next-frame (anim-object time)
-  (plist-map anim-object :animation
+  (plist-map anim-object :current-animation
              #'(lambda (anim)
                  (pacman-anim-next-frame anim time))))
 

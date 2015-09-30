@@ -48,13 +48,6 @@
 (defvar pacman-board-width 10)
 (defvar pacman-board-height 10)
 
-(defvar pacman-player-state nil)
-(setq pacman-player-state
-      (list :row 0
-            :column 0
-            :direction 'right
-            :animation (pacman-load-anim "Pacman-Chomping-Right")))
-
 (defvar pacman-direction-table nil)
 (setq pacman-direction-table
       (list 'left  (cons -1 0)
@@ -62,23 +55,49 @@
             'up    (cons 0 -1)
             'down  (cons 0 1)))
 
-(defvar pacman-direction-animation-table nil)
-(setq pacman-direction-animation-table
-      (list 'left  (pacman-load-anim "Pacman-Chomping-Left")
-            'right (pacman-load-anim "Pacman-Chomping-Right")
-            'up    (pacman-load-anim "Pacman-Chomping-Up")
-            'down  (pacman-load-anim "Pacman-Chomping-Down")))
+(defvar pacman-inversed-direction-table nil)
+(setq pacman-inversed-direction-table
+      (list (cons (cons -1 0) 'left)
+            (cons (cons 1 0) 'right)
+            (cons (cons 0 -1) 'up)
+            (cons (cons 0 1) 'down)))
+
+(defvar pacman-player-state nil)
+(setq pacman-player-state
+      (list :row 0
+            :column 0
+            :direction 'right
+            :current-animation (pacman-load-anim "Pacman-Chomping-Right")
+            :direction-animations (list 'left  (pacman-load-anim "Pacman-Chomping-Left")
+                                        'right (pacman-load-anim "Pacman-Chomping-Right")
+                                        'up    (pacman-load-anim "Pacman-Chomping-Up")
+                                        'down  (pacman-load-anim "Pacman-Chomping-Down"))
+            :speed 0
+            :speed-counter 0))
+
+(defvar pacman-ghost-state nil)
+(setq pacman-ghost-state
+      (list :row 1
+            :column 1
+            :direction 'right
+            :current-animation (pacman-load-anim "Red-Ghost-Right")
+            :direction-animations (list 'left  (pacman-load-anim "Red-Ghost-Left")
+                                        'right (pacman-load-anim "Red-Ghost-Right")
+                                        'up    (pacman-load-anim "Red-Ghost-Up")
+                                        'down  (pacman-load-anim "Red-Ghost-Down"))
+            :speed 1
+            :speed-counter 0))
 
 (defvar pacman-empty-cell nil)
 (setq pacman-empty-cell
-      (list :animation
+      (list :current-animation
             (pacman-make-anim '((0 0 40 40))
                               (pacman-create-transparent-block 40 40))))
 
 (defvar pacman-score 0)
 
 (defun pacman--make-wall-cell (row column)
-  (list :animation (pacman-make-anim '((0 0 40 40))
+  (list :current-animation (pacman-make-anim '((0 0 40 40))
                                      (pacman-create-color-block 40 40 "red"))
         :row row
         :column column))
@@ -89,9 +108,8 @@
                 (pacman--make-wall-cell n n))
               (number-sequence 1 9)))
 
-
 (defun pacman--make-pill (row column)
-  (list :animation (pacman-load-anim "Pill")
+  (list :current-animation (pacman-load-anim "Pill")
         :row row
         :column column))
 
@@ -110,6 +128,11 @@
 (defvar pacman-board nil)
 (setq pacman-board (pacman-init-board pacman-board-width
                                       pacman-board-height))
+
+
+(defvar pacman-track-board nil)
+(setq pacman-track-board (pacman-init-board pacman-board-width
+                                            pacman-board-height))
 
 (define-derived-mode pacman-mode special-mode "pacman-mode"
   (define-key pacman-mode-map (kbd "<up>") 'pacman-up)
@@ -160,32 +183,109 @@
   (when (get-buffer pacman-buffer-name)
     (pacman--kill-buffer-and-its-window pacman-buffer-name)))
 
+(defun pacman--cell-tracked-p (row column)
+  (aref (aref pacman-track-board row) column))
+
+(defun pacman--within-of-map-p (row column)
+  (and (<= 0 row (1- pacman-board-height))
+       (<= 0 column (1- pacman-board-width))))
+
+(defun pacman--switch-direction (game-object direction)
+  (plist-bind ((direction-animations :direction-animations))
+      game-object
+    (plist-put game-object :direction direction)
+    (plist-put game-object :current-animation (plist-get direction-animations direction))))
+
 (defun pacman-step-object (game-object)
   (plist-bind ((row :row)
                (column :column)
-               (direction :direction))
+               (direction :direction)
+               (speed-counter :speed-counter)
+               (speed :speed))
       game-object
-    (let* ((velocity (plist-get pacman-direction-table direction))
-           (new-row (+ row (cdr velocity)))
-           (new-column (+ column (car velocity))))
-      (when (and (<= 0 new-row (1- pacman-board-height))
-                 (<= 0 new-column (1- pacman-board-width))
-                 (not (pacman--wall-at-p new-row new-column)))
-        (plist-put game-object :row new-row)
-        (plist-put game-object :column new-column)))))
+    (if (zerop speed-counter)
+        (let* ((velocity (plist-get pacman-direction-table direction))
+               (new-row (+ row (cdr velocity)))
+               (new-column (+ column (car velocity))))
+          (plist-put game-object :speed-counter speed)
+          (when (and (pacman--within-of-map-p new-row new-column)
+                     (not (pacman--wall-at-p new-row new-column)))
+            (plist-put game-object :row new-row)
+            (plist-put game-object :column new-column)))
+      (plist-put game-object :speed-counter (1- speed-counter)))))
+
+(defun pacman--fill-board (board width height value)
+  (dotimes (row height)
+    (dotimes (column width)
+      (aset (aref board row) column value))))
+
+(defun pacman--possible-ways (row column)
+  (list (cons (1+ row)  column)
+        (cons row (1+ column))
+        (cons (1- row) column)
+        (cons row (1- column))))
+
+(defun pacman--filter-candidates (p)
+  (let ((row (car p))
+        (column (cdr p)))
+    (or (not (pacman--within-of-map-p row column))
+        (pacman--wall-at-p row column)
+        (pacman--cell-tracked-p row column))))
+
+(defun pacman--track-point (p q)
+  (let* ((p-row (car p))
+         (p-column (cdr p))
+
+         (q-row (car q))
+         (q-column (cdr q))
+
+         (d-row (- q-row p-row))
+         (d-column (- q-column p-column)))
+    (aset (aref pacman-track-board p-row) p-column
+          (cdr
+           (assoc (cons d-column d-row)
+                  pacman-inversed-direction-table)))))
+
+(defun pacman--recalc-track-board ()
+  (pacman--fill-board pacman-track-board
+                      pacman-board-width
+                      pacman-board-height
+                      nil)
+  (plist-bind ((player-row :row)
+               (player-column :column))
+      pacman-player-state
+    (let ((wave (list (cons player-row player-column))))
+      (while (not (null wave))
+        (let ((next-wave nil))
+          (dolist (p wave)
+            (let* ((row (car p))
+                   (column (cdr p))
+                   (possible-ways (pacman--possible-ways row column))
+                   (candidate-ways
+                    (remove-if #'pacman--filter-candidates possible-ways)))
+              (dolist (candidate-way candidate-ways)
+                (pacman--track-point candidate-way p))
+              (setq next-wave
+                    (append next-wave candidate-ways))))
+          (setq wave next-wave))))))
+
+(defun pacman--track-object (game-object)
+  (plist-bind ((row :row)
+               (column :column))
+      game-object
+    (let ((direction (aref (aref pacman-track-board row) column)))
+      (pacman--switch-direction game-object direction))))
 
 (defun pacman-tick ()
   (interactive)
   (with-current-buffer pacman-buffer-name
     (let ((inhibit-read-only t))
       (pacman-anim-object-next-frame pacman-player-state pacman-tick-duration-ms)
+      (pacman-anim-object-next-frame pacman-ghost-state pacman-tick-duration-ms)
       (dolist (pill pacman-pills)
         (pacman-anim-object-next-frame pill pacman-tick-duration-ms))
       
       (pacman-step-object pacman-player-state)
-      (let* ((direction (plist-get pacman-player-state :direction))
-             (animation (plist-get pacman-direction-animation-table direction)))
-        (plist-put pacman-player-state :animation animation))
 
       (plist-bind ((row :row)
                    (column :column))
@@ -202,19 +302,18 @@
                                       (= column p-column))))
                              pacman-pills)))))
 
+      (pacman--recalc-track-board)
+      (pacman--track-object pacman-ghost-state)
+      (pacman-step-object pacman-ghost-state)
+      
       (erase-buffer)
       (pacman-render-state))))
 
 (defun pacman-render-object (anim-object)
-  (let* ((anim (plist-get anim-object :animation))
+  (let* ((anim (plist-get anim-object :current-animation))
          (sprite-sheet (plist-get anim :sprite-sheet))
          (current-frame (plist-get (pacman-anim-get-frame anim) :frame)))
     (pacman-insert-image sprite-sheet current-frame)))
-
-(defun pacman-clear-board ()
-  (dotimes (row pacman-board-height)
-    (dotimes (column pacman-board-width)
-      (aset (aref pacman-board row) column pacman-empty-cell))))
 
 (defun pacman-put-object (anim-object)
   (plist-bind ((row :row)
@@ -224,15 +323,40 @@
                (<= 0 column (1- pacman-board-width)))
       (aset (aref pacman-board row) column anim-object))))
 
+(defun pacman-render-track-board ()
+  (dotimes (row pacman-board-height)
+    (dotimes (column pacman-board-width)
+      (let ((x (aref (aref pacman-track-board row) column)))
+        (cond
+         ((null x)
+          (insert "."))
+         ((equal x 'left)
+          (insert "<"))
+         ((equal x 'right)
+          (insert ">"))
+         ((equal x 'up)
+          (insert "^"))
+         ((equal x 'down)
+          (insert "v")))))
+    (insert "\n")))
+
 (defun pacman-render-state ()
   (insert (format "Score: %d\n" pacman-score))
 
-  (pacman-clear-board)
+  (pacman-render-track-board)
+
+  (pacman--fill-board pacman-board
+                      pacman-board-width
+                      pacman-board-height
+                      pacman-empty-cell)
+
   (pacman-put-object pacman-player-state)
 
   (dolist (pill pacman-pills)
     (pacman-put-object pill))
 
+  (pacman-put-object pacman-ghost-state)
+  
   (dolist (wall pacman-wall-cells)
     (pacman-put-object wall))
 
@@ -244,19 +368,19 @@
 
 (defun pacman-up ()
   (interactive)
-  (plist-put pacman-player-state :direction 'up))
+  (pacman--switch-direction pacman-player-state 'up))
 
 (defun pacman-down ()
   (interactive)
-  (plist-put pacman-player-state :direction 'down))
+  (pacman--switch-direction pacman-player-state 'down))
 
 (defun pacman-left ()
   (interactive)
-  (plist-put pacman-player-state :direction 'left))
+  (pacman--switch-direction pacman-player-state 'left))
 
 (defun pacman-right ()
   (interactive)
-  (plist-put pacman-player-state :direction 'right))
+  (pacman--switch-direction pacman-player-state 'right))
 
 (defun pacman--file-content (filename)
   (with-temp-buffer
@@ -272,6 +396,8 @@
 
     (setq pacman-board (pacman-init-board pacman-board-width
                                           pacman-board-height))
+    (setq pacman-track-board (pacman-init-board pacman-board-width
+                                                pacman-board-height))
 
     (setq pacman-wall-cells nil)
     (setq pacman-pills nil)
@@ -287,7 +413,11 @@
 
                        ((char-equal x ?o)
                         (plist-put pacman-player-state :row row)
-                        (plist-put pacman-player-state :column column)))))))
+                        (plist-put pacman-player-state :column column))
+
+                       ((char-equal x ?g)
+                        (plist-put pacman-ghost-state :row row)
+                        (plist-put pacman-ghost-state :column column)))))))
 
 (pacman-load-map "map01")
 

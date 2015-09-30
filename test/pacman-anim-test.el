@@ -25,9 +25,9 @@
 (ert-deftest pacman-anim-object-next-frame-test ()
   (with-mock
    (stub pacman-anim-next-frame => 42)
-   (let ((anim-object '(:animation 41)))
+   (let ((anim-object '(:current-animation 41)))
      (pacman-anim-object-next-frame anim-object 100)
-     (should (equal '(:animation 42)
+     (should (equal '(:current-animation 42)
                     anim-object)))))
 
 (ert-deftest pacman-convert-aseprite-frame-test ()
