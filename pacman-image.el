@@ -44,7 +44,8 @@
    (make-vector
     width (make-bool-vector height t))
    'xbm t :width width :height height
-   :foreground color))
+   :foreground color
+   :background color))
 
 (defun pacman-create-transparent-block (width height)
   (create-image
