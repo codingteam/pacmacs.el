@@ -49,11 +49,11 @@
 (defvar pacman-board-height 10)
 
 (defvar pacman-player-state nil)
-(list :row (setq pacman-player-state
-                 0
-                 :column 0
-                 :direction 'right
-                 :animation (pacman-load-anim "Pacman-Chomping-Right")))
+(setq pacman-player-state
+      (list :row 0
+            :column 0
+            :direction 'right
+            :animation (pacman-load-anim "Pacman-Chomping-Right")))
 
 (defvar pacman-direction-table nil)
 (setq pacman-direction-table
