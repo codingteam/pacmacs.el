@@ -24,7 +24,8 @@
      (mock (create-image make-vector-result
                          'xbm t
                          :width width :height height
-                         :foreground color) => create-image-result :times 1)
+                         :foreground color
+                         :background color) => create-image-result :times 1)
      (should (equal create-image-result
                     (pacman-create-color-block width height color))))))
 
