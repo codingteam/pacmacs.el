@@ -1,10 +1,10 @@
-;;; pacman-image.el --- Pacman for Emacs
+;;; pacmacs-utils.el --- Pacmacs for Emacs
 
 ;; Copyright (C) 2015 Codingteam
 
 ;; Author: Codingteam <codingteam@conference.jabber.ru>
 ;; Maintainer: Alexey Kutepov <reximkut@gmail.com>
-;; URL: http://github.com/rexim/pacman.el
+;; URL: http://github.com/rexim/pacmacs.el
 
 ;; Permission is hereby granted, free of charge, to any person
 ;; obtaining a copy of this software and associated documentation
@@ -28,31 +28,28 @@
 
 ;;; Commentary:
 
-;; Routines for working with game resources
+;; Some common utils
 
 ;;; Code:
 
-(defun pacman-load-image (filename)
-  (create-image (concat default-directory filename)
-                'xpm nil :heuristic-mask t))
+(defmacro plist-bind (keys expr &rest body)
+  (declare (indent 2) (debug t))
+  (let ((expr-name (gensym)))
+    `(let* ((,expr-name ,expr)
+            ,@(mapcar #'(lambda (key)
+                          (cons (car key)
+                                `((plist-get ,expr-name ,(cadr key)))))
+                      keys))
+       ,@body)))
 
-(defun pacman-insert-image (resource resource-vector)
-  (insert-image resource " " nil resource-vector))
+(defun plist-map (plist property transformer)
+  "Transform the value of PROPERTY in PLIST with TRANSFORMER.
+This function modifies plist with plist-put. So it does the same
+side-effects."
+  (plist-bind ((value property)) plist
+    (plist-put plist property
+               (funcall transformer value))))
 
-(defun pacman-create-color-block (width height color)
-  (create-image
-   (make-vector
-    width (make-bool-vector height t))
-   'xbm t :width width :height height
-   :foreground color
-   :background color))
+(provide 'pacmacs-utils)
 
-(defun pacman-create-transparent-block (width height)
-  (create-image
-   (make-vector
-    width (make-bool-vector height nil))
-   'xbm t :width width :height height))
-
-(provide 'pacman-image)
-
-;;; pacman-anim.el ends here
+;;; pacmacs.el ends here

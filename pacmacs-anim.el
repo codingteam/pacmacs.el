@@ -1,10 +1,10 @@
-;;; pacman-anim.el --- Pacman for Emacs
+;;; pacmacs-anim.el --- Pacmacs for Emacs
 
 ;; Copyright (C) 2015 Codingteam
 
 ;; Author: Codingteam <codingteam@conference.jabber.ru>
 ;; Maintainer: Alexey Kutepov <reximkut@gmail.com>
-;; URL: http://github.com/rexim/pacman.el
+;; URL: http://github.com/rexim/pacmacs.el
 
 ;; Permission is hereby granted, free of charge, to any person
 ;; obtaining a copy of this software and associated documentation
@@ -34,61 +34,61 @@
 
 (require 'json)
 
-(require 'pacman-image)
-(require 'pacman-utils)
+(require 'pacmacs-image)
+(require 'pacmacs-utils)
 
-(defun pacman-make-anim (frames sprite-sheet)
+(defun pacmacs-make-anim (frames sprite-sheet)
   (list :frames frames
         :current-frame 0
         :duration-counter 0
         :sprite-sheet sprite-sheet))
 
-(defun pacman-make-frame (frame duration)
+(defun pacmacs-make-frame (frame duration)
   (list :frame frame
         :duration duration))
 
-(defun pacman-load-anim (animation-name)
+(defun pacmacs-load-anim (animation-name)
   (let* ((aseprite-json-file (format "sprites/%s.json" animation-name))
          (sprite-sheet-file (format "sprites/%s.xpm" animation-name))
          (aseprite-json (json-read-file aseprite-json-file))
          (aseprite-frames (cdr (assoc 'frames aseprite-json)))
-         (sprite-sheet (pacman-load-image sprite-sheet-file)))
-    (pacman-make-anim
-     (mapcar 'pacman-convert-aseprite-frame
+         (sprite-sheet (pacmacs-load-image sprite-sheet-file)))
+    (pacmacs-make-anim
+     (mapcar 'pacmacs-convert-aseprite-frame
              (sort aseprite-frames
-                   'pacman-compare-aseprite-frames))
+                   'pacmacs-compare-aseprite-frames))
      sprite-sheet)))
 
-(defun pacman-aseprite-frame-get-order (aseprite-frame)
+(defun pacmacs-aseprite-frame-get-order (aseprite-frame)
   (let ((frame-name (symbol-name (car aseprite-frame))))
     (string-match "\\([0-9]+\\)\\.ase$" frame-name)
     (string-to-number (match-string 1 frame-name))))
 
-(defun pacman-compare-aseprite-frames (aseprite-frame1 aseprite-frame2)
-  (let ((order1 (pacman-aseprite-frame-get-order aseprite-frame1))
-        (order2 (pacman-aseprite-frame-get-order aseprite-frame2)))
+(defun pacmacs-compare-aseprite-frames (aseprite-frame1 aseprite-frame2)
+  (let ((order1 (pacmacs-aseprite-frame-get-order aseprite-frame1))
+        (order2 (pacmacs-aseprite-frame-get-order aseprite-frame2)))
     (< order1 order2)))
 
-(defun pacman-convert-aseprite-frame (aseprite-frame)
+(defun pacmacs-convert-aseprite-frame (aseprite-frame)
   (let* ((frame (cdr (assoc 'frame (cdr aseprite-frame))))
          (duration (cdr (assoc 'duration (cdr aseprite-frame)))))
-    (pacman-make-frame (mapcar (lambda (n)
+    (pacmacs-make-frame (mapcar (lambda (n)
                                  (cdr (assoc n frame)))
                                '(x y w h))
                        duration)))
 
-(defun pacman-anim-get-frame (anim)
+(defun pacmacs-anim-get-frame (anim)
   (plist-bind ((frames :frames)
                (current-frame :current-frame))
       anim
     (nth current-frame frames)))
 
-(defun pacman-anim-next-frame (anim time)
+(defun pacmacs-anim-next-frame (anim time)
   (plist-bind ((frames :frames)
                (current-frame :current-frame)
                (duration-counter :duration-counter))
       anim
-    (let ((duration (plist-get (pacman-anim-get-frame anim) :duration)))
+    (let ((duration (plist-get (pacmacs-anim-get-frame anim) :duration)))
       (if (<= duration (+ duration-counter time))
           (let ((new-current-frame (mod (+ current-frame 1)
                                         (length frames))))
@@ -96,11 +96,11 @@
             (plist-put anim :current-frame new-current-frame))
         (plist-put anim :duration-counter (+ duration-counter time))))))
 
-(defun pacman-anim-object-next-frame (anim-object time)
+(defun pacmacs-anim-object-next-frame (anim-object time)
   (plist-map anim-object :current-animation
              #'(lambda (anim)
-                 (pacman-anim-next-frame anim time))))
+                 (pacmacs-anim-next-frame anim time))))
 
-(provide 'pacman-anim)
+(provide 'pacmacs-anim)
 
-;;; pacman-anim.el ends here
+;;; pacmacs-anim.el ends here

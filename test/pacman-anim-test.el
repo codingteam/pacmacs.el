@@ -1,36 +1,36 @@
-(ert-deftest pacman-make-anim-test ()
+(ert-deftest pacmacs-make-anim-test ()
   (should (equal (list :frames (list 1 2 3 4 5)
                        :current-frame 0
                        :duration-counter 0
                        :sprite-sheet 42)
-                 (pacman-make-anim (number-sequence 1 5) 42))))
+                 (pacmacs-make-anim (number-sequence 1 5) 42))))
 
-(ert-deftest pacman-anim-get-frame-test ()
+(ert-deftest pacmacs-anim-get-frame-test ()
   (let ((anim (list :frames (number-sequence 1 5)
                     :current-frame 2)))
-    (should (equal 3 (pacman-anim-get-frame anim)))))
+    (should (equal 3 (pacmacs-anim-get-frame anim)))))
 
-(ert-deftest pacman-anim-next-frame-test ()
+(ert-deftest pacmacs-anim-next-frame-test ()
   (let ((anim (list :frames (mapcar (lambda (x)
-                                      (pacman-make-frame (+ 41 x) 100))
+                                      (pacmacs-make-frame (+ 41 x) 100))
                                     (number-sequence 1 4)) 
                     :current-frame 2
                     :duration-counter 0)))
-    (pacman-anim-next-frame anim 100)
+    (pacmacs-anim-next-frame anim 100)
     (should (equal 3 (plist-get anim :current-frame)))
 
-    (pacman-anim-next-frame anim 100)
+    (pacmacs-anim-next-frame anim 100)
     (should (equal 0 (plist-get anim :current-frame)))))
 
-(ert-deftest pacman-anim-object-next-frame-test ()
+(ert-deftest pacmacs-anim-object-next-frame-test ()
   (with-mock
-   (stub pacman-anim-next-frame => 42)
+   (stub pacmacs-anim-next-frame => 42)
    (let ((anim-object '(:current-animation 41)))
-     (pacman-anim-object-next-frame anim-object 100)
+     (pacmacs-anim-object-next-frame anim-object 100)
      (should (equal '(:current-animation 42)
                     anim-object)))))
 
-(ert-deftest pacman-convert-aseprite-frame-test ()
+(ert-deftest pacmacs-convert-aseprite-frame-test ()
   (let ((aseprite-frame '(khooy
                           (foo . bar)
                           (frame
@@ -42,9 +42,9 @@
         (expected-frame (list :frame (list 1 2 4 3)
                               :duration 100)))
     (should (equal expected-frame
-                   (pacman-convert-aseprite-frame aseprite-frame)))))
+                   (pacmacs-convert-aseprite-frame aseprite-frame)))))
 
-(ert-deftest pacman-aseprite-frame-get-order-test ()
+(ert-deftest pacmacs-aseprite-frame-get-order-test ()
   (let ((aseprite-frame '(khooy42.ase
                           (foo . bar)
                           (frame
@@ -52,9 +52,9 @@
                            (y . 2)
                            (h . 3)
                            (w . 4)))))
-    (should (equal 42 (pacman-aseprite-frame-get-order aseprite-frame)))))
+    (should (equal 42 (pacmacs-aseprite-frame-get-order aseprite-frame)))))
 
-(ert-deftest pacman-compare-aseprite-frames-test ()
+(ert-deftest pacmacs-compare-aseprite-frames-test ()
   (let ((aseprite-frame1 '(khooy42.ase
                            (foo . bar)
                            (frame
@@ -69,10 +69,10 @@
                             (y . 2)
                             (h . 3)
                             (w . 4)))))
-    (should (pacman-compare-aseprite-frames aseprite-frame1 aseprite-frame2))
-    (should (not (pacman-compare-aseprite-frames aseprite-frame2 aseprite-frame1)))))
+    (should (pacmacs-compare-aseprite-frames aseprite-frame1 aseprite-frame2))
+    (should (not (pacmacs-compare-aseprite-frames aseprite-frame2 aseprite-frame1)))))
 
-(ert-deftest pacman-load-anim-test ()
+(ert-deftest pacmacs-load-anim-test ()
   (let* ((input-aseprite-format '((frames
                                    (frame-3\.ase (frame (h . 3) (w . 3) (y . 3) (x . 3))
                                                  (duration . 400))
@@ -83,14 +83,14 @@
                                    (frame-0\.ase (frame (h . 0) (w . 0) (y . 0) (x . 0))
                                                  (duration . 100)))))
          (input-sprite-sheet 42)
-         (expected-output (pacman-make-anim
+         (expected-output (pacmacs-make-anim
                            (mapcar #'(lambda (x)
-                                       (pacman-make-frame (make-list 4 x)
+                                       (pacmacs-make-frame (make-list 4 x)
                                                           (* (1+ x) 100)))
                                    (number-sequence 0 3))
                            input-sprite-sheet)))
     (with-mock
      (mock (json-read-file *) => input-aseprite-format)
-     (mock (pacman-load-image *) => input-sprite-sheet)
+     (mock (pacmacs-load-image *) => input-sprite-sheet)
      (should (equal expected-output
-                    (pacman-load-anim "foo"))))))
+                    (pacmacs-load-anim "foo"))))))

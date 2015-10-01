@@ -1,17 +1,17 @@
-(ert-deftest pacman-load-image-test ()
+(ert-deftest pacmacs-load-image-test ()
   (let ((default-directory "/khooy/"))
     (with-mock
      (mock (create-image "/khooy/pew" 'xpm nil :heuristic-mask t) => 42 :times 1)
-     (should (= 42 (pacman-load-image "pew"))))))
+     (should (= 42 (pacmacs-load-image "pew"))))))
 
-(ert-deftest pacman-insert-image-test ()
+(ert-deftest pacmacs-insert-image-test ()
   (let ((resource "khooy")
         (resource-vector "pew"))
     (with-mock
      (mock (insert-image resource " " nil resource-vector) => 42 :times 1)
-     (should (= 42 (pacman-insert-image resource resource-vector))))))
+     (should (= 42 (pacmacs-insert-image resource resource-vector))))))
 
-(ert-deftest pacman-create-color-block-test ()
+(ert-deftest pacmacs-create-color-block-test ()
   (let ((width 10)
         (height 20)
         (color "red")
@@ -27,9 +27,9 @@
                          :foreground color
                          :background color) => create-image-result :times 1)
      (should (equal create-image-result
-                    (pacman-create-color-block width height color))))))
+                    (pacmacs-create-color-block width height color))))))
 
-(ert-deftest pacman-create-transparent-block ()
+(ert-deftest pacmacs-create-transparent-block ()
   (let ((width 10)
         (height 20)
         (bool-vector-result 42)
@@ -43,4 +43,4 @@
                          :width width
                          :height height) => create-image-result :times 1)
      (should (equal create-image-result
-                    (pacman-create-transparent-block width height))))))
+                    (pacmacs-create-transparent-block width height))))))

@@ -1,15 +1,17 @@
-[![Build Status](https://travis-ci.org/rexim/pacman.el.svg?branch=master)](https://travis-ci.org/rexim/pacman.el)
-[![Coverage Status](https://coveralls.io/repos/rexim/pacman.el/badge.svg?branch=master&service=github)](https://coveralls.io/github/rexim/pacman.el?branch=master)
+[![Build Status](https://travis-ci.org/rexim/pacmacs.el.svg?branch=master)](https://travis-ci.org/rexim/pacmacs.el)
+[![Coverage Status](https://coveralls.io/repos/rexim/pacmacs.el/badge.svg?branch=master&service=github)](https://coveralls.io/github/rexim/pacmacs.el?branch=master)
 
-# Pacman for Emacs #
+# Pacmacs #
+
+Pacman for Emacs
 
 ## Usage ##
 
-1. `$ git clone git://github.com/rexim/pacman.el.git && cd pacman.el`;
-2. `M-x find-file RET /path/to/pacman.el/pacman.el RET`
+1. `$ git clone git://github.com/rexim/pacmacs.el.git && cd pacmacs.el`;
+2. `M-x find-file RET /path/to/pacmacs.el/pacmacs.el RET`
 3. `M-x eval-expression RET (add-to-list 'load-path default-directory) RET`;
 4. `M-x eval-buffer RET`;
-5. `M-x pacman-start RET`.
+5. `M-x pacmacs-start RET`.
 
 ## Unit Tests ##
 

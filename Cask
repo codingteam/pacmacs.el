@@ -1,7 +1,7 @@
 (source gnu)
 (source melpa)
 
-(package-file "pacman.el")
+(package-file "pacmacs.el")
 
 (files "*.el")
 
