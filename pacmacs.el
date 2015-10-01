@@ -65,17 +65,17 @@
             (cons (cons 0 -1) 'up)
             (cons (cons 0 1) 'down)))
 
-(defvar pacmacs-ghost-state nil)
-(setq pacmacs-ghost-state
-      (list :row 1
-            :column 1
+(defvar pacmacs-player-state nil)
+(setq pacmacs-player-state
+      (list :row 0
+            :column 0
             :direction 'right
-            :current-animation (pacmacs-load-anim "Red-Ghost-Right")
-            :direction-animations (list 'left  (pacmacs-load-anim "Red-Ghost-Left")
-                                        'right (pacmacs-load-anim "Red-Ghost-Right")
-                                        'up    (pacmacs-load-anim "Red-Ghost-Up")
-                                        'down  (pacmacs-load-anim "Red-Ghost-Down"))
-            :speed 1
+            :current-animation (pacmacs-load-anim "Pacman-Chomping-Right")
+            :direction-animations (list 'left  (pacmacs-load-anim "Pacman-Chomping-Left")
+                                        'right (pacmacs-load-anim "Pacman-Chomping-Right")
+                                        'up    (pacmacs-load-anim "Pacman-Chomping-Up")
+                                        'down  (pacmacs-load-anim "Pacman-Chomping-Down"))
+            :speed 0
             :speed-counter 0))
 
 (defvar pacmacs-ghosts nil)
