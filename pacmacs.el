@@ -35,6 +35,8 @@
 
 ;;; Code:
 
+(require 'dash)
+
 (require 'pacmacs-anim)
 (require 'pacmacs-image)
 (require 'pacmacs-utils)

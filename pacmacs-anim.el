@@ -33,6 +33,7 @@
 ;;; Code:
 
 (require 'json)
+(require 'dash)
 
 (require 'pacmacs-image)
 (require 'pacmacs-utils)

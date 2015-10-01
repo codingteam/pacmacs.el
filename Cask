@@ -5,6 +5,8 @@
 
 (files "*.el")
 
+(depends-on "dash")
+
 (development
  (depends-on "el-mock")
  (depends-on "ert-runner")
