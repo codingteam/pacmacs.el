@@ -1,4 +1,4 @@
-;;; pacmacs-utils.el --- Pacmacs for Emacs
+;;; pacmacs-utils.el --- Pacman for Emacs
 
 ;; Copyright (C) 2015 Codingteam
 

@@ -1,4 +1,4 @@
-;;; pacmacs-anim.el --- Pacmacs for Emacs
+;;; pacmacs-anim.el --- Pacman for Emacs
 
 ;; Copyright (C) 2015 Codingteam
 

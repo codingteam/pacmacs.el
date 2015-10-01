@@ -1,4 +1,4 @@
-;;; pacmacs-image.el --- Pacmacs for Emacs
+;;; pacmacs-image.el --- Pacman for Emacs
 
 ;; Copyright (C) 2015 Codingteam
 
