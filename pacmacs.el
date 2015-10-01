@@ -43,12 +43,13 @@
 
 (defconst pacmacs-buffer-name "*Pacmacs*")
 (defconst pacmacs-tick-duration-ms 100)
+(defconst pacmacs-debug-output nil)
 
 (defvar pacmacs-timer nil)
-(defvar pacmacs-counter 0)
 
 (defvar pacmacs-board-width 10)
 (defvar pacmacs-board-height 10)
+(defvar pacmacs-score 0)
 
 (defvar pacmacs-direction-table nil)
 (setq pacmacs-direction-table
@@ -64,19 +65,6 @@
             (cons (cons 0 -1) 'up)
             (cons (cons 0 1) 'down)))
 
-(defvar pacmacs-player-state nil)
-(setq pacmacs-player-state
-      (list :row 0
-            :column 0
-            :direction 'right
-            :current-animation (pacmacs-load-anim "Pacman-Chomping-Right")
-            :direction-animations (list 'left  (pacmacs-load-anim "Pacman-Chomping-Left")
-                                        'right (pacmacs-load-anim "Pacman-Chomping-Right")
-                                        'up    (pacmacs-load-anim "Pacman-Chomping-Up")
-                                        'down  (pacmacs-load-anim "Pacman-Chomping-Down"))
-            :speed 0
-            :speed-counter 0))
-
 (defvar pacmacs-ghost-state nil)
 (setq pacmacs-ghost-state
       (list :row 1
@@ -90,51 +78,20 @@
             :speed 1
             :speed-counter 0))
 
+(defvar pacmacs-ghosts nil)
+(defvar pacmacs-wall-cells nil)
+(defvar pacmacs-pills nil)
+
 (defvar pacmacs-empty-cell nil)
 (setq pacmacs-empty-cell
       (list :current-animation
-            (pacmacs-make-anim '((0 0 40 40))
-                              (pacmacs-create-transparent-block 40 40))))
+            (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
+                               (pacmacs-create-transparent-block 40 40))))
 
-(defvar pacmacs-score 0)
 
-(defun pacmacs--make-wall-cell (row column)
-  (list :current-animation (pacmacs-make-anim '((0 0 40 40))
-                                     (pacmacs-create-color-block 40 40 "red"))
-        :row row
-        :column column))
-
-(defvar pacmacs-wall-cells nil)
-(setq pacmacs-wall-cells
-      (mapcar (lambda (n)
-                (pacmacs--make-wall-cell n n))
-              (number-sequence 1 9)))
-
-(defun pacmacs--make-pill (row column)
-  (list :current-animation (pacmacs-load-anim "Pill")
-        :row row
-        :column column))
-
-(defvar pacmacs-pills nil)
-(setq pacmacs-pills
-      (mapcar (lambda (n)
-                (pacmacs--make-pill n (1+ n)))
-              (number-sequence 1 8)))
-
-(defun pacmacs-init-board (width height)
-  (let ((board (make-vector height nil)))
-    (dotimes (row height)
-      (aset board row (make-vector width nil)))
-    board))
 
 (defvar pacmacs-board nil)
-(setq pacmacs-board (pacmacs-init-board pacmacs-board-width
-                                      pacmacs-board-height))
-
-
 (defvar pacmacs-track-board nil)
-(setq pacmacs-track-board (pacmacs-init-board pacmacs-board-width
-                                            pacmacs-board-height))
 
 (define-derived-mode pacmacs-mode special-mode "pacmacs-mode"
   (define-key pacmacs-mode-map (kbd "<up>") 'pacmacs-up)
@@ -149,6 +106,7 @@
   (interactive)
   (switch-to-buffer-other-window pacmacs-buffer-name)
   (pacmacs-mode)
+  (pacmacs-load-map "map01")
   (unless pacmacs-timer
     (setq pacmacs-timer (run-at-time nil (* pacmacs-tick-duration-ms 0.001) 'pacmacs-tick))))
 
@@ -156,6 +114,35 @@
   (when pacmacs-timer
     (cancel-timer pacmacs-timer)
     (setq pacmacs-timer nil)))
+
+(defun pacmacs--make-wall-cell (row column)
+  (list :current-animation (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
+                                              (pacmacs-create-color-block 40 40 "red"))
+        :row row
+        :column column))
+
+(defun pacmacs--make-pill (row column)
+  (list :current-animation (pacmacs-load-anim "Pill")
+        :row row
+        :column column))
+
+(defun pacmacs--make-ghost (row column)
+  (list :row row
+        :column column
+        :direction 'right
+        :current-animation (pacmacs-load-anim "Red-Ghost-Right")
+        :direction-animations (list 'left  (pacmacs-load-anim "Red-Ghost-Left")
+                                    'right (pacmacs-load-anim "Red-Ghost-Right")
+                                    'up    (pacmacs-load-anim "Red-Ghost-Up")
+                                    'down  (pacmacs-load-anim "Red-Ghost-Down"))
+        :speed 1
+        :speed-counter 0))
+
+(defun pacmacs-init-board (width height)
+  (let ((board (make-vector height nil)))
+    (dotimes (row height)
+      (aset board row (make-vector width nil)))
+    board))
 
 (defun pacmacs--kill-buffer-and-its-window (buffer-or-name)
   (let ((buffer-window (get-buffer-window buffer-or-name)))
@@ -222,7 +209,7 @@
       (aset (aref board row) column value))))
 
 (defun pacmacs--possible-ways (row column)
-  (list (cons (1+ row)  column)
+  (list (cons (1+ row) column)
         (cons row (1+ column))
         (cons (1- row) column)
         (cons row (1- column))))
@@ -250,9 +237,9 @@
 
 (defun pacmacs--recalc-track-board ()
   (pacmacs--fill-board pacmacs-track-board
-                      pacmacs-board-width
-                      pacmacs-board-height
-                      nil)
+                       pacmacs-board-width
+                       pacmacs-board-height
+                       nil)
   (plist-bind ((player-row :row)
                (player-column :column))
       pacmacs-player-state
@@ -283,7 +270,8 @@
   (with-current-buffer pacmacs-buffer-name
     (let ((inhibit-read-only t))
       (pacmacs-anim-object-next-frame pacmacs-player-state pacmacs-tick-duration-ms)
-      (pacmacs-anim-object-next-frame pacmacs-ghost-state pacmacs-tick-duration-ms)
+      (dolist (ghost pacmacs-ghosts)
+        (pacmacs-anim-object-next-frame ghost pacmacs-tick-duration-ms))
       (dolist (pill pacmacs-pills)
         (pacmacs-anim-object-next-frame pill pacmacs-tick-duration-ms))
       
@@ -305,8 +293,9 @@
                              pacmacs-pills)))))
 
       (pacmacs--recalc-track-board)
-      (pacmacs--track-object pacmacs-ghost-state)
-      (pacmacs-step-object pacmacs-ghost-state)
+      (dolist (ghost pacmacs-ghosts)
+        (pacmacs--track-object ghost)
+        (pacmacs-step-object ghost))
       
       (erase-buffer)
       (pacmacs-render-state))))
@@ -345,7 +334,8 @@
 (defun pacmacs-render-state ()
   (insert (format "Score: %d\n" pacmacs-score))
 
-  (pacmacs-render-track-board)
+  (when pacmacs-debug-output
+    (pacmacs-render-track-board))
 
   (pacmacs--fill-board pacmacs-board
                       pacmacs-board-width
@@ -357,7 +347,8 @@
   (dolist (pill pacmacs-pills)
     (pacmacs-put-object pill))
 
-  (pacmacs-put-object pacmacs-ghost-state)
+  (dolist (ghost pacmacs-ghosts)
+    (pacmacs-put-object ghost))
   
   (dolist (wall pacmacs-wall-cells)
     (pacmacs-put-object wall))
@@ -397,12 +388,13 @@
     (setq pacmacs-board-height board-height)
 
     (setq pacmacs-board (pacmacs-init-board pacmacs-board-width
-                                          pacmacs-board-height))
+                                            pacmacs-board-height))
     (setq pacmacs-track-board (pacmacs-init-board pacmacs-board-width
-                                                pacmacs-board-height))
+                                                  pacmacs-board-height))
 
     (setq pacmacs-wall-cells nil)
     (setq pacmacs-pills nil)
+    (setq pacmacs-ghosts nil)
 
     (loop
      for line being the element of lines using (index row)
@@ -418,10 +410,7 @@
                         (plist-put pacmacs-player-state :column column))
 
                        ((char-equal x ?g)
-                        (plist-put pacmacs-ghost-state :row row)
-                        (plist-put pacmacs-ghost-state :column column)))))))
-
-(pacmacs-load-map "map01")
+                        (add-to-list 'pacmacs-ghosts (pacmacs--make-ghost row column))))))))
 
 (provide 'pacmacs)
 
