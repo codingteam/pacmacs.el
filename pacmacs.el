@@ -66,29 +66,12 @@
             (cons (cons 0 1) 'down)))
 
 (defvar pacmacs-player-state nil)
-(setq pacmacs-player-state
-      (list :row 0
-            :column 0
-            :direction 'right
-            :current-animation (pacmacs-load-anim "Pacman-Chomping-Right")
-            :direction-animations (list 'left  (pacmacs-load-anim "Pacman-Chomping-Left")
-                                        'right (pacmacs-load-anim "Pacman-Chomping-Right")
-                                        'up    (pacmacs-load-anim "Pacman-Chomping-Up")
-                                        'down  (pacmacs-load-anim "Pacman-Chomping-Down"))
-            :speed 0
-            :speed-counter 0))
 
 (defvar pacmacs-ghosts nil)
 (defvar pacmacs-wall-cells nil)
 (defvar pacmacs-pills nil)
 
 (defvar pacmacs-empty-cell nil)
-(setq pacmacs-empty-cell
-      (list :current-animation
-            (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
-                               (pacmacs-create-transparent-block 40 40))))
-
-
 
 (defvar pacmacs-board nil)
 (defvar pacmacs-track-board nil)
@@ -138,6 +121,18 @@
         :speed 1
         :speed-counter 0))
 
+(defun pacmacs--make-player (row column)
+  (list :row row
+        :column column
+        :direction 'right
+        :current-animation (pacmacs-load-anim "Pacman-Chomping-Right")
+        :direction-animations (list 'left  (pacmacs-load-anim "Pacman-Chomping-Left")
+                                    'right (pacmacs-load-anim "Pacman-Chomping-Right")
+                                    'up    (pacmacs-load-anim "Pacman-Chomping-Up")
+                                    'down  (pacmacs-load-anim "Pacman-Chomping-Down"))
+        :speed 0
+        :speed-counter 0))
+
 (defun pacmacs-init-board (width height)
   (let ((board (make-vector height nil)))
     (dotimes (row height)
@@ -184,6 +179,14 @@
       game-object
     (plist-put game-object :direction direction)
     (plist-put game-object :current-animation (plist-get direction-animations direction))))
+
+(defun pacmacs--make-empty-cell ()
+  (if pacmacs-empty-cell
+      pacmacs-empty-cell
+    (setq pacmacs-empty-cell
+          (list :current-animation
+                (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
+                                   (pacmacs-create-transparent-block 40 40))))))
 
 (defun pacmacs-step-object (game-object)
   (plist-bind ((row :row)
@@ -338,9 +341,9 @@
     (pacmacs-render-track-board))
 
   (pacmacs--fill-board pacmacs-board
-                      pacmacs-board-width
-                      pacmacs-board-height
-                      pacmacs-empty-cell)
+                       pacmacs-board-width
+                       pacmacs-board-height
+                       (pacmacs--make-empty-cell))
 
   (pacmacs-put-object pacmacs-player-state)
 
@@ -406,8 +409,10 @@
                         (add-to-list 'pacmacs-pills (pacmacs--make-pill row column)))
 
                        ((char-equal x ?o)
-                        (plist-put pacmacs-player-state :row row)
-                        (plist-put pacmacs-player-state :column column))
+                        (if (not pacmacs-player-state)
+                            (setq pacmacs-player-state (pacmacs--make-player row column))
+                          (plist-put pacmacs-player-state :row row)
+                          (plist-put pacmacs-player-state :column column)))
 
                        ((char-equal x ?g)
                         (add-to-list 'pacmacs-ghosts (pacmacs--make-ghost row column))))))))
