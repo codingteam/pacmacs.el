@@ -66,17 +66,6 @@
             (cons (cons 0 1) 'down)))
 
 (defvar pacmacs-player-state nil)
-(setq pacmacs-player-state
-      (list :row 0
-            :column 0
-            :direction 'right
-            :current-animation (pacmacs-load-anim "Pacman-Chomping-Right")
-            :direction-animations (list 'left  (pacmacs-load-anim "Pacman-Chomping-Left")
-                                        'right (pacmacs-load-anim "Pacman-Chomping-Right")
-                                        'up    (pacmacs-load-anim "Pacman-Chomping-Up")
-                                        'down  (pacmacs-load-anim "Pacman-Chomping-Down"))
-            :speed 0
-            :speed-counter 0))
 
 (defvar pacmacs-ghosts nil)
 (defvar pacmacs-wall-cells nil)
@@ -87,8 +76,6 @@
       (list :current-animation
             (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
                                (pacmacs-create-transparent-block 40 40))))
-
-
 
 (defvar pacmacs-board nil)
 (defvar pacmacs-track-board nil)
@@ -136,6 +123,18 @@
                                     'up    (pacmacs-load-anim "Red-Ghost-Up")
                                     'down  (pacmacs-load-anim "Red-Ghost-Down"))
         :speed 1
+        :speed-counter 0))
+
+(defun pacmacs--make-player (row column)
+  (list :row row
+        :column column
+        :direction 'right
+        :current-animation (pacmacs-load-anim "Pacman-Chomping-Right")
+        :direction-animations (list 'left  (pacmacs-load-anim "Pacman-Chomping-Left")
+                                    'right (pacmacs-load-anim "Pacman-Chomping-Right")
+                                    'up    (pacmacs-load-anim "Pacman-Chomping-Up")
+                                    'down  (pacmacs-load-anim "Pacman-Chomping-Down"))
+        :speed 0
         :speed-counter 0))
 
 (defun pacmacs-init-board (width height)
@@ -406,8 +405,10 @@
                         (add-to-list 'pacmacs-pills (pacmacs--make-pill row column)))
 
                        ((char-equal x ?o)
-                        (plist-put pacmacs-player-state :row row)
-                        (plist-put pacmacs-player-state :column column))
+                        (if (not pacmacs-player-state)
+                            (setq pacmacs-player-state (pacmacs--make-player row column))
+                          (plist-put pacmacs-player-state :row row)
+                          (plist-put pacmacs-player-state :column column)))
 
                        ((char-equal x ?g)
                         (add-to-list 'pacmacs-ghosts (pacmacs--make-ghost row column))))))))

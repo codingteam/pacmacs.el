@@ -6,6 +6,4 @@
 (undercover "*.el")
 
 (add-to-list 'load-path ".")
-(load "pacmacs-anim.el")
-(load "pacmacs-image.el")
-(load "pacmacs-utils.el")
+(load "pacmacs.el")
