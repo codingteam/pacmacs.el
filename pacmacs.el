@@ -72,10 +72,6 @@
 (defvar pacmacs-pills nil)
 
 (defvar pacmacs-empty-cell nil)
-(setq pacmacs-empty-cell
-      (list :current-animation
-            (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
-                               (pacmacs-create-transparent-block 40 40))))
 
 (defvar pacmacs-board nil)
 (defvar pacmacs-track-board nil)
@@ -183,6 +179,14 @@
       game-object
     (plist-put game-object :direction direction)
     (plist-put game-object :current-animation (plist-get direction-animations direction))))
+
+(defun pacmacs--make-empty-cell ()
+  (if pacmacs-empty-cell
+      pacmacs-empty-cell
+    (setq pacmacs-empty-cell
+          (list :current-animation
+                (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
+                                   (pacmacs-create-transparent-block 40 40))))))
 
 (defun pacmacs-step-object (game-object)
   (plist-bind ((row :row)
@@ -337,9 +341,9 @@
     (pacmacs-render-track-board))
 
   (pacmacs--fill-board pacmacs-board
-                      pacmacs-board-width
-                      pacmacs-board-height
-                      pacmacs-empty-cell)
+                       pacmacs-board-width
+                       pacmacs-board-height
+                       (pacmacs--make-empty-cell))
 
   (pacmacs-put-object pacmacs-player-state)
 
