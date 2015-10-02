@@ -89,7 +89,7 @@
   (interactive)
   (switch-to-buffer-other-window pacmacs-buffer-name)
   (pacmacs-mode)
-  (pacmacs-load-map "map01")
+  (pacmacs-load-map "map02")
   (unless pacmacs-timer
     (setq pacmacs-timer (run-at-time nil (* pacmacs-tick-duration-ms 0.001) 'pacmacs-tick))))
 
@@ -197,11 +197,12 @@
       game-object
     (if (zerop speed-counter)
         (let* ((velocity (plist-get pacmacs-direction-table direction))
-               (new-row (+ row (cdr velocity)))
-               (new-column (+ column (car velocity))))
+               (new-row (mod (+ row (cdr velocity))
+                             pacmacs-board-height))
+               (new-column (mod (+ column (car velocity))
+                                pacmacs-board-width)))
           (plist-put game-object :speed-counter speed)
-          (when (and (pacmacs--within-of-map-p new-row new-column)
-                     (not (pacmacs--wall-at-p new-row new-column)))
+          (when (not (pacmacs--wall-at-p new-row new-column))
             (plist-put game-object :row new-row)
             (plist-put game-object :column new-column)))
       (plist-put game-object :speed-counter (1- speed-counter)))))
