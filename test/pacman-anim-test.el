@@ -16,6 +16,9 @@
                                     (number-sequence 1 4)) 
                     :current-frame 2
                     :duration-counter 0)))
+    (pacmacs-anim-next-frame anim 50)
+    (should (equal 2 (plist-get anim :current-frame)))
+
     (pacmacs-anim-next-frame anim 100)
     (should (equal 3 (plist-get anim :current-frame)))
 
