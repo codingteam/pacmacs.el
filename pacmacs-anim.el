@@ -73,8 +73,8 @@
 (defun pacmacs-convert-aseprite-frame (aseprite-frame)
   (let* ((frame (cdr (assoc 'frame (cdr aseprite-frame))))
          (duration (cdr (assoc 'duration (cdr aseprite-frame)))))
-    (pacmacs-make-frame (mapcar (lambda (n)
-                                 (cdr (assoc n frame)))
+    (pacmacs-make-frame (mapcar #'(lambda (n)
+                                    (cdr (assoc n frame)))
                                '(x y w h))
                        duration)))
 

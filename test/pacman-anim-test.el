@@ -11,8 +11,8 @@
     (should (equal 3 (pacmacs-anim-get-frame anim)))))
 
 (ert-deftest pacmacs-anim-next-frame-test ()
-  (let ((anim (list :frames (mapcar (lambda (x)
-                                      (pacmacs-make-frame (+ 41 x) 100))
+  (let ((anim (list :frames (mapcar #'(lambda (x)
+                                        (pacmacs-make-frame (+ 41 x) 100))
                                     (number-sequence 1 4)) 
                     :current-frame 2
                     :duration-counter 0)))

@@ -154,11 +154,11 @@
 
 (defun pacmacs--object-at-p (row column objects)
   (member (cons row column)
-          (mapcar (lambda (object)
-                    (plist-bind ((row :row)
-                                 (column :column))
-                        object
-                      (cons row column)))
+          (mapcar #'(lambda (object)
+                      (plist-bind ((row :row)
+                                   (column :column))
+                          object
+                        (cons row column)))
                   objects)))
 
 (defun pacmacs--wall-at-p (row column)
@@ -284,12 +284,12 @@
           (when pill
             (setq pacmacs-score (+ pacmacs-score 10))
             (setq pacmacs-pills
-                  (remove-if (lambda (pill)
-                               (plist-bind ((p-row :row)
-                                            (p-column :column))
-                                   pill
-                                 (and (= row p-row)
-                                      (= column p-column))))
+                  (remove-if #'(lambda (pill)
+                                 (plist-bind ((p-row :row)
+                                              (p-column :column))
+                                     pill
+                                   (and (= row p-row)
+                                        (= column p-column))))
                              pacmacs-pills)))))
 
       (pacmacs--recalc-track-board)
