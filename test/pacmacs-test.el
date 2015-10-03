@@ -38,3 +38,17 @@
                               ['left 'right]]))
     (should (not (pacmacs--cell-tracked-p 0 0)))
     (should (pacmacs--cell-tracked-p 1 0))))
+
+(ert-deftest pacmacs--track-point-test ()
+  (let ((pacmacs-board-width 2)
+        (pacmacs-board-height 2)
+        (pacmacs-track-board [[nil nil]
+                              [nil nil]]))
+    (pacmacs--track-point (cons 0 0) (cons 0 1))
+    (should (equal [[right nil]
+                    [nil nil]]
+                   pacmacs-track-board))
+    (pacmacs--track-point (cons 1 0) (cons 1 -1))
+    (should (equal [[right nil]
+                    [left nil]]
+                   pacmacs-track-board))))
