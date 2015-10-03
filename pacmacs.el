@@ -45,8 +45,6 @@
 (defconst pacmacs-tick-duration-ms 100)
 (defconst pacmacs-debug-output nil)
 
-(setq pacmacs-debug-output t)
-
 (defvar pacmacs-timer nil)
 
 (defvar pacmacs-board-width 10)
@@ -237,7 +235,6 @@
 
          (d-row (- end-row start-row))
          (d-column (- end-column start-column)))
-    ;; (insert (format "(%d, %d)\n" d-row d-column))
     (aset (aref pacmacs-track-board (mod start-row pacmacs-board-height))
           (mod start-column pacmacs-board-width)
           (cdr
@@ -255,8 +252,6 @@
       pacmacs-player-state
     (let ((wave (list (cons player-row player-column))))
       (while (not (null wave))
-        ;; (pacmacs-render-track-board)
-        ;; (insert "------------------------------\n")
         (let ((next-wave nil))
           (dolist (p wave)
             (let* ((row (car p))
