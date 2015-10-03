@@ -133,7 +133,7 @@
         :speed 0
         :speed-counter 0))
 
-(defun pacmacs-init-board (width height)
+(defun pacmacs--init-board (width height)
   (let ((board (make-vector height nil)))
     (dotimes (row height)
       (aset board row (make-vector width nil)))
@@ -171,10 +171,6 @@
 (defun pacmacs--cell-tracked-p (row column)
   (aref (aref pacmacs-track-board (mod row pacmacs-board-height))
         (mod column pacmacs-board-width)))
-
-(defun pacmacs--within-of-map-p (row column)
-  (and (<= 0 row (1- pacmacs-board-height))
-       (<= 0 column (1- pacmacs-board-width))))
 
 (defun pacmacs--switch-direction (game-object direction)
   (plist-bind ((direction-animations :direction-animations))
@@ -313,7 +309,7 @@
          (current-frame (plist-get (pacmacs-anim-get-frame anim) :frame)))
     (pacmacs-insert-image sprite-sheet current-frame)))
 
-(defun pacmacs-put-object (anim-object)
+(defun pacmacs--put-object (anim-object)
   (plist-bind ((row :row)
                (column :column))
       anim-object
@@ -349,16 +345,16 @@
                        pacmacs-board-height
                        (pacmacs--make-empty-cell))
 
-  (pacmacs-put-object pacmacs-player-state)
+  (pacmacs--put-object pacmacs-player-state)
 
   (dolist (pill pacmacs-pills)
-    (pacmacs-put-object pill))
+    (pacmacs--put-object pill))
 
   (dolist (ghost pacmacs-ghosts)
-    (pacmacs-put-object ghost))
+    (pacmacs--put-object ghost))
   
   (dolist (wall pacmacs-wall-cells)
-    (pacmacs-put-object wall))
+    (pacmacs--put-object wall))
 
   (dotimes (row pacmacs-board-height)
     (dotimes (column pacmacs-board-width)
@@ -394,10 +390,10 @@
     (setq pacmacs-board-width board-width)
     (setq pacmacs-board-height board-height)
 
-    (setq pacmacs-board (pacmacs-init-board pacmacs-board-width
-                                            pacmacs-board-height))
-    (setq pacmacs-track-board (pacmacs-init-board pacmacs-board-width
-                                                  pacmacs-board-height))
+    (setq pacmacs-board (pacmacs--init-board pacmacs-board-width
+                                             pacmacs-board-height))
+    (setq pacmacs-track-board (pacmacs--init-board pacmacs-board-width
+                                                   pacmacs-board-height))
 
     (setq pacmacs-wall-cells nil)
     (setq pacmacs-pills nil)
