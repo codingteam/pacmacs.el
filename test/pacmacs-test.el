@@ -30,3 +30,11 @@
     (should (not (pacmacs--object-at-p 0 1 objects)))
     (should (pacmacs--object-at-p 0 5 objects))
     (should (not (pacmacs--object-at-p 1 5 objects)))))
+
+(ert-deftest pacmacs--cell-tracked-p-test ()
+  (let ((pacmacs-board-width 2)
+        (pacmacs-board-height 2)
+        (pacmacs-track-board [[nil nil]
+                              ['left 'right]]))
+    (should (not (pacmacs--cell-tracked-p 0 0)))
+    (should (pacmacs--cell-tracked-p 1 0))))
