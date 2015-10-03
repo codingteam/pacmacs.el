@@ -52,3 +52,14 @@
     (should (equal [[right nil]
                     [left nil]]
                    pacmacs-track-board))))
+
+(ert-deftest pacmacs--track-object-test ()
+  (let ((pacmacs-board-width 2)
+        (pacmacs-board-height 2)
+        (pacmacs-track-board [[right down]
+                              [up left]])
+        (game-object (list :row 0
+                           :column 0)))
+    (with-mock
+     (mock (pacmacs--switch-direction (list :row 0 :column 0) 'right) :times 1)
+     (pacmacs--track-object game-object))))
