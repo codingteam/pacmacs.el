@@ -133,7 +133,7 @@
         :speed 0
         :speed-counter 0))
 
-(defun pacmacs-init-board (width height)
+(defun pacmacs--init-board (width height)
   (let ((board (make-vector height nil)))
     (dotimes (row height)
       (aset board row (make-vector width nil)))
@@ -394,10 +394,10 @@
     (setq pacmacs-board-width board-width)
     (setq pacmacs-board-height board-height)
 
-    (setq pacmacs-board (pacmacs-init-board pacmacs-board-width
-                                            pacmacs-board-height))
-    (setq pacmacs-track-board (pacmacs-init-board pacmacs-board-width
-                                                  pacmacs-board-height))
+    (setq pacmacs-board (pacmacs--init-board pacmacs-board-width
+                                             pacmacs-board-height))
+    (setq pacmacs-track-board (pacmacs--init-board pacmacs-board-width
+                                                   pacmacs-board-height))
 
     (setq pacmacs-wall-cells nil)
     (setq pacmacs-pills nil)
