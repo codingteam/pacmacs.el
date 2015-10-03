@@ -172,10 +172,6 @@
   (aref (aref pacmacs-track-board (mod row pacmacs-board-height))
         (mod column pacmacs-board-width)))
 
-(defun pacmacs--within-of-map-p (row column)
-  (and (<= 0 row (1- pacmacs-board-height))
-       (<= 0 column (1- pacmacs-board-width))))
-
 (defun pacmacs--switch-direction (game-object direction)
   (plist-bind ((direction-animations :direction-animations))
       game-object
