@@ -63,3 +63,14 @@
     (with-mock
      (mock (pacmacs--switch-direction (list :row 0 :column 0) 'right) :times 1)
      (pacmacs--track-object game-object))))
+
+(ert-deftest pacmacs--put-object-test ()
+  (let ((pacmacs-board-width 2)
+        (pacmacs-board-height 2)
+        (pacmacs-board [[nil nil]
+                        [nil nil]])
+        (anim-object (list :row 0 :column 1)))
+    (pacmacs--put-object anim-object)
+    (should (equal [[nil (:row 0 :column 1)]
+                    [nil nil]]
+                   pacmacs-board))))

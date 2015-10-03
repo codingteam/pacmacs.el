@@ -309,7 +309,7 @@
          (current-frame (plist-get (pacmacs-anim-get-frame anim) :frame)))
     (pacmacs-insert-image sprite-sheet current-frame)))
 
-(defun pacmacs-put-object (anim-object)
+(defun pacmacs--put-object (anim-object)
   (plist-bind ((row :row)
                (column :column))
       anim-object
@@ -345,16 +345,16 @@
                        pacmacs-board-height
                        (pacmacs--make-empty-cell))
 
-  (pacmacs-put-object pacmacs-player-state)
+  (pacmacs--put-object pacmacs-player-state)
 
   (dolist (pill pacmacs-pills)
-    (pacmacs-put-object pill))
+    (pacmacs--put-object pill))
 
   (dolist (ghost pacmacs-ghosts)
-    (pacmacs-put-object ghost))
+    (pacmacs--put-object ghost))
   
   (dolist (wall pacmacs-wall-cells)
-    (pacmacs-put-object wall))
+    (pacmacs--put-object wall))
 
   (dotimes (row pacmacs-board-height)
     (dotimes (column pacmacs-board-width)
