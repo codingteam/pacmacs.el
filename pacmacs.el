@@ -45,6 +45,8 @@
 (defconst pacmacs-tick-duration-ms 100)
 (defconst pacmacs-debug-output nil)
 
+(setq pacmacs-debug-output t)
+
 (defvar pacmacs-timer nil)
 
 (defvar pacmacs-board-width 10)
@@ -148,7 +150,8 @@
       (kill-buffer buffer-or-name))))
 
 (defun pacmacs--object-at-p (row column objects)
-  (member (cons row column)
+  (member (cons (mod row pacmacs-board-height)
+                (mod column pacmacs-board-width))
           (mapcar #'(lambda (object)
                       (plist-bind ((row :row)
                                    (column :column))
@@ -168,7 +171,8 @@
     (pacmacs--kill-buffer-and-its-window pacmacs-buffer-name)))
 
 (defun pacmacs--cell-tracked-p (row column)
-  (aref (aref pacmacs-track-board row) column))
+  (aref (aref pacmacs-track-board (mod row pacmacs-board-height))
+        (mod column pacmacs-board-width)))
 
 (defun pacmacs--within-of-map-p (row column)
   (and (<= 0 row (1- pacmacs-board-height))
@@ -221,22 +225,24 @@
 (defun pacmacs--filter-candidates (p)
   (let ((row (car p))
         (column (cdr p)))
-    (or (not (pacmacs--within-of-map-p row column))
-        (pacmacs--wall-at-p row column)
+    (or (pacmacs--wall-at-p row column)
         (pacmacs--cell-tracked-p row column))))
 
-(defun pacmacs--track-point (p q)
-  (let* ((p-row (car p))
-         (p-column (cdr p))
+(defun pacmacs--track-point (start end)
+  (let* ((start-row (car start))
+         (start-column (cdr start))
 
-         (q-row (car q))
-         (q-column (cdr q))
+         (end-row (car end))
+         (end-column (cdr end))
 
-         (d-row (- q-row p-row))
-         (d-column (- q-column p-column)))
-    (aset (aref pacmacs-track-board p-row) p-column
+         (d-row (- end-row start-row))
+         (d-column (- end-column start-column)))
+    ;; (insert (format "(%d, %d)\n" d-row d-column))
+    (aset (aref pacmacs-track-board (mod start-row pacmacs-board-height))
+          (mod start-column pacmacs-board-width)
           (cdr
-           (assoc (cons d-column d-row)
+           (assoc (cons d-column
+                        d-row)
                   pacmacs-inversed-direction-table)))))
 
 (defun pacmacs--recalc-track-board ()
@@ -249,6 +255,8 @@
       pacmacs-player-state
     (let ((wave (list (cons player-row player-column))))
       (while (not (null wave))
+        ;; (pacmacs-render-track-board)
+        ;; (insert "------------------------------\n")
         (let ((next-wave nil))
           (dolist (p wave)
             (let* ((row (car p))
