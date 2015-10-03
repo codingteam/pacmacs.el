@@ -5,6 +5,12 @@
 
 Pacman for Emacs
 
+## Requirements ##
+
+- Emacs 24.3+
+- Emacs should have displaying images support
+- Emacs should have the [XPM](https://en.wikipedia.org/wiki/X_PixMap) image format support
+
 ## Usage ##
 
 1. `$ git clone git://github.com/rexim/pacmacs.el.git && cd pacmacs.el`;
@@ -21,11 +27,6 @@ tests:
 
     $ cask # only once to download development dependencies
     $ cask exec ert-runner
-
-## Limitations ##
-
-- Emacs should be compiled with displaying images support
-- Emacs should have the [XPM](https://en.wikipedia.org/wiki/X_PixMap) image format support
 
 ## Licensing ##
 
