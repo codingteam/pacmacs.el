@@ -29,3 +29,15 @@
     (pacmacs--cell-set input-board 1 1 42)
     (should (equal expected-board
                    input-board))))
+
+(ert-deftest pacmacs--object-at-p-test ()
+  (let ((board (list :width 5
+                     :height 4))
+        (objects (-map #'(lambda (x)
+                           (list :row x
+                                 :column x))
+                       (number-sequence 0 3))))
+    (should (pacmacs--object-at-p board 0 0 objects))
+    (should (not (pacmacs--object-at-p board 0 1 objects)))
+    (should (pacmacs--object-at-p board 0 5 objects))
+    (should (not (pacmacs--object-at-p board 1 5 objects)))))

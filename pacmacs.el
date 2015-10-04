@@ -142,21 +142,15 @@
           (kill-buffer-and-window))
       (kill-buffer buffer-or-name))))
 
-(defun pacmacs--object-at-p (row column objects)
-  (member (cons (mod row pacmacs-board-height)
-                (mod column pacmacs-board-width))
-          (mapcar #'(lambda (object)
-                      (plist-bind ((row :row)
-                                   (column :column))
-                          object
-                        (cons row column)))
-                  objects)))
-
 (defun pacmacs--wall-at-p (row column)
-  (pacmacs--object-at-p row column pacmacs-wall-cells))
+  (pacmacs--object-at-p pacmacs-board
+                        row column
+                        pacmacs-wall-cells))
 
 (defun pacmacs--pill-at-p (row column)
-  (pacmacs--object-at-p row column pacmacs-pills))
+  (pacmacs--object-at-p pacmacs-board
+                        row column
+                        pacmacs-pills))
 
 (defun pacmacs-quit ()
   (interactive)

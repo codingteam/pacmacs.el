@@ -57,6 +57,20 @@
           (mod column width)
           value)))
 
+(defun pacmacs--object-at-p (board row column objects)
+  (plist-bind ((width :width)
+               (height :height))
+      board
+    (member (cons (mod row height)
+                  (mod column width))
+            (mapcar #'(lambda (object)
+                        (plist-bind ((row :row)
+                                     (column :column))
+                            object
+                          (cons row column)))
+                    objects))))
+
 (provide 'pacmacs-board)
 
 ;;; pacmacs-board.el ends here
+
