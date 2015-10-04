@@ -38,6 +38,7 @@
 (require 'dash)
 
 (require 'pacmacs-anim)
+(require 'pacmacs-board)
 (require 'pacmacs-image)
 (require 'pacmacs-utils)
 
@@ -50,13 +51,6 @@
 (defvar pacmacs-board-width 10)
 (defvar pacmacs-board-height 10)
 (defvar pacmacs-score 0)
-
-(defvar pacmacs-direction-table nil)
-(setq pacmacs-direction-table
-      (list 'left  (cons -1 0)
-            'right (cons 1 0)
-            'up    (cons 0 -1)
-            'down  (cons 0 1)))
 
 (defvar pacmacs-inversed-direction-table nil)
 (setq pacmacs-inversed-direction-table
@@ -133,12 +127,6 @@
         :speed 0
         :speed-counter 0))
 
-(defun pacmacs--init-board (width height)
-  (let ((board (make-vector height nil)))
-    (dotimes (row height)
-      (aset board row (make-vector width nil)))
-    board))
-
 (defun pacmacs--kill-buffer-and-its-window (buffer-or-name)
   (let ((buffer-window (get-buffer-window buffer-or-name)))
     (if (and buffer-window
@@ -147,21 +135,15 @@
           (kill-buffer-and-window))
       (kill-buffer buffer-or-name))))
 
-(defun pacmacs--object-at-p (row column objects)
-  (member (cons (mod row pacmacs-board-height)
-                (mod column pacmacs-board-width))
-          (mapcar #'(lambda (object)
-                      (plist-bind ((row :row)
-                                   (column :column))
-                          object
-                        (cons row column)))
-                  objects)))
-
 (defun pacmacs--wall-at-p (row column)
-  (pacmacs--object-at-p row column pacmacs-wall-cells))
+  (pacmacs--object-at-p pacmacs-board
+                        row column
+                        pacmacs-wall-cells))
 
 (defun pacmacs--pill-at-p (row column)
-  (pacmacs--object-at-p row column pacmacs-pills))
+  (pacmacs--object-at-p pacmacs-board
+                        row column
+                        pacmacs-pills))
 
 (defun pacmacs-quit ()
   (interactive)
@@ -169,8 +151,7 @@
     (pacmacs--kill-buffer-and-its-window pacmacs-buffer-name)))
 
 (defun pacmacs--cell-tracked-p (row column)
-  (aref (aref pacmacs-track-board (mod row pacmacs-board-height))
-        (mod column pacmacs-board-width)))
+  (pacmacs--cell-get pacmacs-track-board row column))
 
 (defun pacmacs--switch-direction (game-object direction)
   (plist-bind ((direction-animations :direction-animations))
@@ -194,21 +175,14 @@
                (speed :speed))
       game-object
     (if (zerop speed-counter)
-        (let* ((velocity (plist-get pacmacs-direction-table direction))
-               (new-row (mod (+ row (cdr velocity))
-                             pacmacs-board-height))
-               (new-column (mod (+ column (car velocity))
-                                pacmacs-board-width)))
+        (let* ((new-point (pacmacs--step-point pacmacs-board row column direction))
+               (new-row (car new-point))
+               (new-column (cdr new-point)))
           (plist-put game-object :speed-counter speed)
           (when (not (pacmacs--wall-at-p new-row new-column))
             (plist-put game-object :row new-row)
             (plist-put game-object :column new-column)))
       (plist-put game-object :speed-counter (1- speed-counter)))))
-
-(defun pacmacs--fill-board (board width height value)
-  (dotimes (row height)
-    (dotimes (column width)
-      (aset (aref board row) column value))))
 
 (defun pacmacs--possible-ways (row column)
   (list (cons (1+ row) column)
@@ -231,18 +205,15 @@
 
          (d-row (- end-row start-row))
          (d-column (- end-column start-column)))
-    (aset (aref pacmacs-track-board (mod start-row pacmacs-board-height))
-          (mod start-column pacmacs-board-width)
-          (cdr
-           (assoc (cons d-column
-                        d-row)
-                  pacmacs-inversed-direction-table)))))
+    
+    (pacmacs--cell-set pacmacs-track-board
+                       start-row start-column
+                       (cdr
+                        (assoc (cons d-column d-row)
+                               pacmacs-inversed-direction-table)))))
 
 (defun pacmacs--recalc-track-board ()
-  (pacmacs--fill-board pacmacs-track-board
-                       pacmacs-board-width
-                       pacmacs-board-height
-                       nil)
+  (pacmacs--fill-board pacmacs-track-board nil)
   (plist-bind ((player-row :row)
                (player-column :column))
       pacmacs-player-state
@@ -265,7 +236,7 @@
   (plist-bind ((row :row)
                (column :column))
       game-object
-    (let ((direction (aref (aref pacmacs-track-board row) column)))
+    (let ((direction (pacmacs--cell-get pacmacs-track-board row column)))
       (pacmacs--switch-direction game-object direction))))
 
 (defun pacmacs-tick ()
@@ -313,26 +284,27 @@
   (plist-bind ((row :row)
                (column :column))
       anim-object
-    (when (and (<= 0 row) (<= row (1- pacmacs-board-height))
-               (<= 0 column) (<= column (1- pacmacs-board-width)))
-      (aset (aref pacmacs-board row) column anim-object))))
+    (pacmacs--cell-set pacmacs-board row column anim-object)))
 
 (defun pacmacs-render-track-board ()
-  (dotimes (row pacmacs-board-height)
-    (dotimes (column pacmacs-board-width)
-      (let ((x (aref (aref pacmacs-track-board row) column)))
-        (cond
-         ((null x)
-          (insert "."))
-         ((equal x 'left)
-          (insert "<"))
-         ((equal x 'right)
-          (insert ">"))
-         ((equal x 'up)
-          (insert "^"))
-         ((equal x 'down)
-          (insert "v")))))
-    (insert "\n")))
+  (plist-bind ((width :width)
+               (height :height))
+      pacmacs-board
+    (dotimes (row height)
+      (dotimes (column width)
+        (let ((x (pacmacs--cell-get pacmacs-track-board row column)))
+          (cond
+           ((null x)
+            (insert "."))
+           ((equal x 'left)
+            (insert "<"))
+           ((equal x 'right)
+            (insert ">"))
+           ((equal x 'up)
+            (insert "^"))
+           ((equal x 'down)
+            (insert "v")))))
+      (insert "\n"))))
 
 (defun pacmacs-render-state ()
   (insert (format "Score: %d\n" pacmacs-score))
@@ -340,10 +312,7 @@
   (when pacmacs-debug-output
     (pacmacs-render-track-board))
 
-  (pacmacs--fill-board pacmacs-board
-                       pacmacs-board-width
-                       pacmacs-board-height
-                       (pacmacs--make-empty-cell))
+  (pacmacs--fill-board pacmacs-board (pacmacs--make-empty-cell))
 
   (pacmacs--put-object pacmacs-player-state)
 
@@ -356,11 +325,14 @@
   (dolist (wall pacmacs-wall-cells)
     (pacmacs--put-object wall))
 
-  (dotimes (row pacmacs-board-height)
-    (dotimes (column pacmacs-board-width)
-      (let ((anim-object (aref (aref pacmacs-board row) column)))
-        (pacmacs-render-object anim-object)))
-    (insert "\n")))
+  (plist-bind ((width :width)
+               (height :height))
+      pacmacs-board
+    (dotimes (row height)
+      (dotimes (column width)
+        (let ((anim-object (pacmacs--cell-get pacmacs-board row column)))
+          (pacmacs-render-object anim-object)))
+      (insert "\n"))))
 
 (defun pacmacs-up ()
   (interactive)
@@ -390,9 +362,9 @@
     (setq pacmacs-board-width board-width)
     (setq pacmacs-board-height board-height)
 
-    (setq pacmacs-board (pacmacs--init-board pacmacs-board-width
+    (setq pacmacs-board (pacmacs--make-board pacmacs-board-width
                                              pacmacs-board-height))
-    (setq pacmacs-track-board (pacmacs--init-board pacmacs-board-width
+    (setq pacmacs-track-board (pacmacs--make-board pacmacs-board-width
                                                    pacmacs-board-height))
 
     (setq pacmacs-wall-cells nil)
