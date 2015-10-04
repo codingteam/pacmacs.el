@@ -44,7 +44,7 @@
 
 (ert-deftest pacmacs--step-point-test ()
   (let ((board (list :width 3
-                     :heigth 2))
+                     :height 2))
         (row 0)
         (column 0))
     (should (equal (cons 0 1) (pacmacs--step-point board
