@@ -52,12 +52,7 @@
 (defvar pacmacs-board-height 10)
 (defvar pacmacs-score 0)
 
-(defvar pacmacs-direction-table nil)
-(setq pacmacs-direction-table
-      (list 'left  (cons -1 0)
-            'right (cons 1 0)
-            'up    (cons 0 -1)
-            'down  (cons 0 1)))
+
 
 (defvar pacmacs-inversed-direction-table nil)
 (setq pacmacs-inversed-direction-table
@@ -182,11 +177,9 @@
                (speed :speed))
       game-object
     (if (zerop speed-counter)
-        (let* ((velocity (plist-get pacmacs-direction-table direction))
-               (new-row (mod (+ row (cdr velocity))
-                             pacmacs-board-height))
-               (new-column (mod (+ column (car velocity))
-                                pacmacs-board-width)))
+        (let* ((new-point (pacmacs--step-point pacmacs-board row column))
+               (new-row (car new-point))
+               (new-column (cdr new-point)))
           (plist-put game-object :speed-counter speed)
           (when (not (pacmacs--wall-at-p new-row new-column))
             (plist-put game-object :row new-row)

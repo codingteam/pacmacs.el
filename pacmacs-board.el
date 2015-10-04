@@ -32,6 +32,8 @@
 
 ;;; Code:
 
+(require 'pacmacs-utils)
+
 (defun pacmacs--make-board (width height)
   (let ((board (make-vector height nil)))
     (dotimes (row height)
@@ -69,6 +71,16 @@
                             object
                           (cons row column)))
                     objects))))
+
+(defun pacmacs--step-point (board row column direction)
+  (plist-bind ((width :width)
+               (height :heigth))
+      board
+    (let* ((velocity (pacmacs--direction-vector direction))
+           (d-row (car velocity))
+           (d-column (cdr velocity)))
+      (cons (mod (+ row d-row) height)
+            (mod (+ column d-column) width)))))
 
 (provide 'pacmacs-board)
 

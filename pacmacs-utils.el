@@ -50,6 +50,13 @@ side-effects."
     (plist-put plist property
                (funcall transformer value))))
 
+(defun pacmacs--direction-vector (direction)
+  (let ((direction-table (list 'left  (cons  0 -1)
+                               'right (cons  0  1)
+                               'up    (cons -1  0)
+                               'down  (cons  1  0))))
+    (plist-get direction-table direction)))
+
 (provide 'pacmacs-utils)
 
 ;;; pacmacs.el ends here

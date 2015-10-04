@@ -41,3 +41,16 @@
     (should (not (pacmacs--object-at-p board 0 1 objects)))
     (should (pacmacs--object-at-p board 0 5 objects))
     (should (not (pacmacs--object-at-p board 1 5 objects)))))
+
+(ert-deftest pacmacs--step-point-test ()
+  (let ((board (list :width 3
+                     :heigth 2))
+        (row 0)
+        (column 0))
+    (should (equal (cons 0 1) (pacmacs--step-point board
+                                                   row column
+                                                   'right)))
+    (should (equal (cons 0 2) (pacmacs--step-point board
+                                                   row column
+                                                   'left)))))
+
