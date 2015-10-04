@@ -38,6 +38,7 @@
 (require 'dash)
 
 (require 'pacmacs-anim)
+(require 'pacmacs-board)
 (require 'pacmacs-image)
 (require 'pacmacs-utils)
 
@@ -132,12 +133,6 @@
                                     'down  (pacmacs-load-anim "Pacman-Chomping-Down"))
         :speed 0
         :speed-counter 0))
-
-(defun pacmacs--init-board (width height)
-  (let ((board (make-vector height nil)))
-    (dotimes (row height)
-      (aset board row (make-vector width nil)))
-    board))
 
 (defun pacmacs--kill-buffer-and-its-window (buffer-or-name)
   (let ((buffer-window (get-buffer-window buffer-or-name)))
@@ -390,9 +385,9 @@
     (setq pacmacs-board-width board-width)
     (setq pacmacs-board-height board-height)
 
-    (setq pacmacs-board (pacmacs--init-board pacmacs-board-width
+    (setq pacmacs-board (pacmacs--make-board pacmacs-board-width
                                              pacmacs-board-height))
-    (setq pacmacs-track-board (pacmacs--init-board pacmacs-board-width
+    (setq pacmacs-track-board (pacmacs--make-board pacmacs-board-width
                                                    pacmacs-board-height))
 
     (setq pacmacs-wall-cells nil)
