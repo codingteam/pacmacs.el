@@ -36,7 +36,26 @@
   (let ((board (make-vector height nil)))
     (dotimes (row height)
       (aset board row (make-vector width nil)))
-    board))
+    (list :width width
+          :height height
+          :data board)))
+
+(defun pacmacs--cell-get (board row column)
+  (plist-bind ((width :width)
+               (height :height)
+               (data :data))
+      board
+    (aref (aref data (mod row height))
+          (mod column width))))
+
+(defun pacmacs--cell-set (board row column value)
+  (plist-bind ((width :width)
+               (height :height)
+               (data :data))
+      board
+    (aset (aref data (mod row height))
+          (mod column width)
+          value)))
 
 (provide 'pacmacs-board)
 
