@@ -207,12 +207,12 @@
 
          (d-row (- end-row start-row))
          (d-column (- end-column start-column)))
-    (aset (aref pacmacs-track-board (mod start-row pacmacs-board-height))
-          (mod start-column pacmacs-board-width)
-          (cdr
-           (assoc (cons d-column
-                        d-row)
-                  pacmacs-inversed-direction-table)))))
+    
+    (pacmacs--cell-set pacmacs-track-board
+                       start-row start-column
+                       (cdr
+                        (assoc (cons d-column d-row)
+                               pacmacs-inversed-direction-table)))))
 
 (defun pacmacs--recalc-track-board ()
   (pacmacs--fill-board pacmacs-track-board nil)
