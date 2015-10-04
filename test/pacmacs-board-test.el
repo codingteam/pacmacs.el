@@ -54,3 +54,15 @@
                                                    row column
                                                    'left)))))
 
+(ert-deftest pacmacs--fill-board-test ()
+  (let ((input-board (list :width 2
+                           :height 2
+                           :data [[nil nil]
+                                  [nil nil]]))
+        (expected-board (list :width 2
+                              :height 2
+                              :data [[5 5]
+                                     [5 5]])))
+    (pacmacs--fill-board input-board 5)
+    (should (equal expected-board
+                   input-board))))

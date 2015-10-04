@@ -186,11 +186,6 @@
             (plist-put game-object :column new-column)))
       (plist-put game-object :speed-counter (1- speed-counter)))))
 
-(defun pacmacs--fill-board (board width height value)
-  (dotimes (row height)
-    (dotimes (column width)
-      (aset (aref board row) column value))))
-
 (defun pacmacs--possible-ways (row column)
   (list (cons (1+ row) column)
         (cons row (1+ column))
@@ -220,10 +215,7 @@
                   pacmacs-inversed-direction-table)))))
 
 (defun pacmacs--recalc-track-board ()
-  (pacmacs--fill-board pacmacs-track-board
-                       pacmacs-board-width
-                       pacmacs-board-height
-                       nil)
+  (pacmacs--fill-board pacmacs-track-board nil)
   (plist-bind ((player-row :row)
                (player-column :column))
       pacmacs-player-state
@@ -321,10 +313,7 @@
   (when pacmacs-debug-output
     (pacmacs-render-track-board))
 
-  (pacmacs--fill-board pacmacs-board
-                       pacmacs-board-width
-                       pacmacs-board-height
-                       (pacmacs--make-empty-cell))
+  (pacmacs--fill-board pacmacs-board (pacmacs--make-empty-cell))
 
   (pacmacs--put-object pacmacs-player-state)
 

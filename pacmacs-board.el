@@ -82,6 +82,15 @@
       (cons (mod (+ row d-row) height)
             (mod (+ column d-column) width)))))
 
+(defun pacmacs--fill-board (board value)
+  (plist-bind ((width :width)
+               (height :height)
+               (data :data))
+      board
+    (dotimes (row height)
+      (dotimes (column width)
+        (aset (aref data row) column value)))))
+
 (provide 'pacmacs-board)
 
 ;;; pacmacs-board.el ends here

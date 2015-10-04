@@ -1,13 +1,4 @@
 
-(ert-deftest pacmacs--fill-board-test ()
-  (let ((input-board [[nil nil]
-                      [nil nil]])
-        (expected-board [[5 5]
-                         [5 5]]))
-    (pacmacs--fill-board input-board 2 2 5)
-    (should (equal expected-board
-                   input-board))))
-
 (ert-deftest pacmacs--cell-tracked-p-test ()
   (let ((pacmacs-track-board (list :width 2
                                    :height 2
