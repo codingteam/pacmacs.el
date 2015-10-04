@@ -286,9 +286,7 @@
   (plist-bind ((row :row)
                (column :column))
       anim-object
-    (when (and (<= 0 row) (<= row (1- pacmacs-board-height))
-               (<= 0 column) (<= column (1- pacmacs-board-width)))
-      (aset (aref pacmacs-board row) column anim-object))))
+    (pacmacs--cell-set pacmacs-board row column anim-object)))
 
 (defun pacmacs-render-track-board ()
   (dotimes (row pacmacs-board-height)

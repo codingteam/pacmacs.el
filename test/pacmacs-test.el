@@ -33,12 +33,14 @@
      (pacmacs--track-object game-object))))
 
 (ert-deftest pacmacs--put-object-test ()
-  (let ((pacmacs-board-width 2)
-        (pacmacs-board-height 2)
-        (pacmacs-board [[nil nil]
-                        [nil nil]])
+  (let ((pacmacs-board (list :width 2
+                             :height 2
+                             :data [[nil nil]
+                                    [nil nil]]))
         (anim-object (list :row 0 :column 1)))
     (pacmacs--put-object anim-object)
-    (should (equal [[nil (:row 0 :column 1)]
-                    [nil nil]]
+    (should (equal (list :width 2
+                         :height 2
+                         :data [[nil (:row 0 :column 1)]
+                                [nil nil]])
                    pacmacs-board))))
