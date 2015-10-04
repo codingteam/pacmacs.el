@@ -52,8 +52,6 @@
 (defvar pacmacs-board-height 10)
 (defvar pacmacs-score 0)
 
-
-
 (defvar pacmacs-inversed-direction-table nil)
 (setq pacmacs-inversed-direction-table
       (list (cons (cons -1 0) 'left)
@@ -327,11 +325,14 @@
   (dolist (wall pacmacs-wall-cells)
     (pacmacs--put-object wall))
 
-  (dotimes (row pacmacs-board-height)
-    (dotimes (column pacmacs-board-width)
-      (let ((anim-object (aref (aref pacmacs-board row) column)))
-        (pacmacs-render-object anim-object)))
-    (insert "\n")))
+  (plist-bind ((width :width)
+               (height :height))
+      pacmacs-board
+    (dotimes (row height)
+      (dotimes (column width)
+        (let ((anim-object (pacmacs--cell-get pacmacs-board row column)))
+          (pacmacs-render-object anim-object)))
+      (insert "\n"))))
 
 (defun pacmacs-up ()
   (interactive)
