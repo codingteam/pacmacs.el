@@ -158,8 +158,7 @@
     (pacmacs--kill-buffer-and-its-window pacmacs-buffer-name)))
 
 (defun pacmacs--cell-tracked-p (row column)
-  (aref (aref pacmacs-track-board (mod row pacmacs-board-height))
-        (mod column pacmacs-board-width)))
+  (pacmacs--cell-get pacmacs-track-board row column))
 
 (defun pacmacs--switch-direction (game-object direction)
   (plist-bind ((direction-animations :direction-animations))

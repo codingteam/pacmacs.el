@@ -8,13 +8,11 @@
     (should (equal expected-board
                    input-board))))
 
-
-
 (ert-deftest pacmacs--cell-tracked-p-test ()
-  (let ((pacmacs-board-width 2)
-        (pacmacs-board-height 2)
-        (pacmacs-track-board [[nil nil]
-                              ['left 'right]]))
+  (let ((pacmacs-track-board (list :width 2
+                                   :height 2
+                                   :data [[nil nil]
+                                          ['left 'right]])))
     (should (not (pacmacs--cell-tracked-p 0 0)))
     (should (pacmacs--cell-tracked-p 1 0))))
 
