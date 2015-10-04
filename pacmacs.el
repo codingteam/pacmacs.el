@@ -238,7 +238,7 @@
   (plist-bind ((row :row)
                (column :column))
       game-object
-    (let ((direction (aref (aref pacmacs-track-board row) column)))
+    (let ((direction (pacmacs--cell-get pacmacs-track-board row column)))
       (pacmacs--switch-direction game-object direction))))
 
 (defun pacmacs-tick ()

@@ -22,10 +22,10 @@
                    (plist-get pacmacs-track-board :data)))))
 
 (ert-deftest pacmacs--track-object-test ()
-  (let ((pacmacs-board-width 2)
-        (pacmacs-board-height 2)
-        (pacmacs-track-board [[right down]
-                              [up left]])
+  (let ((pacmacs-track-board (list :width 2
+                                   :height 2
+                                   :data [[right down]
+                                          [up left]]))
         (game-object (list :row 0
                            :column 0)))
     (with-mock
