@@ -74,7 +74,7 @@
 
 (defun pacmacs--step-point (board row column direction)
   (plist-bind ((width :width)
-               (height :heigth))
+               (height :height))
       board
     (let* ((velocity (pacmacs--direction-vector direction))
            (d-row (car velocity))

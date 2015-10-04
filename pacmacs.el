@@ -175,7 +175,7 @@
                (speed :speed))
       game-object
     (if (zerop speed-counter)
-        (let* ((new-point (pacmacs--step-point pacmacs-board row column))
+        (let* ((new-point (pacmacs--step-point pacmacs-board row column direction))
                (new-row (car new-point))
                (new-column (cdr new-point)))
           (plist-put game-object :speed-counter speed)
