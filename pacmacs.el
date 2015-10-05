@@ -70,6 +70,8 @@
 (defvar pacmacs-board nil)
 (defvar pacmacs-track-board nil)
 
+(defvar pacmacs-game-state 'play)
+
 (define-derived-mode pacmacs-mode special-mode "pacmacs-mode"
   (define-key pacmacs-mode-map (kbd "<up>") 'pacmacs-up)
   (define-key pacmacs-mode-map (kbd "<down>") 'pacmacs-down)
@@ -83,7 +85,7 @@
   (interactive)
   (switch-to-buffer-other-window pacmacs-buffer-name)
   (pacmacs-mode)
-  (pacmacs-load-map "map02")
+  (pacmacs-load-map "map05")
   (unless pacmacs-timer
     (setq pacmacs-timer (run-at-time nil (* pacmacs-tick-duration-ms 0.001) 'pacmacs-tick))))
 
@@ -106,6 +108,8 @@
 (defun pacmacs--make-ghost (row column)
   (list :row row
         :column column
+        :init-row row
+        :init-column column
         :direction 'right
         :current-animation (pacmacs-load-anim "Red-Ghost-Right")
         :direction-animations (list 'left  (pacmacs-load-anim "Red-Ghost-Left")
@@ -118,6 +122,8 @@
 (defun pacmacs--make-player (row column)
   (list :row row
         :column column
+        :init-row row
+        :init-column column
         :direction 'right
         :current-animation (pacmacs-load-anim "Pacman-Chomping-Right")
         :direction-animations (list 'left  (pacmacs-load-anim "Pacman-Chomping-Left")
@@ -126,6 +132,13 @@
                                     'down  (pacmacs-load-anim "Pacman-Chomping-Down"))
         :speed 0
         :speed-counter 0))
+
+(defun pacmacs--reset-object-position (game-object)
+  (plist-bind ((init-row :init-row)
+               (init-column :init-column))
+      game-object
+    (plist-put game-object :row init-row)
+    (plist-put game-object :column init-column)))
 
 (defun pacmacs--kill-buffer-and-its-window (buffer-or-name)
   (let ((buffer-window (get-buffer-window buffer-or-name)))
@@ -144,6 +157,11 @@
   (pacmacs--object-at-p pacmacs-board
                         row column
                         pacmacs-pills))
+
+(defun pacmacs--ghost-at-p (row column)
+  (pacmacs--object-at-p pacmacs-board
+                        row column
+                        pacmacs-ghosts))
 
 (defun pacmacs-quit ()
   (interactive)
@@ -243,36 +261,55 @@
   (interactive)
   (with-current-buffer pacmacs-buffer-name
     (let ((inhibit-read-only t))
-      (pacmacs-anim-object-next-frame pacmacs-player-state pacmacs-tick-duration-ms)
-      (dolist (ghost pacmacs-ghosts)
-        (pacmacs-anim-object-next-frame ghost pacmacs-tick-duration-ms))
-      (dolist (pill pacmacs-pills)
-        (pacmacs-anim-object-next-frame pill pacmacs-tick-duration-ms))
-      
-      (pacmacs-step-object pacmacs-player-state)
 
-      (plist-bind ((row :row)
-                   (column :column))
-          pacmacs-player-state
-        (let ((pill (pacmacs--pill-at-p row column)))
-          (when pill
-            (setq pacmacs-score (+ pacmacs-score 10))
-            (setq pacmacs-pills
-                  (remove-if #'(lambda (pill)
-                                 (plist-bind ((p-row :row)
-                                              (p-column :column))
-                                     pill
-                                   (and (= row p-row)
-                                        (= column p-column))))
-                             pacmacs-pills)))))
+      (cond
+       ((equal pacmacs-game-state 'play)
+        (pacmacs-play-state-logic))
+       ((equal pacmacs-game-state 'death)
+        (pacmacs-death-state-logic)))
 
-      (pacmacs--recalc-track-board)
-      (dolist (ghost pacmacs-ghosts)
-        (pacmacs--track-object ghost)
-        (pacmacs-step-object ghost))
-      
       (erase-buffer)
       (pacmacs-render-state))))
+
+(defun pacmacs-play-state-logic ()
+  (pacmacs-anim-object-next-frame pacmacs-player-state pacmacs-tick-duration-ms)
+  (dolist (ghost pacmacs-ghosts)
+    (pacmacs-anim-object-next-frame ghost pacmacs-tick-duration-ms))
+  (dolist (pill pacmacs-pills)
+    (pacmacs-anim-object-next-frame pill pacmacs-tick-duration-ms))
+  
+  (pacmacs-step-object pacmacs-player-state)
+  (pacmacs--recalc-track-board)
+  (dolist (ghost pacmacs-ghosts)
+    (pacmacs--track-object ghost)
+    (pacmacs-step-object ghost))
+
+  (plist-bind ((row :row)
+               (column :column))
+      pacmacs-player-state
+    (-when-let (pill (pacmacs--pill-at-p row column))
+      (setq pacmacs-score (+ pacmacs-score 10))
+      (setq pacmacs-pills
+            (remove-if #'(lambda (pill)
+                           (plist-bind ((p-row :row)
+                                        (p-column :column))
+                               pill
+                             (and (= row p-row)
+                                  (= column p-column))))
+                       pacmacs-pills)))
+
+    (-when-let (ghost (pacmacs--ghost-at-p row column))
+      (pacmacs--switch-to-death-state))))
+
+
+(defun pacmacs-death-state-logic ()
+  (pacmacs-anim-object-next-frame pacmacs-player-state
+                                  pacmacs-tick-duration-ms)
+  (when (= 0 (plist-get
+              (plist-get pacmacs-player-state
+                         :current-animation)
+              :current-frame))
+    (pacmacs--switch-to-play-state)))
 
 (defun pacmacs-render-object (anim-object)
   (let* ((anim (plist-get anim-object :current-animation))
@@ -285,6 +322,18 @@
                (column :column))
       anim-object
     (pacmacs--cell-set pacmacs-board row column anim-object)))
+
+(defun pacmacs--switch-to-death-state ()
+  (setq pacmacs-game-state 'death)
+  (plist-put pacmacs-player-state :current-animation
+             (pacmacs-load-anim "Pacman-Death")))
+
+(defun pacmacs--switch-to-play-state ()
+  (setq pacmacs-game-state 'play)
+  (pacmacs--reset-object-position pacmacs-player-state)
+  (dolist (ghost pacmacs-ghosts)
+    (pacmacs--reset-object-position ghost))
+  (pacmacs--switch-direction pacmacs-player-state 'right))
 
 (defun pacmacs-render-track-board ()
   (plist-bind ((width :width)
@@ -314,13 +363,13 @@
 
   (pacmacs--fill-board pacmacs-board (pacmacs--make-empty-cell))
 
-  (pacmacs--put-object pacmacs-player-state)
-
   (dolist (pill pacmacs-pills)
     (pacmacs--put-object pill))
 
   (dolist (ghost pacmacs-ghosts)
     (pacmacs--put-object ghost))
+
+  (pacmacs--put-object pacmacs-player-state)
   
   (dolist (wall pacmacs-wall-cells)
     (pacmacs--put-object wall))
@@ -336,19 +385,23 @@
 
 (defun pacmacs-up ()
   (interactive)
-  (pacmacs--switch-direction pacmacs-player-state 'up))
+  (when (equal pacmacs-game-state 'play)
+    (pacmacs--switch-direction pacmacs-player-state 'up)))
 
 (defun pacmacs-down ()
   (interactive)
-  (pacmacs--switch-direction pacmacs-player-state 'down))
+  (when (equal pacmacs-game-state 'play)
+    (pacmacs--switch-direction pacmacs-player-state 'down)))
 
 (defun pacmacs-left ()
   (interactive)
-  (pacmacs--switch-direction pacmacs-player-state 'left))
+  (when (equal pacmacs-game-state 'play)
+    (pacmacs--switch-direction pacmacs-player-state 'left)))
 
 (defun pacmacs-right ()
   (interactive)
-  (pacmacs--switch-direction pacmacs-player-state 'right))
+  (when (equal pacmacs-game-state 'play)
+    (pacmacs--switch-direction pacmacs-player-state 'right)))
 
 (defun pacmacs--file-content (filename)
   (with-temp-buffer
@@ -381,13 +434,12 @@
                         (add-to-list 'pacmacs-pills (pacmacs--make-pill row column)))
 
                        ((char-equal x ?o)
-                        (if (not pacmacs-player-state)
-                            (setq pacmacs-player-state (pacmacs--make-player row column))
-                          (plist-put pacmacs-player-state :row row)
-                          (plist-put pacmacs-player-state :column column)))
+                        (setq pacmacs-player-state (pacmacs--make-player row column)))
 
                        ((char-equal x ?g)
-                        (add-to-list 'pacmacs-ghosts (pacmacs--make-ghost row column))))))))
+                        (add-to-list 'pacmacs-ghosts (pacmacs--make-ghost row column))))))
+
+    (pacmacs--switch-to-play-state)))
 
 (provide 'pacmacs)
 
