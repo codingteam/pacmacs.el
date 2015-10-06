@@ -44,7 +44,8 @@
 
 (defconst pacmacs-buffer-name "*Pacmacs*")
 (defconst pacmacs-tick-duration-ms 100)
-(defconst pacmacs-debug-output nil)
+
+(defvar pacmacs-debug-output nil)
 
 (defvar pacmacs-timer nil)
 
@@ -271,19 +272,12 @@
       (erase-buffer)
       (pacmacs-render-state))))
 
-(defun pacmacs-play-state-logic ()
-  (pacmacs-anim-object-next-frame pacmacs-player-state pacmacs-tick-duration-ms)
-  (dolist (ghost pacmacs-ghosts)
-    (pacmacs-anim-object-next-frame ghost pacmacs-tick-duration-ms))
-  (dolist (pill pacmacs-pills)
-    (pacmacs-anim-object-next-frame pill pacmacs-tick-duration-ms))
-  
-  (pacmacs-step-object pacmacs-player-state)
-  (pacmacs--recalc-track-board)
+(defun pacmacs--step-ghosts ()
   (dolist (ghost pacmacs-ghosts)
     (pacmacs--track-object ghost)
-    (pacmacs-step-object ghost))
+    (pacmacs-step-object ghost)))
 
+(defun pacmacs--detect-pill-collision ()
   (plist-bind ((row :row)
                (column :column))
       pacmacs-player-state
@@ -296,11 +290,30 @@
                                pill
                              (and (= row p-row)
                                   (= column p-column))))
-                       pacmacs-pills)))
+                       pacmacs-pills)))))
 
+(defun pacmacs--detect-ghost-collision ()
+  (plist-bind ((row :row)
+               (column :column))
+      pacmacs-player-state
     (-when-let (ghost (pacmacs--ghost-at-p row column))
       (pacmacs--switch-to-death-state))))
 
+(defun pacmacs-play-state-logic ()
+  (pacmacs-anim-object-next-frame pacmacs-player-state pacmacs-tick-duration-ms)
+  (dolist (ghost pacmacs-ghosts)
+    (pacmacs-anim-object-next-frame ghost pacmacs-tick-duration-ms))
+  (dolist (pill pacmacs-pills)
+    (pacmacs-anim-object-next-frame pill pacmacs-tick-duration-ms))
+
+  (pacmacs--recalc-track-board)
+  (pacmacs--detect-ghost-collision)
+  (when (equal pacmacs-game-state 'play)
+    (pacmacs-step-object pacmacs-player-state)
+    (pacmacs--detect-pill-collision)
+    (pacmacs--detect-ghost-collision)
+    (when (equal pacmacs-game-state 'play)
+      (pacmacs--step-ghosts))))
 
 (defun pacmacs-death-state-logic ()
   (pacmacs-anim-object-next-frame pacmacs-player-state
