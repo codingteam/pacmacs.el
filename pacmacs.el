@@ -73,6 +73,9 @@
 
 (defvar pacmacs-game-state 'play)
 
+(defvar pacmacs-lives 3)
+(defvar pacmacs-live-icon nil)
+
 (define-derived-mode pacmacs-mode special-mode "pacmacs-mode"
   (define-key pacmacs-mode-map (kbd "<up>") 'pacmacs-up)
   (define-key pacmacs-mode-map (kbd "<down>") 'pacmacs-down)
@@ -87,6 +90,7 @@
   (switch-to-buffer-other-window pacmacs-buffer-name)
   (pacmacs-mode)
   (pacmacs-load-map "map05")
+  (setq pacmacs-lives 3)
   (unless pacmacs-timer
     (setq pacmacs-timer (run-at-time nil (* pacmacs-tick-duration-ms 0.001) 'pacmacs-tick))))
 
@@ -177,6 +181,13 @@
       game-object
     (plist-put game-object :direction direction)
     (plist-put game-object :current-animation (plist-get direction-animations direction))))
+
+(defun pacmacs--render-live-icon ()
+  (when (not pacmacs-live-icon)
+    (setq pacmacs-live-icon
+          (pacmacs-load-anim "Pacman-Chomping-Right"))
+    (plist-put pacmacs-live-icon :current-frame 2))
+  (pacmacs-render-anim pacmacs-live-icon))
 
 (defun pacmacs--make-empty-cell ()
   (if pacmacs-empty-cell
@@ -318,17 +329,21 @@
 (defun pacmacs-death-state-logic ()
   (pacmacs-anim-object-next-frame pacmacs-player-state
                                   pacmacs-tick-duration-ms)
+  
   (when (= 0 (plist-get
               (plist-get pacmacs-player-state
                          :current-animation)
               :current-frame))
     (pacmacs--switch-to-play-state)))
 
-(defun pacmacs-render-object (anim-object)
-  (let* ((anim (plist-get anim-object :current-animation))
-         (sprite-sheet (plist-get anim :sprite-sheet))
+(defun pacmacs-render-anim (anim)
+  (let* ((sprite-sheet (plist-get anim :sprite-sheet))
          (current-frame (plist-get (pacmacs-anim-get-frame anim) :frame)))
     (pacmacs-insert-image sprite-sheet current-frame)))
+
+(defun pacmacs-render-object (anim-object)
+  (let* ((anim (plist-get anim-object :current-animation)))
+    (pacmacs-render-anim anim)))
 
 (defun pacmacs--put-object (anim-object)
   (plist-bind ((row :row)
@@ -338,6 +353,7 @@
 
 (defun pacmacs--switch-to-death-state ()
   (setq pacmacs-game-state 'death)
+  (decf pacmacs-lives)
   (plist-put pacmacs-player-state :current-animation
              (pacmacs-load-anim "Pacman-Death")))
 
@@ -394,7 +410,9 @@
       (dotimes (column width)
         (let ((anim-object (pacmacs--cell-get pacmacs-board row column)))
           (pacmacs-render-object anim-object)))
-      (insert "\n"))))
+      (insert "\n")))
+  (dotimes (i pacmacs-lives)
+    (pacmacs--render-live-icon)))
 
 (defun pacmacs-up ()
   (interactive)
