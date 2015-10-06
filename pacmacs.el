@@ -411,6 +411,7 @@
         (let ((anim-object (pacmacs--cell-get pacmacs-board row column)))
           (pacmacs-render-object anim-object)))
       (insert "\n")))
+  (insert "\n")
   (dotimes (i pacmacs-lives)
     (pacmacs--render-live-icon)))
 
