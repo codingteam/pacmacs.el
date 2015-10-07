@@ -76,6 +76,10 @@
 (defvar pacmacs-lives 3)
 (defvar pacmacs-life-icon nil)
 
+(defvar pacmacs-levels ["map01" "map02" "map03"
+                        "map04" "map05" "map06"])
+(defvar pacmacs-current-level 0)
+
 (define-derived-mode pacmacs-mode special-mode "pacmacs-mode"
   (define-key pacmacs-mode-map (kbd "<up>") 'pacmacs-up)
   (define-key pacmacs-mode-map (kbd "<down>") 'pacmacs-down)
@@ -89,8 +93,11 @@
   (interactive)
   (switch-to-buffer-other-window pacmacs-buffer-name)
   (pacmacs-mode)
-  (pacmacs-load-map "map05")
+
   (setq pacmacs-lives 3)
+  (setq pacmacs-current-level 0)
+  (pacmacs--load-current-level)
+
   (unless pacmacs-timer
     (setq pacmacs-timer (run-at-time nil (* pacmacs-tick-duration-ms 0.001) 'pacmacs-tick))))
 
@@ -98,6 +105,14 @@
   (when pacmacs-timer
     (cancel-timer pacmacs-timer)
     (setq pacmacs-timer nil)))
+
+(defun pacmacs--load-current-level ()
+  (pacmacs-load-map (aref pacmacs-levels
+                          pacmacs-current-level)))
+(defun pacmacs--switch-to-next-level ()
+  (setq pacmacs-current-level
+        (mod (1+ pacmacs-current-level)
+             (length pacmacs-levels))))
 
 (defun pacmacs--make-wall-cell (row column)
   (list :current-animation (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
@@ -322,9 +337,13 @@
   (when (equal pacmacs-game-state 'play)
     (pacmacs-step-object pacmacs-player-state)
     (pacmacs--detect-pill-collision)
-    (pacmacs--detect-ghost-collision)
-    (when (equal pacmacs-game-state 'play)
-      (pacmacs--step-ghosts))))
+    (if pacmacs-pills
+        (progn
+          (pacmacs--detect-ghost-collision)
+          (when (equal pacmacs-game-state 'play)
+            (pacmacs--step-ghosts)))
+      (pacmacs--switch-to-next-level)
+      (pacmacs--load-current-level))))
 
 (defun pacmacs-death-state-logic ()
   (pacmacs-anim-object-next-frame pacmacs-player-state
