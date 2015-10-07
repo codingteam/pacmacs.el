@@ -340,16 +340,16 @@
     (pacmacs-anim-object-next-frame pill pacmacs-tick-duration-ms))
 
   (pacmacs--recalc-track-board)
-  (if (pacmacs--ghost-collision-p)
-      (pacmacs--switch-to-death-state)
-    (pacmacs-step-object pacmacs-player-state)
-    (pacmacs--detect-pill-collision)
-    (if pacmacs-pills
+  (if pacmacs-pills
+      (if (pacmacs--ghost-collision-p)
+          (pacmacs--switch-to-death-state)
+        (pacmacs-step-object pacmacs-player-state)
+        (pacmacs--detect-pill-collision)
         (if (pacmacs--ghost-collision-p)
             (pacmacs--switch-to-death-state)
-          (pacmacs--step-ghosts))
-      (pacmacs--load-next-level)
-      (pacmacs--switch-to-prepare-state))))
+          (pacmacs--step-ghosts)))
+    (pacmacs--load-next-level)
+    (pacmacs--switch-to-prepare-state)))
 
 (defun pacmacs-death-state-logic ()
   (pacmacs-anim-object-next-frame pacmacs-player-state
