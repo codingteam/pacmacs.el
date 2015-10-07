@@ -71,6 +71,7 @@
 (defvar pacmacs-board nil)
 (defvar pacmacs-track-board nil)
 
+;;; play death prepare
 (defvar pacmacs-game-state 'play)
 
 (defvar pacmacs-lives 3)
@@ -79,6 +80,8 @@
 (defvar pacmacs-levels ["map01" "map02" "map03"
                         "map04" "map05" "map06"])
 (defvar pacmacs-current-level 0)
+
+(defvar pacmacs-prepare-time-counter 0)
 
 (define-derived-mode pacmacs-mode special-mode "pacmacs-mode"
   (define-key pacmacs-mode-map (kbd "<up>") 'pacmacs-up)
@@ -97,6 +100,7 @@
   (setq pacmacs-lives 3)
   (setq pacmacs-current-level 0)
   (pacmacs--load-current-level)
+  (pacmacs--switch-to-play-state)
 
   (unless pacmacs-timer
     (setq pacmacs-timer (run-at-time nil (* pacmacs-tick-duration-ms 0.001) 'pacmacs-tick))))
@@ -109,6 +113,7 @@
 (defun pacmacs--load-current-level ()
   (pacmacs-load-map (aref pacmacs-levels
                           pacmacs-current-level)))
+
 (defun pacmacs--switch-to-next-level ()
   (setq pacmacs-current-level
         (mod (1+ pacmacs-current-level)
@@ -293,7 +298,9 @@
        ((equal pacmacs-game-state 'play)
         (pacmacs-play-state-logic))
        ((equal pacmacs-game-state 'death)
-        (pacmacs-death-state-logic)))
+        (pacmacs-death-state-logic))
+       ((equal pacmacs-game-state 'prepare)
+        (pacmacs-prepare-state-logic)))
 
       (erase-buffer)
       (pacmacs-render-state))))
@@ -343,7 +350,8 @@
           (when (equal pacmacs-game-state 'play)
             (pacmacs--step-ghosts)))
       (pacmacs--switch-to-next-level)
-      (pacmacs--load-current-level))))
+      (pacmacs--load-current-level)
+      (pacmacs--switch-to-prepare-state))))
 
 (defun pacmacs-death-state-logic ()
   (pacmacs-anim-object-next-frame pacmacs-player-state
@@ -354,6 +362,12 @@
                          :current-animation)
               :current-frame))
     (pacmacs--switch-to-play-state)))
+
+(defun pacmacs-prepare-state-logic ()
+  (if (<= pacmacs-prepare-time-counter 0)
+      (pacmacs--switch-to-play-state)
+    (decf pacmacs-prepare-time-counter
+          pacmacs-tick-duration-ms)))
 
 (defun pacmacs-render-anim (anim)
   (let* ((sprite-sheet (plist-get anim :sprite-sheet))
@@ -382,6 +396,10 @@
   (dolist (ghost pacmacs-ghosts)
     (pacmacs--reset-object-position ghost))
   (pacmacs--switch-direction pacmacs-player-state 'right))
+
+(defun pacmacs--switch-to-prepare-state ()
+  (setq pacmacs-game-state 'prepare)
+  (setq pacmacs-prepare-time-counter 1000))
 
 (defun pacmacs-render-track-board ()
   (plist-bind ((width :width)
@@ -488,9 +506,7 @@
                         (setq pacmacs-player-state (pacmacs--make-player row column)))
 
                        ((char-equal x ?g)
-                        (add-to-list 'pacmacs-ghosts (pacmacs--make-ghost row column))))))
-
-    (pacmacs--switch-to-play-state)))
+                        (add-to-list 'pacmacs-ghosts (pacmacs--make-ghost row column))))))))
 
 (provide 'pacmacs)
 
