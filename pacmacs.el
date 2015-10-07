@@ -326,7 +326,7 @@
                                   (= column p-column))))
                        pacmacs-pills)))))
 
-(defun pacmacs--detect-ghost-collision ()
+(defun pacmacs--ghost-collision-p ()
   (plist-bind ((row :row)
                (column :column))
       pacmacs-player-state
@@ -340,12 +340,12 @@
     (pacmacs-anim-object-next-frame pill pacmacs-tick-duration-ms))
 
   (pacmacs--recalc-track-board)
-  (if (pacmacs--detect-ghost-collision)
+  (if (pacmacs--ghost-collision-p)
       (pacmacs--switch-to-death-state)
     (pacmacs-step-object pacmacs-player-state)
     (pacmacs--detect-pill-collision)
     (if pacmacs-pills
-        (if (pacmacs--detect-ghost-collision)
+        (if (pacmacs--ghost-collision-p)
             (pacmacs--switch-to-death-state)
           (pacmacs--step-ghosts))
       (pacmacs--load-next-level)
