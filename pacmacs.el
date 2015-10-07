@@ -98,6 +98,7 @@
   (pacmacs-mode)
 
   (setq pacmacs-lives 3)
+  (setq pacmacs-score 0)
   (setq pacmacs-current-level 0)
   (pacmacs--load-current-level)
   (pacmacs--switch-to-play-state)
