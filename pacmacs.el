@@ -114,10 +114,11 @@
   (pacmacs-load-map (aref pacmacs-levels
                           pacmacs-current-level)))
 
-(defun pacmacs--switch-to-next-level ()
+(defun pacmacs--load-next-level ()
   (setq pacmacs-current-level
         (mod (1+ pacmacs-current-level)
-             (length pacmacs-levels))))
+             (length pacmacs-levels)))
+  (pacmacs--load-current-level))
 
 (defun pacmacs--make-wall-cell (row column)
   (list :current-animation (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
@@ -349,8 +350,7 @@
           (pacmacs--detect-ghost-collision)
           (when (equal pacmacs-game-state 'play)
             (pacmacs--step-ghosts)))
-      (pacmacs--switch-to-next-level)
-      (pacmacs--load-current-level)
+      (pacmacs--load-next-level)
       (pacmacs--switch-to-prepare-state))))
 
 (defun pacmacs-death-state-logic ()
