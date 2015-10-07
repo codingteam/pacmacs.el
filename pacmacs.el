@@ -74,7 +74,7 @@
 (defvar pacmacs-game-state 'play)
 
 (defvar pacmacs-lives 3)
-(defvar pacmacs-live-icon nil)
+(defvar pacmacs-life-icon nil)
 
 (define-derived-mode pacmacs-mode special-mode "pacmacs-mode"
   (define-key pacmacs-mode-map (kbd "<up>") 'pacmacs-up)
@@ -182,12 +182,12 @@
     (plist-put game-object :direction direction)
     (plist-put game-object :current-animation (plist-get direction-animations direction))))
 
-(defun pacmacs--render-live-icon ()
-  (when (not pacmacs-live-icon)
-    (setq pacmacs-live-icon
+(defun pacmacs--render-life-icon ()
+  (when (not pacmacs-life-icon)
+    (setq pacmacs-life-icon
           (pacmacs-load-anim "Pacman-Chomping-Right"))
-    (plist-put pacmacs-live-icon :current-frame 2))
-  (pacmacs-render-anim pacmacs-live-icon))
+    (plist-put pacmacs-life-icon :current-frame 2))
+  (pacmacs-render-anim pacmacs-life-icon))
 
 (defun pacmacs--make-empty-cell ()
   (if pacmacs-empty-cell
@@ -413,7 +413,7 @@
       (insert "\n")))
   (insert "\n")
   (dotimes (i pacmacs-lives)
-    (pacmacs--render-live-icon)))
+    (pacmacs--render-life-icon)))
 
 (defun pacmacs-up ()
   (interactive)
