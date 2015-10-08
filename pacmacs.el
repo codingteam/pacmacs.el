@@ -59,7 +59,7 @@
 (defvar pacmacs-wall-cells nil)
 (defvar pacmacs-pills nil)
 
-(defvar pacmacs-empty-cell nil)
+(defvar pacmacs--empty-cell nil)
 
 (defvar pacmacs-board nil)
 (defvar pacmacs-track-board nil)
@@ -205,13 +205,10 @@
     (plist-put pacmacs-life-icon :current-frame 2))
   (pacmacs-render-anim pacmacs-life-icon))
 
-(defun pacmacs--make-empty-cell ()
-  (if pacmacs-empty-cell
-      pacmacs-empty-cell
-    (setq pacmacs-empty-cell
-          (list :current-animation
-                (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
-                                   (pacmacs-create-transparent-block 40 40))))))
+(defun pacmacs--render-empty-cell ()
+  (when (not pacmacs--empty-cell)
+    (setq pacmacs--empty-cell (pacmacs-create-transparent-block 40 40)))
+  (pacmacs-insert-image pacmacs--empty-cell '(0 0 40 40)))
 
 (defun pacmacs-step-object (game-object)
   (plist-bind ((row :row)
@@ -371,8 +368,10 @@
     (pacmacs-insert-image sprite-sheet current-frame)))
 
 (defun pacmacs-render-object (anim-object)
-  (let* ((anim (plist-get anim-object :current-animation)))
-    (pacmacs-render-anim anim)))
+  (if anim-object
+      (let* ((anim (plist-get anim-object :current-animation)))
+        (pacmacs-render-anim anim))
+    (pacmacs--render-empty-cell)))
 
 (defun pacmacs--put-object (anim-object)
   (when anim-object
@@ -432,7 +431,7 @@
   (when pacmacs-debug-output
     (pacmacs-render-track-board))
 
-  (pacmacs--fill-board pacmacs-board (pacmacs--make-empty-cell))
+  (pacmacs--fill-board pacmacs-board nil)
 
   (dolist (pill pacmacs-pills)
     (pacmacs--put-object pill))
