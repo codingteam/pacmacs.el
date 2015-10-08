@@ -83,11 +83,12 @@
   (define-key pacmacs-mode-map (kbd "<right>") 'pacmacs-right)
   (define-key pacmacs-mode-map (kbd "q") 'pacmacs-quit)
   (add-hook 'kill-buffer-hook 'pacmacs-destroy nil t)
-  (setq cursor-type nil))
+  (setq cursor-type nil)
+  (setq truncate-lines t))
 
 (defun pacmacs-start ()
   (interactive)
-  (switch-to-buffer-other-window pacmacs-buffer-name)
+  (switch-to-buffer pacmacs-buffer-name)
   (pacmacs-mode)
 
   (setq pacmacs-lives 3)
@@ -354,7 +355,9 @@
               (plist-get pacmacs-player-state
                          :current-animation)
               :current-frame))
-    (pacmacs--switch-to-play-state)))
+    (if (<= pacmacs-lives 0)
+        (pacmacs--switch-to-game-over-state)
+      (pacmacs--switch-to-play-state))))
 
 (defun pacmacs-waiting-logic (switcher)
   (if (<= pacmacs-waiting-counter 0)
@@ -372,16 +375,21 @@
     (pacmacs-render-anim anim)))
 
 (defun pacmacs--put-object (anim-object)
-  (plist-bind ((row :row)
-               (column :column))
-      anim-object
-    (pacmacs--cell-set pacmacs-board row column anim-object)))
+  (when anim-object
+    (plist-bind ((row :row)
+                 (column :column))
+        anim-object
+      (pacmacs--cell-set pacmacs-board row column anim-object))))
 
 (defun pacmacs--switch-to-death-state ()
   (setq pacmacs-game-state 'death)
   (decf pacmacs-lives)
   (plist-put pacmacs-player-state :current-animation
              (pacmacs-load-anim "Pacman-Death")))
+
+(defun pacmacs--switch-to-game-over-state ()
+  (setq pacmacs-game-state 'game-over)
+  (pacmacs-load-map "game-over"))
 
 (defun pacmacs--switch-to-play-state ()
   (setq pacmacs-game-state 'play)
@@ -489,6 +497,7 @@
     (setq pacmacs-wall-cells nil)
     (setq pacmacs-pills nil)
     (setq pacmacs-ghosts nil)
+    (setq pacmacs-player-state nil)
 
     (loop
      for line being the element of lines using (index row)
