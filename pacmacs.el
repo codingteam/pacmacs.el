@@ -64,7 +64,7 @@
 (defvar pacmacs-board nil)
 (defvar pacmacs-track-board nil)
 
-;;; play death prepare
+;;; play death prepare level-beaten
 (defvar pacmacs-game-state 'play)
 
 (defvar pacmacs-lives 3)
@@ -74,7 +74,7 @@
                         "map04" "map05" "map06"])
 (defvar pacmacs-current-level 0)
 
-(defvar pacmacs-prepare-time-counter 0)
+(defvar pacmacs-waiting-counter 0)
 
 (define-derived-mode pacmacs-mode special-mode "pacmacs-mode"
   (define-key pacmacs-mode-map (kbd "<up>") 'pacmacs-up)
@@ -293,7 +293,11 @@
        ((equal pacmacs-game-state 'death)
         (pacmacs-death-state-logic))
        ((equal pacmacs-game-state 'prepare)
-        (pacmacs-prepare-state-logic)))
+        (pacmacs-waiting-logic #'pacmacs--switch-to-play-state))
+       ((equal pacmacs-game-state 'level-beaten)
+        (pacmacs-waiting-logic #'(lambda ()
+                                   (pacmacs--load-next-level)
+                                   (pacmacs--switch-to-prepare-state)))))
 
       (erase-buffer)
       (pacmacs-render-state))))
@@ -340,8 +344,7 @@
         (if (pacmacs--ghost-collision-p)
             (pacmacs--switch-to-death-state)
           (pacmacs--step-ghosts)))
-    (pacmacs--load-next-level)
-    (pacmacs--switch-to-prepare-state)))
+    (pacmacs--switch-to-level-beaten-state)))
 
 (defun pacmacs-death-state-logic ()
   (pacmacs-anim-object-next-frame pacmacs-player-state
@@ -353,10 +356,10 @@
               :current-frame))
     (pacmacs--switch-to-play-state)))
 
-(defun pacmacs-prepare-state-logic ()
-  (if (<= pacmacs-prepare-time-counter 0)
-      (pacmacs--switch-to-play-state)
-    (decf pacmacs-prepare-time-counter
+(defun pacmacs-waiting-logic (switcher)
+  (if (<= pacmacs-waiting-counter 0)
+      (funcall switcher)
+    (decf pacmacs-waiting-counter
           pacmacs-tick-duration-ms)))
 
 (defun pacmacs-render-anim (anim)
@@ -389,7 +392,11 @@
 
 (defun pacmacs--switch-to-prepare-state ()
   (setq pacmacs-game-state 'prepare)
-  (setq pacmacs-prepare-time-counter 1000))
+  (setq pacmacs-waiting-counter 1000))
+
+(defun pacmacs--switch-to-level-beaten-state ()
+  (setq pacmacs-game-state 'level-beaten)
+  (setq pacmacs-waiting-counter 1000))
 
 (defun pacmacs-render-track-board ()
   (plist-bind ((width :width)
