@@ -57,6 +57,14 @@ side-effects."
                                'down  (cons  1  0))))
     (plist-get direction-table direction)))
 
+(defun pacmacs--direction-name (direction-vector)
+  (let ((direction-table '((( 0 . -1) . left)
+                           (( 0 .  1) . right)
+                           ((-1 .  0) . up)
+                           (( 1 .  0) . down))))
+    (cdr (assoc direction-vector
+                direction-table))))
+
 (provide 'pacmacs-utils)
 
 ;;; pacmacs.el ends here

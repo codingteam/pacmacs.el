@@ -53,13 +53,6 @@
 (defvar pacmacs-board-height 10)
 (defvar pacmacs-score 0)
 
-(defvar pacmacs-inversed-direction-table nil)
-(setq pacmacs-inversed-direction-table
-      (list (cons (cons -1 0) 'left)
-            (cons (cons 1 0) 'right)
-            (cons (cons 0 -1) 'up)
-            (cons (cons 0 1) 'down)))
-
 (defvar pacmacs-player-state nil)
 
 (defvar pacmacs-ghosts nil)
@@ -260,9 +253,7 @@
     
     (pacmacs--cell-set pacmacs-track-board
                        start-row start-column
-                       (cdr
-                        (assoc (cons d-column d-row)
-                               pacmacs-inversed-direction-table)))))
+                       (pacmacs--direction-name (cons d-row d-column)))))
 
 (defun pacmacs--recalc-track-board ()
   (pacmacs--fill-board pacmacs-track-board nil)
