@@ -41,6 +41,7 @@
 (require 'pacmacs-board)
 (require 'pacmacs-image)
 (require 'pacmacs-utils)
+(require 'pacmacs-render)
 
 (defconst pacmacs-buffer-name "*Pacmacs*")
 (defconst pacmacs-tick-duration-ms 100)
@@ -59,8 +60,6 @@
 (defvar pacmacs-wall-cells nil)
 (defvar pacmacs-pills nil)
 
-(defvar pacmacs--empty-cell nil)
-
 (defvar pacmacs-board nil)
 (defvar pacmacs-track-board nil)
 
@@ -68,7 +67,7 @@
 (defvar pacmacs-game-state 'play)
 
 (defvar pacmacs-lives 3)
-(defvar pacmacs-life-icon nil)
+
 
 (defvar pacmacs-levels ["map01" "map02" "map03"
                         "map04" "map05" "map06"])
@@ -197,18 +196,6 @@
       game-object
     (plist-put game-object :direction direction)
     (plist-put game-object :current-animation (plist-get direction-animations direction))))
-
-(defun pacmacs--render-life-icon ()
-  (when (not pacmacs-life-icon)
-    (setq pacmacs-life-icon
-          (pacmacs-load-anim "Pacman-Chomping-Right"))
-    (plist-put pacmacs-life-icon :current-frame 2))
-  (pacmacs-render-anim pacmacs-life-icon))
-
-(defun pacmacs--render-empty-cell ()
-  (when (not pacmacs--empty-cell)
-    (setq pacmacs--empty-cell (pacmacs-create-transparent-block 40 40)))
-  (pacmacs-insert-image pacmacs--empty-cell '(0 0 40 40)))
 
 (defun pacmacs-step-object (game-object)
   (plist-bind ((row :row)
@@ -362,16 +349,7 @@
     (decf pacmacs-waiting-counter
           pacmacs-tick-duration-ms)))
 
-(defun pacmacs-render-anim (anim)
-  (let* ((sprite-sheet (plist-get anim :sprite-sheet))
-         (current-frame (plist-get (pacmacs-anim-get-frame anim) :frame)))
-    (pacmacs-insert-image sprite-sheet current-frame)))
 
-(defun pacmacs-render-object (anim-object)
-  (if anim-object
-      (let* ((anim (plist-get anim-object :current-animation)))
-        (pacmacs-render-anim anim))
-    (pacmacs--render-empty-cell)))
 
 (defun pacmacs--put-object (anim-object)
   (when anim-object
@@ -405,31 +383,11 @@
   (setq pacmacs-game-state 'level-beaten)
   (setq pacmacs-waiting-counter 1000))
 
-(defun pacmacs-render-track-board ()
-  (plist-bind ((width :width)
-               (height :height))
-      pacmacs-board
-    (dotimes (row height)
-      (dotimes (column width)
-        (let ((x (pacmacs--cell-get pacmacs-track-board row column)))
-          (cond
-           ((null x)
-            (insert "."))
-           ((equal x 'left)
-            (insert "<"))
-           ((equal x 'right)
-            (insert ">"))
-           ((equal x 'up)
-            (insert "^"))
-           ((equal x 'down)
-            (insert "v")))))
-      (insert "\n"))))
-
 (defun pacmacs-render-state ()
   (insert (format "Score: %d\n" pacmacs-score))
 
   (when pacmacs-debug-output
-    (pacmacs-render-track-board))
+    (pacmacs--render-track-board pacmacs-track-board))
 
   (pacmacs--fill-board pacmacs-board nil)
 
@@ -450,7 +408,7 @@
     (dotimes (row height)
       (dotimes (column width)
         (let ((anim-object (pacmacs--cell-get pacmacs-board row column)))
-          (pacmacs-render-object anim-object)))
+          (pacmacs--render-object anim-object)))
       (insert "\n")))
   (insert "\n")
   (dotimes (i pacmacs-lives)
