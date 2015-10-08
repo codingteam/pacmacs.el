@@ -314,11 +314,9 @@
     (pacmacs--ghost-at-p row column)))
 
 (defun pacmacs-play-state-logic ()
-  (pacmacs-anim-object-next-frame pacmacs-player-state pacmacs-tick-duration-ms)
-  (dolist (ghost pacmacs-ghosts)
-    (pacmacs-anim-object-next-frame ghost pacmacs-tick-duration-ms))
-  (dolist (pill pacmacs-pills)
-    (pacmacs-anim-object-next-frame pill pacmacs-tick-duration-ms))
+  (pacmacs--anim-object-next-frame pacmacs-player-state pacmacs-tick-duration-ms)
+  (pacmacs--anim-object-list-next-frame pacmacs-ghosts pacmacs-tick-duration-ms)
+  (pacmacs--anim-object-list-next-frame pacmacs-pills pacmacs-tick-duration-ms)
 
   (pacmacs--recalc-track-board)
   (if pacmacs-pills
@@ -332,8 +330,8 @@
     (pacmacs--switch-to-level-beaten-state)))
 
 (defun pacmacs-death-state-logic ()
-  (pacmacs-anim-object-next-frame pacmacs-player-state
-                                  pacmacs-tick-duration-ms)
+  (pacmacs--anim-object-next-frame pacmacs-player-state
+                                   pacmacs-tick-duration-ms)
   
   (when (= 0 (plist-get
               (plist-get pacmacs-player-state

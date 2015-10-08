@@ -97,10 +97,15 @@
             (plist-put anim :current-frame new-current-frame))
         (plist-put anim :duration-counter (+ duration-counter time))))))
 
-(defun pacmacs-anim-object-next-frame (anim-object time)
+(defun pacmacs--anim-object-next-frame (anim-object time)
   (plist-map anim-object :current-animation
              #'(lambda (anim)
                  (pacmacs-anim-next-frame anim time))))
+
+(defun pacmacs--anim-object-list-next-frame (anim-object-list time)
+  (-each anim-object-list
+    #'(lambda (anim-object)
+        (pacmacs--anim-object-next-frame anim-object time))))
 
 (provide 'pacmacs-anim)
 

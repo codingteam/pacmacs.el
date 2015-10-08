@@ -25,11 +25,11 @@
     (pacmacs-anim-next-frame anim 100)
     (should (equal 0 (plist-get anim :current-frame)))))
 
-(ert-deftest pacmacs-anim-object-next-frame-test ()
+(ert-deftest pacmacs--anim-object-next-frame-test ()
   (with-mock
    (stub pacmacs-anim-next-frame => 42)
    (let ((anim-object '(:current-animation 41)))
-     (pacmacs-anim-object-next-frame anim-object 100)
+     (pacmacs--anim-object-next-frame anim-object 100)
      (should (equal '(:current-animation 42)
                     anim-object)))))
 
