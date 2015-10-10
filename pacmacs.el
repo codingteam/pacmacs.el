@@ -447,11 +447,6 @@
   (when (equal pacmacs-game-state 'play)
     (pacmacs--switch-direction pacmacs-player-state 'right)))
 
-(defun pacmacs--file-content (filename)
-  (with-temp-buffer
-    (insert-file-contents filename)
-    (buffer-string)))
-
 (defun pacmacs-load-map (map-name)
   (let* ((lines (split-string (pacmacs--file-content (format "maps/%s.txt" map-name)) "\n" t))
          (board-width (apply 'max (mapcar #'length lines)))
