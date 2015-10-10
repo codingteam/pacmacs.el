@@ -81,6 +81,13 @@
                                      ?\s)
                         score))))))
 
+(defun pacmacs--add-entry-to-score-table (nickname score)
+  (->> (pacmacs--read-score-table)
+       (cons (cons nickname score))
+       (pacmacs--sort-score-table)
+       (-take 10)
+       (pacmacs--write-score-table)))
+
 (provide 'pacmacs-score)
 
 ;;; pacmacs-score.el ends here
