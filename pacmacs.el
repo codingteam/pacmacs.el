@@ -130,6 +130,8 @@
         :column column
         :init-row row
         :init-column column
+        :prev-row row
+        :prev-column column
         :direction 'right
         :current-animation (pacmacs-load-anim "Red-Ghost-Right")
         :direction-animations (list 'left  (pacmacs-load-anim "Red-Ghost-Left")
@@ -144,6 +146,8 @@
         :column column
         :init-row row
         :init-column column
+        :prev-row row
+        :prev-column column
         :direction 'right
         :current-animation (pacmacs-load-anim "Pacman-Chomping-Right")
         :direction-animations (list 'left  (pacmacs-load-anim "Pacman-Chomping-Left")
@@ -159,6 +163,13 @@
       game-object
     (plist-put game-object :row init-row)
     (plist-put game-object :column init-column)))
+
+(defun pacmacs--step-back-object (game-object)
+  (plist-bind ((prev-row :prev-row)
+               (prev-column :prev-column))
+      game-object
+    (plist-put game-object :row prev-row)
+    (plist-put game-object :column prev-column)))
 
 (defun pacmacs--kill-buffer-and-its-window (buffer-or-name)
   (let ((buffer-window (get-buffer-window buffer-or-name)))
@@ -197,13 +208,15 @@
     (plist-put game-object :direction direction)
     (plist-put game-object :current-animation (plist-get direction-animations direction))))
 
-(defun pacmacs-step-object (game-object)
+(defun pacmacs--step-object (game-object)
   (plist-bind ((row :row)
                (column :column)
                (direction :direction)
                (speed-counter :speed-counter)
                (speed :speed))
       game-object
+    (plist-put game-object :prev-row row)
+    (plist-put game-object :prev-column column)
     (if (zerop speed-counter)
         (let* ((new-point (pacmacs--step-point pacmacs-board row column direction))
                (new-row (car new-point))
@@ -290,7 +303,7 @@
 (defun pacmacs--step-ghosts ()
   (dolist (ghost pacmacs-ghosts)
     (pacmacs--track-object ghost)
-    (pacmacs-step-object ghost)))
+    (pacmacs--step-object ghost)))
 
 (defun pacmacs--detect-pill-collision ()
   (plist-bind ((row :row)
@@ -320,13 +333,17 @@
 
   (pacmacs--recalc-track-board)
   (if pacmacs-pills
-      (if (pacmacs--ghost-collision-p)
-          (pacmacs--switch-to-death-state)
-        (pacmacs-step-object pacmacs-player-state)
-        (pacmacs--detect-pill-collision)
+      (progn
+        (pacmacs--step-object pacmacs-player-state)
         (if (pacmacs--ghost-collision-p)
-            (pacmacs--switch-to-death-state)
-          (pacmacs--step-ghosts)))
+            (progn (pacmacs--step-back-object pacmacs-player-state)
+                   (pacmacs--switch-to-death-state))
+          (pacmacs--detect-pill-collision)
+          (pacmacs--step-ghosts)
+          (when (pacmacs--ghost-collision-p)
+            (dolist (ghost pacmacs-ghosts)
+              (pacmacs--step-back-object ghost))
+            (pacmacs--switch-to-death-state))))
     (pacmacs--switch-to-level-beaten-state)))
 
 (defun pacmacs-death-state-logic ()
@@ -346,8 +363,6 @@
       (funcall switcher)
     (decf pacmacs-waiting-counter
           pacmacs-tick-duration-ms)))
-
-
 
 (defun pacmacs--put-object (anim-object)
   (when anim-object
