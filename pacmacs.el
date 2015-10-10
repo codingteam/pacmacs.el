@@ -60,8 +60,8 @@
 (defvar pacmacs-wall-cells nil)
 (defvar pacmacs-pills nil)
 
-(defvar pacmacs-board nil)
-(defvar pacmacs-track-board nil)
+(defvar pacmacs--render-buffer nil)
+(defvar pacmacs--track-buffer nil)
 
 ;;; play death prepare level-beaten
 (defvar pacmacs-game-state 'play)
@@ -169,17 +169,17 @@
       (kill-buffer buffer-or-name))))
 
 (defun pacmacs--wall-at-p (row column)
-  (pacmacs--object-at-p pacmacs-board
+  (pacmacs--object-at-p pacmacs--render-buffer
                         row column
                         pacmacs-wall-cells))
 
 (defun pacmacs--pill-at-p (row column)
-  (pacmacs--object-at-p pacmacs-board
+  (pacmacs--object-at-p pacmacs--render-buffer
                         row column
                         pacmacs-pills))
 
 (defun pacmacs--ghost-at-p (row column)
-  (pacmacs--object-at-p pacmacs-board
+  (pacmacs--object-at-p pacmacs--render-buffer
                         row column
                         pacmacs-ghosts))
 
@@ -189,7 +189,7 @@
     (pacmacs--kill-buffer-and-its-window pacmacs-buffer-name)))
 
 (defun pacmacs--cell-tracked-p (row column)
-  (pacmacs--cell-get pacmacs-track-board row column))
+  (pacmacs--cell-get pacmacs--track-buffer row column))
 
 (defun pacmacs--switch-direction (game-object direction)
   (plist-bind ((direction-animations :direction-animations))
@@ -205,7 +205,7 @@
                (speed :speed))
       game-object
     (if (zerop speed-counter)
-        (let* ((new-point (pacmacs--step-point pacmacs-board row column direction))
+        (let* ((new-point (pacmacs--step-point pacmacs--render-buffer row column direction))
                (new-row (car new-point))
                (new-column (cdr new-point)))
           (plist-put game-object :speed-counter speed)
@@ -236,12 +236,12 @@
          (d-row (- end-row start-row))
          (d-column (- end-column start-column)))
     
-    (pacmacs--cell-set pacmacs-track-board
+    (pacmacs--cell-set pacmacs--track-buffer
                        start-row start-column
                        (pacmacs--direction-name (cons d-row d-column)))))
 
 (defun pacmacs--recalc-track-board ()
-  (pacmacs--fill-board pacmacs-track-board nil)
+  (pacmacs--fill-board pacmacs--track-buffer nil)
   (plist-bind ((player-row :row)
                (player-column :column))
       pacmacs-player-state
@@ -264,7 +264,7 @@
   (plist-bind ((row :row)
                (column :column))
       game-object
-    (let ((direction (pacmacs--cell-get pacmacs-track-board row column)))
+    (let ((direction (pacmacs--cell-get pacmacs--track-buffer row column)))
       (pacmacs--switch-direction game-object direction))))
 
 (defun pacmacs-tick ()
@@ -354,7 +354,7 @@
     (plist-bind ((row :row)
                  (column :column))
         anim-object
-      (pacmacs--cell-set pacmacs-board row column anim-object))))
+      (pacmacs--cell-set pacmacs--render-buffer row column anim-object))))
 
 (defun pacmacs--switch-to-death-state ()
   (setq pacmacs-game-state 'death)
@@ -385,9 +385,9 @@
   (insert (format "Score: %d\n" pacmacs-score))
 
   (when pacmacs-debug-output
-    (pacmacs--render-track-board pacmacs-track-board))
+    (pacmacs--render-track-board pacmacs--track-buffer))
 
-  (pacmacs--fill-board pacmacs-board nil)
+  (pacmacs--fill-board pacmacs--render-buffer nil)
 
   (dolist (pill pacmacs-pills)
     (pacmacs--put-object pill))
@@ -402,10 +402,10 @@
 
   (plist-bind ((width :width)
                (height :height))
-      pacmacs-board
+      pacmacs--render-buffer
     (dotimes (row height)
       (dotimes (column width)
-        (let ((anim-object (pacmacs--cell-get pacmacs-board row column)))
+        (let ((anim-object (pacmacs--cell-get pacmacs--render-buffer row column)))
           (pacmacs--render-object anim-object)))
       (insert "\n")))
   (insert "\n")
@@ -444,10 +444,10 @@
     (setq pacmacs-board-width board-width)
     (setq pacmacs-board-height board-height)
 
-    (setq pacmacs-board (pacmacs--make-board pacmacs-board-width
-                                             pacmacs-board-height))
-    (setq pacmacs-track-board (pacmacs--make-board pacmacs-board-width
-                                                   pacmacs-board-height))
+    (setq pacmacs--render-buffer (pacmacs--make-board pacmacs-board-width
+                                                      pacmacs-board-height))
+    (setq pacmacs--track-buffer (pacmacs--make-board pacmacs-board-width
+                                                     pacmacs-board-height))
 
     (setq pacmacs-wall-cells nil)
     (setq pacmacs-pills nil)
