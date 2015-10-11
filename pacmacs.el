@@ -282,23 +282,21 @@
 
 (defun pacmacs-tick ()
   (interactive)
-  (with-current-buffer pacmacs-buffer-name
-    (let ((inhibit-read-only t))
 
-      (cond
-       ((equal pacmacs-game-state 'play)
-        (pacmacs-play-state-logic))
-       ((equal pacmacs-game-state 'death)
-        (pacmacs-death-state-logic))
-       ((equal pacmacs-game-state 'prepare)
-        (pacmacs-waiting-logic #'pacmacs--switch-to-play-state))
-       ((equal pacmacs-game-state 'level-beaten)
-        (pacmacs-waiting-logic #'(lambda ()
-                                   (pacmacs--load-next-level)
-                                   (pacmacs--switch-to-prepare-state)))))
 
-      (erase-buffer)
-      (pacmacs-render-state))))
+  (cond
+   ((equal pacmacs-game-state 'play)
+    (pacmacs-play-state-logic))
+   ((equal pacmacs-game-state 'death)
+    (pacmacs-death-state-logic))
+   ((equal pacmacs-game-state 'prepare)
+    (pacmacs-waiting-logic #'pacmacs--switch-to-play-state))
+   ((equal pacmacs-game-state 'level-beaten)
+    (pacmacs-waiting-logic #'(lambda ()
+                               (pacmacs--load-next-level)
+                               (pacmacs--switch-to-prepare-state)))))
+
+  (pacmacs-render-state))
 
 (defun pacmacs--step-ghosts ()
   (dolist (ghost pacmacs-ghosts)
@@ -379,7 +377,8 @@
 
 (defun pacmacs--switch-to-game-over-state ()
   (setq pacmacs-game-state 'game-over)
-  (pacmacs-load-map "game-over"))
+  (pacmacs-load-map "game-over")
+  (pacmacs--register-new-score pacmacs-score))
 
 (defun pacmacs--switch-to-play-state ()
   (setq pacmacs-game-state 'play)
@@ -397,35 +396,44 @@
   (setq pacmacs-waiting-counter 1000))
 
 (defun pacmacs-render-state ()
-  (insert (format "Score: %d\n" pacmacs-score))
+  (with-current-buffer pacmacs-buffer-name
+    (let ((inhibit-read-only t))
+      (erase-buffer)
 
-  (when pacmacs-debug-output
-    (pacmacs--render-track-board pacmacs-track-board))
+      (insert (format "Score: %d\n" pacmacs-score))
 
-  (pacmacs--fill-board pacmacs-board nil)
+      (when pacmacs-debug-output
+        (pacmacs--render-track-board pacmacs-track-board))
 
-  (dolist (pill pacmacs-pills)
-    (pacmacs--put-object pill))
+      (pacmacs--fill-board pacmacs-board nil)
 
-  (dolist (ghost pacmacs-ghosts)
-    (pacmacs--put-object ghost))
+      (dolist (pill pacmacs-pills)
+        (pacmacs--put-object pill))
 
-  (pacmacs--put-object pacmacs-player-state)
-  
-  (dolist (wall pacmacs-wall-cells)
-    (pacmacs--put-object wall))
+      (dolist (ghost pacmacs-ghosts)
+        (pacmacs--put-object ghost))
 
-  (plist-bind ((width :width)
-               (height :height))
-      pacmacs-board
-    (dotimes (row height)
-      (dotimes (column width)
-        (let ((anim-object (pacmacs--cell-get pacmacs-board row column)))
-          (pacmacs--render-object anim-object)))
-      (insert "\n")))
-  (insert "\n")
-  (dotimes (i pacmacs-lives)
-    (pacmacs--render-life-icon)))
+      (pacmacs--put-object pacmacs-player-state)
+      
+      (dolist (wall pacmacs-wall-cells)
+        (pacmacs--put-object wall))
+
+      (plist-bind ((width :width)
+                   (height :height))
+          pacmacs-board
+        (dotimes (row height)
+          (dotimes (column width)
+            (let ((anim-object (pacmacs--cell-get pacmacs-board row column)))
+              (pacmacs--render-object anim-object)))
+          (insert "\n")))
+      (insert "\n")
+      (dotimes (i pacmacs-lives)
+        (pacmacs--render-life-icon))
+
+      (when (equal pacmacs-game-state 'game-over)
+        (-> (pacmacs--read-score-table)
+            (pacmacs--sort-score-table)
+            (pacmacs--render-score-table))))))
 
 (defun pacmacs-up ()
   (interactive)
@@ -446,11 +454,6 @@
   (interactive)
   (when (equal pacmacs-game-state 'play)
     (pacmacs--switch-direction pacmacs-player-state 'right)))
-
-(defun pacmacs--file-content (filename)
-  (with-temp-buffer
-    (insert-file-contents filename)
-    (buffer-string)))
 
 (defun pacmacs-load-map (map-name)
   (let* ((lines (split-string (pacmacs--file-content (format "maps/%s.txt" map-name)) "\n" t))

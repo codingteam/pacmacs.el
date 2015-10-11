@@ -65,6 +65,11 @@ side-effects."
     (cdr (assoc direction-vector
                 direction-table))))
 
+(defun pacmacs--file-content (filename)
+  (with-temp-buffer
+    (insert-file-contents filename)
+    (buffer-string)))
+
 (provide 'pacmacs-utils)
 
 ;;; pacmacs.el ends here
