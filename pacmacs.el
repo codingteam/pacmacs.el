@@ -68,9 +68,7 @@
 
 (defvar pacmacs-lives 3)
 
-
-(defvar pacmacs-levels ["map01" "map02" "map03"
-                        "map04" "map05" "map06"])
+(defvar pacmacs-levels nil)
 (defvar pacmacs-current-level 0)
 
 (defvar pacmacs-waiting-counter 0)
@@ -92,7 +90,9 @@
 
   (setq pacmacs-lives 3)
   (setq pacmacs-score 0)
+  (setq pacmacs-levels (pacmacs--get-list-of-levels))
   (setq pacmacs-current-level 0)
+  
   (pacmacs--load-current-level)
   (pacmacs--switch-to-play-state)
 
@@ -454,6 +454,13 @@
   (interactive)
   (when (equal pacmacs-game-state 'play)
     (pacmacs--switch-direction pacmacs-player-state 'right)))
+
+(defun pacmacs--get-list-of-levels ()
+  (->> (directory-files "./maps/")
+       (-map #'pacmacs--levelname-from-filename)
+       (-remove #'null)
+       (-sort #'string-lessp)
+       (apply #'vector)))
 
 (defun pacmacs-load-map (map-name)
   (let* ((lines (split-string (pacmacs--file-content (format "maps/%s.txt" map-name)) "\n" t))

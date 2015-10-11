@@ -70,6 +70,10 @@ side-effects."
     (insert-file-contents filename)
     (buffer-string)))
 
+(defun pacmacs--levelname-from-filename (filename)
+  (string-match "\\(map[0-9]+\\)\\.txt" filename)
+  (match-string 1 filename))
+
 (provide 'pacmacs-utils)
 
 ;;; pacmacs.el ends here
