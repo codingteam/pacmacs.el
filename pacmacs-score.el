@@ -73,6 +73,7 @@
          (--> (pacmacs--read-score-table)
               (-map (-compose #'length #'car) it)
               (apply #'max it))))
+    (insert "Best Scores:\n------------\n")
     (-each score-table
       (-lambda ((nickname . score))
         (insert (format "%s%s %d\n"

@@ -400,7 +400,7 @@
     (let ((inhibit-read-only t))
       (erase-buffer)
 
-      (insert (format "Score: %d\n" pacmacs-score))
+      (insert (format "Score: %d\n\n" pacmacs-score))
 
       (when pacmacs-debug-output
         (pacmacs--render-track-board pacmacs-track-board))
@@ -433,7 +433,8 @@
       (when (equal pacmacs-game-state 'game-over)
         (-> (pacmacs--read-score-table)
             (pacmacs--sort-score-table)
-            (pacmacs--render-score-table))))))
+            (pacmacs--render-score-table)))
+      (goto-char 0))))
 
 (defun pacmacs-up ()
   (interactive)
