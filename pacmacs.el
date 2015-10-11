@@ -35,6 +35,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'dash)
 
 (require 'pacmacs-anim)
@@ -268,7 +269,7 @@
                    (column (cdr p))
                    (possible-ways (pacmacs--possible-ways row column))
                    (candidate-ways
-                    (remove-if #'pacmacs--filter-candidates possible-ways)))
+                    (cl-remove-if #'pacmacs--filter-candidates possible-ways)))
               (dolist (candidate-way candidate-ways)
                 (pacmacs--track-point candidate-way p))
               (setq next-wave
@@ -312,13 +313,13 @@
     (-when-let (pill (pacmacs--pill-at-p row column))
       (setq pacmacs-score (+ pacmacs-score 10))
       (setq pacmacs-pills
-            (remove-if #'(lambda (pill)
-                           (plist-bind ((p-row :row)
-                                        (p-column :column))
-                               pill
-                             (and (= row p-row)
-                                  (= column p-column))))
-                       pacmacs-pills)))))
+            (cl-remove-if #'(lambda (pill)
+                              (plist-bind ((p-row :row)
+                                           (p-column :column))
+                                  pill
+                                (and (= row p-row)
+                                     (= column p-column))))
+                          pacmacs-pills)))))
 
 (defun pacmacs--ghost-collision-p ()
   (plist-bind ((row :row)
@@ -361,8 +362,8 @@
 (defun pacmacs-waiting-logic (switcher)
   (if (<= pacmacs-waiting-counter 0)
       (funcall switcher)
-    (decf pacmacs-waiting-counter
-          pacmacs-tick-duration-ms)))
+    (cl-decf pacmacs-waiting-counter
+             pacmacs-tick-duration-ms)))
 
 (defun pacmacs--put-object (anim-object)
   (when anim-object
@@ -373,7 +374,7 @@
 
 (defun pacmacs--switch-to-death-state ()
   (setq pacmacs-game-state 'death)
-  (decf pacmacs-lives)
+  (cl-decf pacmacs-lives)
   (plist-put pacmacs-player-state :current-animation
              (pacmacs-load-anim "Pacman-Death")))
 
@@ -486,20 +487,20 @@
     (setq pacmacs-ghosts nil)
     (setq pacmacs-player-state nil)
 
-    (loop
+    (cl-loop
      for line being the element of lines using (index row)
-     do (loop for x being the element of line using (index column)
-              do (cond ((char-equal x ?#)
-                        (add-to-list 'pacmacs-wall-cells (pacmacs--make-wall-cell row column)))
+     do (cl-loop for x being the element of line using (index column)
+                 do (cond ((char-equal x ?#)
+                           (add-to-list 'pacmacs-wall-cells (pacmacs--make-wall-cell row column)))
 
-                       ((char-equal x ?.)
-                        (add-to-list 'pacmacs-pills (pacmacs--make-pill row column)))
+                          ((char-equal x ?.)
+                           (add-to-list 'pacmacs-pills (pacmacs--make-pill row column)))
 
-                       ((char-equal x ?o)
-                        (setq pacmacs-player-state (pacmacs--make-player row column)))
+                          ((char-equal x ?o)
+                           (setq pacmacs-player-state (pacmacs--make-player row column)))
 
-                       ((char-equal x ?g)
-                        (add-to-list 'pacmacs-ghosts (pacmacs--make-ghost row column))))))))
+                          ((char-equal x ?g)
+                           (add-to-list 'pacmacs-ghosts (pacmacs--make-ghost row column))))))))
 
 (provide 'pacmacs)
 
