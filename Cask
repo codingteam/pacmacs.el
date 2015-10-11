@@ -8,9 +8,6 @@
        ("sprites" "sprites/*.json")
        ("sprites" "sprites/*.xpm"))
 
-(depends-on "dash")
-(depends-on "dash-functional")
-
 (development
  (depends-on "el-mock")
  (depends-on "ert-runner")
