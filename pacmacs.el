@@ -84,6 +84,7 @@
   (setq cursor-type nil)
   (setq truncate-lines t))
 
+;;;###autoload
 (defun pacmacs-start ()
   (interactive)
   (switch-to-buffer pacmacs-buffer-name)
