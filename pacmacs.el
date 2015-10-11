@@ -428,7 +428,12 @@
           (insert "\n")))
       (insert "\n")
       (dotimes (i pacmacs-lives)
-        (pacmacs--render-life-icon)))))
+        (pacmacs--render-life-icon))
+
+      (when (equal pacmacs-game-state 'game-over)
+        (-> (pacmacs--read-score-table)
+            (pacmacs--sort-score-table)
+            (pacmacs--render-score-table))))))
 
 (defun pacmacs-up ()
   (interactive)

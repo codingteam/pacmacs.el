@@ -91,8 +91,7 @@
 
 (defun pacmacs--register-new-score (score)
   (let ((nickname (read-from-minibuffer "Nickname: ")))
-    (pacmacs--add-entry-to-score-table nickname score)
-    (pacmacs-score)))
+    (pacmacs--add-entry-to-score-table nickname score)))
 
 (provide 'pacmacs-score)
 
