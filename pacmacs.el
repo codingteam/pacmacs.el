@@ -42,6 +42,7 @@
 (require 'pacmacs-image)
 (require 'pacmacs-utils)
 (require 'pacmacs-render)
+(require 'pacmacs-score)
 
 (defconst pacmacs-buffer-name "*Pacmacs*")
 (defconst pacmacs-tick-duration-ms 100)
@@ -457,14 +458,18 @@
     (pacmacs--switch-direction pacmacs-player-state 'right)))
 
 (defun pacmacs--get-list-of-levels ()
-  (->> (directory-files "./maps/")
+  (->> (directory-files (pacmacs--find-resource-file "./maps/"))
        (-map #'pacmacs--levelname-from-filename)
        (-remove #'null)
        (-sort #'string-lessp)
        (apply #'vector)))
 
 (defun pacmacs-load-map (map-name)
-  (let* ((lines (split-string (pacmacs--file-content (format "maps/%s.txt" map-name)) "\n" t))
+  (let* ((lines (split-string (->> map-name
+                                   (format "./maps/%s.txt")
+                                   (pacmacs--find-resource-file)
+                                   (pacmacs--file-content))
+                              "\n" t))
          (board-width (apply 'max (mapcar #'length lines)))
          (board-height (length lines)))
     (setq pacmacs-board-width board-width)

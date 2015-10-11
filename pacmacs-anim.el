@@ -49,8 +49,10 @@
         :duration duration))
 
 (defun pacmacs-load-anim (animation-name)
-  (let* ((aseprite-json-file (format "sprites/%s.json" animation-name))
-         (sprite-sheet-file (format "sprites/%s.xpm" animation-name))
+  (let* ((aseprite-json-file (pacmacs--find-resource-file
+                              (format "sprites/%s.json" animation-name)))
+         (sprite-sheet-file (pacmacs--find-resource-file
+                             (format "sprites/%s.xpm" animation-name)))
          (aseprite-json (json-read-file aseprite-json-file))
          (aseprite-frames (cdr (assoc 'frames aseprite-json)))
          (sprite-sheet (pacmacs-load-image sprite-sheet-file)))

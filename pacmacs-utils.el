@@ -32,6 +32,8 @@
 
 ;;; Code:
 
+(defconst pacmacs--base (file-name-directory load-file-name))
+
 (defmacro plist-bind (keys expr &rest body)
   (declare (indent 2) (debug (sexp form &rest form)))
   (let ((expr-name (gensym)))
@@ -49,6 +51,9 @@ side-effects."
   (plist-bind ((value property)) plist
     (plist-put plist property
                (funcall transformer value))))
+
+(defun pacmacs--find-resource-file (filename)
+  (expand-file-name filename pacmacs--base))
 
 (defun pacmacs--direction-vector (direction)
   (let ((direction-table (list 'left  (cons  0 -1)
