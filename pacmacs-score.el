@@ -33,6 +33,7 @@
 ;;; Code:
 
 (require 'dash)
+(require 'dash-functional)
 
 (defconst pacmacs--score-file-name "~/.pacmacs-score")
 (defconst pacmacs--score-buffer-name "*Pacmacs Score*")
@@ -87,6 +88,11 @@
        (pacmacs--sort-score-table)
        (-take 10)
        (pacmacs--write-score-table)))
+
+(defun pacmacs--register-new-score (score)
+  (let ((nickname (read-from-minibuffer "Nickname: ")))
+    (pacmacs--add-entry-to-score-table nickname score)
+    (pacmacs-score)))
 
 (provide 'pacmacs-score)
 
