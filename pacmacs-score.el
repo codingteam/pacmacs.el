@@ -51,10 +51,11 @@
           (pacmacs--render-score-table)))))
 
 (defun pacmacs--read-score-table ()
-  (-> pacmacs--score-file-name
-      (pacmacs--file-content)
-      (read-from-string)
-      (car)))
+  (when (file-exists-p pacmacs--score-file-name)
+    (-> pacmacs--score-file-name
+        (pacmacs--file-content)
+        (read-from-string)
+        (car))))
 
 (defun pacmacs--write-score-table (score-table)
   (with-temp-buffer
