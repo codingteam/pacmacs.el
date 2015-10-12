@@ -34,6 +34,7 @@
 
 (require 'pacmacs-image)
 (require 'pacmacs-anim)
+(require 'pacmacs-board)
 
 (defvar pacmacs--empty-cell nil)
 (defvar pacmacs--life-icon nil)
