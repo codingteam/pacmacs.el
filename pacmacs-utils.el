@@ -32,11 +32,13 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
 (defconst pacmacs--base (file-name-directory load-file-name))
 
 (defmacro plist-bind (keys expr &rest body)
   (declare (indent 2) (debug (sexp form &rest form)))
-  (let ((expr-name (gensym)))
+  (let ((expr-name (cl-gensym)))
     `(let* ((,expr-name ,expr)
             ,@(mapcar #'(lambda (key)
                           (cons (car key)
