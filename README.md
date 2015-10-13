@@ -47,7 +47,7 @@ Only available in the `*Pacman*` buffer.
 Before developing the game please remove it from Emacs if it was
 installed before.
 
-I usually use the following workflow when I develop this gamae:
+I usually use the following workflow when I develop this game:
 
 1. `$ git clone git://github.com/rexim/pacmacs.el.git && cd pacmacs.el`;
 2. `M-x find-file RET /path/to/pacmacs.el/pacmacs.el RET`
