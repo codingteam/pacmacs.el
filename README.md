@@ -40,7 +40,9 @@ Only available in the `*Pacman*` buffer.
 2. `<down>` — move Pacman down;
 3. `<left>` — move Pacman left;
 4. `<right>` — move Pacman right;
-5. `<q>` — quit the game.
+5. `q` — quit the game;
+6. `SPC` — pause the game.
+
 
 ## Development ##
 
