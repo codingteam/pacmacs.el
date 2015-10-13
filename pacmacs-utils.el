@@ -78,9 +78,8 @@ side-effects."
     (buffer-string)))
 
 (defun pacmacs--levelname-from-filename (filename)
-  (let ((text filename))
-    (when (string-match "\\(map[0-9]+\\)\\.txt" text)
-      (match-string 1 text))))
+  (when (string-match "\\(map[0-9]+\\)\\.txt" filename)
+    (match-string 1 filename)))
 
 (provide 'pacmacs-utils)
 
