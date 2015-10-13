@@ -66,7 +66,9 @@
 (defvar pacmacs-board nil)
 (defvar pacmacs-track-board nil)
 
-;;; play death prepare level-beaten
+(defvar pacmacs-play-pause nil)
+
+;;; play death prepare level-beaten game-over
 (defvar pacmacs-game-state 'play)
 
 (defvar pacmacs-lives 3)
@@ -82,6 +84,7 @@
   (define-key pacmacs-mode-map (kbd "<left>") 'pacmacs-left)
   (define-key pacmacs-mode-map (kbd "<right>") 'pacmacs-right)
   (define-key pacmacs-mode-map (kbd "q") 'pacmacs-quit)
+  (define-key pacmacs-mode-map (kbd "SPC") 'pacmacs-pause)
   (add-hook 'kill-buffer-hook 'pacmacs-destroy nil t)
   (setq cursor-type nil)
   (setq truncate-lines t))
@@ -287,7 +290,6 @@
 (defun pacmacs-tick ()
   (interactive)
 
-
   (cond
    ((equal pacmacs-game-state 'play)
     (pacmacs-play-state-logic))
@@ -329,24 +331,25 @@
     (pacmacs--ghost-at-p row column)))
 
 (defun pacmacs-play-state-logic ()
-  (pacmacs--anim-object-next-frame pacmacs-player-state pacmacs-tick-duration-ms)
-  (pacmacs--anim-object-list-next-frame pacmacs-ghosts pacmacs-tick-duration-ms)
-  (pacmacs--anim-object-list-next-frame pacmacs-pills pacmacs-tick-duration-ms)
+  (when (not pacmacs-play-pause)
+    (pacmacs--anim-object-next-frame pacmacs-player-state pacmacs-tick-duration-ms)
+    (pacmacs--anim-object-list-next-frame pacmacs-ghosts pacmacs-tick-duration-ms)
+    (pacmacs--anim-object-list-next-frame pacmacs-pills pacmacs-tick-duration-ms)
 
-  (pacmacs--recalc-track-board)
-  (if pacmacs-pills
-      (progn
-        (pacmacs--step-object pacmacs-player-state)
-        (if (pacmacs--ghost-collision-p)
-            (progn (pacmacs--step-back-object pacmacs-player-state)
-                   (pacmacs--switch-to-death-state))
-          (pacmacs--detect-pill-collision)
-          (pacmacs--step-ghosts)
-          (when (pacmacs--ghost-collision-p)
-            (dolist (ghost pacmacs-ghosts)
-              (pacmacs--step-back-object ghost))
-            (pacmacs--switch-to-death-state))))
-    (pacmacs--switch-to-level-beaten-state)))
+    (pacmacs--recalc-track-board)
+    (if pacmacs-pills
+        (progn
+          (pacmacs--step-object pacmacs-player-state)
+          (if (pacmacs--ghost-collision-p)
+              (progn (pacmacs--step-back-object pacmacs-player-state)
+                     (pacmacs--switch-to-death-state))
+            (pacmacs--detect-pill-collision)
+            (pacmacs--step-ghosts)
+            (when (pacmacs--ghost-collision-p)
+              (dolist (ghost pacmacs-ghosts)
+                (pacmacs--step-back-object ghost))
+              (pacmacs--switch-to-death-state))))
+      (pacmacs--switch-to-level-beaten-state))))
 
 (defun pacmacs-death-state-logic ()
   (pacmacs--anim-object-next-frame pacmacs-player-state
@@ -386,6 +389,7 @@
 
 (defun pacmacs--switch-to-play-state ()
   (setq pacmacs-game-state 'play)
+  (setq pacmacs-play-pause nil)
   (pacmacs--reset-object-position pacmacs-player-state)
   (dolist (ghost pacmacs-ghosts)
     (pacmacs--reset-object-position ghost))
@@ -442,23 +446,32 @@
 
 (defun pacmacs-up ()
   (interactive)
-  (when (equal pacmacs-game-state 'play)
+  (when (and (equal pacmacs-game-state 'play)
+             (not pacmacs-play-pause))
     (pacmacs--switch-direction pacmacs-player-state 'up)))
 
 (defun pacmacs-down ()
   (interactive)
-  (when (equal pacmacs-game-state 'play)
+  (when (and (equal pacmacs-game-state 'play)
+             (not pacmacs-play-pause))
     (pacmacs--switch-direction pacmacs-player-state 'down)))
 
 (defun pacmacs-left ()
   (interactive)
-  (when (equal pacmacs-game-state 'play)
+  (when (and (equal pacmacs-game-state 'play)
+             (not pacmacs-play-pause))
     (pacmacs--switch-direction pacmacs-player-state 'left)))
 
 (defun pacmacs-right ()
   (interactive)
-  (when (equal pacmacs-game-state 'play)
+  (when (and (equal pacmacs-game-state 'play)
+             (not pacmacs-play-pause))
     (pacmacs--switch-direction pacmacs-player-state 'right)))
+
+(defun pacmacs-pause ()
+  (interactive)
+  (when (equal pacmacs-game-state 'play)
+    (setq pacmacs-play-pause (not pacmacs-play-pause))))
 
 (defun pacmacs--get-list-of-levels ()
   (->> (directory-files (pacmacs--find-resource-file "./maps/"))
