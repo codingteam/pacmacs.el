@@ -20,7 +20,7 @@ your emacs config file somewhere (.emacs, init.el, whatever):
 ```
 (require 'package)
 (add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+             '("melpa" . "https://melpa.org/packages/") t)
 ```
 
 Then use `M-x package-install RET pacmacs RET` to install the game.
@@ -29,18 +29,18 @@ Then use `M-x package-install RET pacmacs RET` to install the game.
 
 ### Functions ###
 
-1. `pacmacs-start` — start the game;
-2. `pacmacs-score` — show the 10 best scores;
+1. `M-x pacmacs-start RET` — start the game;
+2. `M-x pacmacs-score RET` — show the 10 best scores.
 
 ### Controls ###
 
 Only available in the `*Pacman*` buffer.
 
-1. `<up>` — move Pacman up
-2. `<down>` — move Pacman down
-3. `<left>` — move Pacman left
-4. `<right>` — move Pacman right
-5. `<q>` — quit the game
+1. `<up>` — move Pacman up;
+2. `<down>` — move Pacman down;
+3. `<left>` — move Pacman left;
+4. `<right>` — move Pacman right;
+5. `<q>` — quit the game.
 
 ## Development ##
 
