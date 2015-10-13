@@ -56,7 +56,7 @@ I usually use the following workflow when I develop this game:
 5. `M-x pacmacs-start RET`;
 6. `M-x pacmacs-quit RET`;
 7. Change something in the source code;
-8. Go to the step 3.
+8. Go to the step 4.
 
 ## Unit Tests ##
 
