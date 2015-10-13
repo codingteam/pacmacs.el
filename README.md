@@ -12,13 +12,51 @@ Pacman for Emacs
 - Emacs should have displaying images support
 - Emacs should have the [XPM](https://en.wikipedia.org/wiki/X_PixMap) image format support
 
+## Installation ##
+
+Pacmacs available on [MELPA](http://melpa.org/). Add the following to
+your emacs config file somewhere (.emacs, init.el, whatever):
+
+```
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+```
+
+Then use `M-x package-install RET pacmacs RET` to install the game.
+
 ## Usage ##
+
+### Functions ###
+
+1. `pacmacs-start` — start the game;
+2. `pacmacs-score` — show the 10 best scores;
+
+### Controls ###
+
+Only available in the `*Pacman*` buffer.
+
+1. `<up>` — move Pacman up
+2. `<down>` — move Pacman down
+3. `<left>` — move Pacman left
+4. `<right>` — move Pacman right
+5. `<q>` — quit the game
+
+## Development ##
+
+Before developing the game please remove it from Emacs if it was
+installed before.
+
+I usually use the following workflow when I develop this gamae:
 
 1. `$ git clone git://github.com/rexim/pacmacs.el.git && cd pacmacs.el`;
 2. `M-x find-file RET /path/to/pacmacs.el/pacmacs.el RET`
 3. `M-x eval-expression RET (add-to-list 'load-path default-directory) RET`;
 4. `M-x eval-buffer RET`;
-5. `M-x pacmacs-start RET`.
+5. `M-x pacmacs-start RET`;
+6. `M-x pacmacs-quit RET`;
+7. Change something in the source code;
+8. Go to the step 3.
 
 ## Unit Tests ##
 
