@@ -6,6 +6,10 @@
 
 Pacman for Emacs
 
+[![Animated Screenshot](https://cloud.githubusercontent.com/assets/5211845/10491579/9ba466b2-72a7-11e5-982c-579ed6abe1a5.gif)](https://www.reddit.com/r/emacs/comments/3opb5k/pacmacs_a_pacman_variant_for_emacs/)
+
+(thanks to [@kaushalmodi](https://github.com/kaushalmodi) for animation)
+
 ## Requirements ##
 
 - Emacs 24.3+
