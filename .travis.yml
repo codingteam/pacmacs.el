@@ -15,6 +15,7 @@ env:
   - EVM_EMACS=emacs-24.4-bin
   - EVM_EMACS=emacs-24.5-bin
 script:
+  - emacs --script ./tools/compile.el
   - cask exec ert-runner
 notifications:
   email:
