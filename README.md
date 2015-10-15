@@ -3,6 +3,12 @@
 
 # Pacman for Emacs #
 
+**This branch contains proof of concept of using one image inside of
+  Emacs as a canvas. I'm not going to continue to develop it, but
+  don't wanna through it away too. So I will just leave it here and
+  maybe reuse that concept somewhere in my another Emacs Lisp project
+  in the future. :)**
+
 ## Usage ##
 
 1. `$ git clone git://github.com/rexim/pacman.el.git && cd pacman.el`;
