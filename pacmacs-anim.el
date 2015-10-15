@@ -1,4 +1,4 @@
-;;; pacmacs-anim.el --- Pacman for Emacs
+;;; pacmacs-anim.el --- Pacman for Emacs -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2015 Codingteam
 
