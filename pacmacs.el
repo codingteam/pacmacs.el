@@ -444,28 +444,28 @@
             (pacmacs--render-score-table)))
       (goto-char 0))))
 
+(defun pacmacs--unpaused-play-state-p ()
+  (and (equal pacmacs-game-state 'play)
+       (not pacmacs-play-pause)))
+
 (defun pacmacs-up ()
   (interactive)
-  (when (and (equal pacmacs-game-state 'play)
-             (not pacmacs-play-pause))
+  (when (pacmacs--unpaused-play-state-p)
     (pacmacs--switch-direction pacmacs-player-state 'up)))
 
 (defun pacmacs-down ()
   (interactive)
-  (when (and (equal pacmacs-game-state 'play)
-             (not pacmacs-play-pause))
+  (when (pacmacs--unpaused-play-state-p)
     (pacmacs--switch-direction pacmacs-player-state 'down)))
 
 (defun pacmacs-left ()
   (interactive)
-  (when (and (equal pacmacs-game-state 'play)
-             (not pacmacs-play-pause))
+  (when (pacmacs--unpaused-play-state-p)
     (pacmacs--switch-direction pacmacs-player-state 'left)))
 
 (defun pacmacs-right ()
   (interactive)
-  (when (and (equal pacmacs-game-state 'play)
-             (not pacmacs-play-pause))
+  (when (pacmacs--unpaused-play-state-p)
     (pacmacs--switch-direction pacmacs-player-state 'right)))
 
 (defun pacmacs-pause ()
