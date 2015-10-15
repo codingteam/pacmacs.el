@@ -59,7 +59,7 @@
 
 (defvar pacmacs-player-state nil)
 
-(defvar pacmacs-ghosts nil)
+(defvar pacmacs--ghosts nil)
 (defvar pacmacs-wall-cells nil)
 (defvar pacmacs-pills nil)
 
@@ -199,7 +199,7 @@
 (defun pacmacs--ghost-at-p (row column)
   (pacmacs--object-at-p pacmacs-board
                         row column
-                        pacmacs-ghosts))
+                        pacmacs--ghosts))
 
 (defun pacmacs-quit ()
   (interactive)
@@ -305,7 +305,7 @@
   (pacmacs-render-state))
 
 (defun pacmacs--step-ghosts ()
-  (dolist (ghost pacmacs-ghosts)
+  (dolist (ghost pacmacs--ghosts)
     (pacmacs--track-object ghost)
     (pacmacs--step-object ghost)))
 
@@ -333,7 +333,7 @@
 (defun pacmacs-play-state-logic ()
   (when (not pacmacs-play-pause)
     (pacmacs--anim-object-next-frame pacmacs-player-state pacmacs-tick-duration-ms)
-    (pacmacs--anim-object-list-next-frame pacmacs-ghosts pacmacs-tick-duration-ms)
+    (pacmacs--anim-object-list-next-frame pacmacs--ghosts pacmacs-tick-duration-ms)
     (pacmacs--anim-object-list-next-frame pacmacs-pills pacmacs-tick-duration-ms)
 
     (pacmacs--recalc-track-board)
@@ -346,7 +346,7 @@
             (pacmacs--detect-pill-collision)
             (pacmacs--step-ghosts)
             (when (pacmacs--ghost-collision-p)
-              (dolist (ghost pacmacs-ghosts)
+              (dolist (ghost pacmacs--ghosts)
                 (pacmacs--step-back-object ghost))
               (pacmacs--switch-to-death-state))))
       (pacmacs--switch-to-level-beaten-state))))
@@ -354,6 +354,8 @@
 (defun pacmacs-death-state-logic ()
   (pacmacs--anim-object-next-frame pacmacs-player-state
                                    pacmacs-tick-duration-ms)
+  (pacmacs--anim-object-list-next-frame pacmacs--ghosts
+                                        pacmacs-tick-duration-ms)
   
   (when (= 0 (plist-get
               (plist-get pacmacs-player-state
@@ -380,7 +382,10 @@
   (setq pacmacs-game-state 'death)
   (cl-decf pacmacs-lives)
   (plist-put pacmacs-player-state :current-animation
-             (pacmacs-load-anim "Pacman-Death")))
+             (pacmacs-load-anim "Pacman-Death"))
+  (dolist (ghost pacmacs--ghosts)
+    (plist-put ghost :current-animation
+               (pacmacs-load-anim "Red-Ghost-Win"))))
 
 (defun pacmacs--switch-to-game-over-state ()
   (setq pacmacs-game-state 'game-over)
@@ -391,7 +396,7 @@
   (setq pacmacs-game-state 'play)
   (setq pacmacs-play-pause nil)
   (pacmacs--reset-object-position pacmacs-player-state)
-  (dolist (ghost pacmacs-ghosts)
+  (dolist (ghost pacmacs--ghosts)
     (pacmacs--reset-object-position ghost))
   (pacmacs--switch-direction pacmacs-player-state 'right))
 
@@ -418,7 +423,7 @@
       (dolist (pill pacmacs-pills)
         (pacmacs--put-object pill))
 
-      (dolist (ghost pacmacs-ghosts)
+      (dolist (ghost pacmacs--ghosts)
         (pacmacs--put-object ghost))
 
       (pacmacs--put-object pacmacs-player-state)
@@ -498,7 +503,7 @@
 
     (setq pacmacs-wall-cells nil)
     (setq pacmacs-pills nil)
-    (setq pacmacs-ghosts nil)
+    (setq pacmacs--ghosts nil)
     (setq pacmacs-player-state nil)
 
     (cl-loop
@@ -514,7 +519,7 @@
                            (setq pacmacs-player-state (pacmacs--make-player row column)))
 
                           ((char-equal x ?g)
-                           (add-to-list 'pacmacs-ghosts (pacmacs--make-ghost row column))))))))
+                           (add-to-list 'pacmacs--ghosts (pacmacs--make-ghost row column))))))))
 
 (provide 'pacmacs)
 
