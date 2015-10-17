@@ -373,7 +373,10 @@
     (plist-bind ((row :row)
                  (column :column))
         anim-object
-      (pacmacs--cell-wrapped-set pacmacs--object-board row column anim-object))))
+      (let ((cell (pacmacs--cell-wrapped-get pacmacs--object-board
+                                             row column)))
+        (pacmacs--cell-wrapped-set pacmacs--object-board row column
+                                   (cons anim-object cell))))))
 
 (defun pacmacs--switch-to-death-state ()
   (setq pacmacs-game-state 'death)
@@ -405,6 +408,20 @@
   (setq pacmacs-game-state 'level-beaten)
   (setq pacmacs-waiting-counter 1000))
 
+(defun pacmacs--fill-object-board ()
+  (pacmacs--fill-board pacmacs--object-board nil)
+
+  (dolist (pill pacmacs-pills)
+    (pacmacs--put-object pill))
+
+  (dolist (ghost pacmacs--ghosts)
+    (pacmacs--put-object ghost))
+
+  (pacmacs--put-object pacmacs-player-state)
+  
+  (dolist (wall pacmacs-wall-cells)
+    (pacmacs--put-object wall)))
+
 (defun pacmacs--render-state ()
   (with-current-buffer pacmacs-buffer-name
     (let ((inhibit-read-only t))
@@ -415,25 +432,15 @@
       (when pacmacs-debug-output
         (pacmacs--render-track-board pacmacs--track-board))
 
-      (pacmacs--fill-board pacmacs--object-board nil)
+      (pacmacs--fill-object-board)
 
-      (dolist (pill pacmacs-pills)
-        (pacmacs--put-object pill))
-
-      (dolist (ghost pacmacs--ghosts)
-        (pacmacs--put-object ghost))
-
-      (pacmacs--put-object pacmacs-player-state)
-      
-      (dolist (wall pacmacs-wall-cells)
-        (pacmacs--put-object wall))
-      
       (plist-bind ((width :width)
                    (height :height))
           pacmacs--object-board
         (dotimes (row height)
           (dotimes (column width)
-            (let ((anim-object (pacmacs--cell-wrapped-get pacmacs--object-board row column)))
+            (let ((anim-object (car (pacmacs--cell-wrapped-get pacmacs--object-board
+                                                               row column))))
               (pacmacs--render-object anim-object)))
           (insert "\n")))
       (insert "\n")
