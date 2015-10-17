@@ -42,6 +42,20 @@
     (should (pacmacs--object-at-p board 0 5 objects))
     (should (not (pacmacs--object-at-p board 1 5 objects)))))
 
+(ert-deftest pacmacs--object-type-at-p-test ()
+  (let ((board (pacmacs--make-board 5 4)))
+    (dotimes (i 4)
+      (pacmacs--cell-wrapped-set
+       board i i
+       (list (list :row i
+                   :column i
+                   :type 'khooy))))
+
+    (should (pacmacs--object-type-at-p board 0 0 'khooy))
+    (should (not (pacmacs--object-type-at-p board 0 1 'khooy)))
+    (should (pacmacs--object-type-at-p board 0 5 'khooy))
+    (should (not (pacmacs--object-type-at-p board 1 5 'khooy)))))
+
 (ert-deftest pacmacs--step-point-test ()
   (let ((board (list :width 3
                      :height 2))
