@@ -122,12 +122,14 @@
   (list :current-animation (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
                                               (pacmacs-create-color-block 40 40 "red"))
         :row row
-        :column column))
+        :column column
+        :type 'wall))
 
 (defun pacmacs--make-pill (row column)
   (list :current-animation (pacmacs-load-anim "Pill")
         :row row
-        :column column))
+        :column column
+        :type 'pill))
 
 (defun pacmacs--make-ghost (row column)
   (list :row row
@@ -143,7 +145,8 @@
                                     'up    (pacmacs-load-anim "Red-Ghost-Up")
                                     'down  (pacmacs-load-anim "Red-Ghost-Down"))
         :speed 1
-        :speed-counter 0))
+        :speed-counter 0
+        :type 'ghost))
 
 (defun pacmacs--make-player (row column)
   (list :row row
@@ -159,21 +162,26 @@
                                     'up    (pacmacs-load-anim "Pacman-Chomping-Up")
                                     'down  (pacmacs-load-anim "Pacman-Chomping-Down"))
         :speed 0
-        :speed-counter 0))
+        :speed-counter 0
+        :type 'player))
 
 (defun pacmacs--reset-object-position (game-object)
   (plist-bind ((init-row :init-row)
                (init-column :init-column))
       game-object
+    (pacmacs--remove-object game-object)
     (plist-put game-object :row init-row)
-    (plist-put game-object :column init-column)))
+    (plist-put game-object :column init-column)
+    (pacmacs--put-object game-object)))
 
 (defun pacmacs--step-back-object (game-object)
   (plist-bind ((prev-row :prev-row)
                (prev-column :prev-column))
       game-object
+    (pacmacs--remove-object game-object)
     (plist-put game-object :row prev-row)
-    (plist-put game-object :column prev-column)))
+    (plist-put game-object :column prev-column)
+    (pacmacs--put-object game-object)))
 
 (defun pacmacs--kill-buffer-and-its-window (buffer-or-name)
   (let ((buffer-window (get-buffer-window buffer-or-name)))
@@ -184,24 +192,16 @@
       (kill-buffer buffer-or-name))))
 
 (defun pacmacs--wall-at-p (row column)
-  (pacmacs--object-at-p pacmacs--object-board
-                        row column
-                        pacmacs--wall-cells))
+  (pacmacs--object-type-at-p pacmacs--object-board
+                             row column 'wall))
 
 (defun pacmacs--pill-at-p (row column)
-  (pacmacs--object-at-p pacmacs--object-board
-                        row column
-                        pacmacs--pills))
+  (pacmacs--object-type-at-p pacmacs--object-board
+                             row column 'pill))
 
 (defun pacmacs--ghost-at-p (row column)
-  (pacmacs--object-at-p pacmacs--object-board
-                        row column
-                        pacmacs--ghosts))
-
-(defun pacmacs-quit ()
-  (interactive)
-  (when (get-buffer pacmacs-buffer-name)
-    (pacmacs--kill-buffer-and-its-window pacmacs-buffer-name)))
+  (pacmacs--object-type-at-p pacmacs--object-board
+                             row column 'ghost))
 
 (defun pacmacs--cell-tracked-p (row column)
   (pacmacs--cell-wrapped-get pacmacs--track-board row column))
@@ -227,8 +227,10 @@
                (new-column (cdr new-point)))
           (plist-put game-object :speed-counter speed)
           (when (not (pacmacs--wall-at-p new-row new-column))
+            (pacmacs--remove-object game-object)
             (plist-put game-object :row new-row)
-            (plist-put game-object :column new-column)))
+            (plist-put game-object :column new-column)
+            (pacmacs--put-object game-object)))
       (plist-put game-object :speed-counter (1- speed-counter)))))
 
 (defun pacmacs--possible-ways (row column)
@@ -312,14 +314,8 @@
       pacmacs--player-state
     (-when-let (pill (pacmacs--pill-at-p row column))
       (setq pacmacs-score (+ pacmacs-score 10))
-      (setq pacmacs--pills
-            (cl-remove-if #'(lambda (pill)
-                              (plist-bind ((p-row :row)
-                                           (p-column :column))
-                                  pill
-                                (and (= row p-row)
-                                     (= column p-column))))
-                          pacmacs--pills)))))
+      (setq pacmacs--pills (-remove (-partial #'eql pill) pacmacs--pills))
+      (pacmacs--remove-object pill))))
 
 (defun pacmacs--ghost-collision-p ()
   (plist-bind ((row :row)
@@ -368,15 +364,26 @@
     (cl-decf pacmacs-waiting-counter
              pacmacs-tick-duration-ms)))
 
-(defun pacmacs--put-object (anim-object)
-  (when anim-object
+(defun pacmacs--put-object (game-object)
+  (when game-object
     (plist-bind ((row :row)
                  (column :column))
-        anim-object
+        game-object
       (let ((cell (pacmacs--cell-wrapped-get pacmacs--object-board
                                              row column)))
         (pacmacs--cell-wrapped-set pacmacs--object-board row column
-                                   (cons anim-object cell))))))
+                                   (cons game-object cell))))))
+
+(defun pacmacs--remove-object (game-object)
+  (when game-object
+    (plist-bind ((row :row)
+                 (column :column))
+        game-object
+      (let ((cell (pacmacs--cell-wrapped-get pacmacs--object-board
+                                             row column)))
+        (pacmacs--cell-wrapped-set pacmacs--object-board
+                                   row column
+                                   (-remove (-partial #'eql game-object) cell))))))
 
 (defun pacmacs--switch-to-death-state ()
   (setq pacmacs-game-state 'death)
@@ -431,8 +438,6 @@
 
       (when pacmacs-debug-output
         (pacmacs--render-track-board pacmacs--track-board))
-
-      (pacmacs--fill-object-board)
 
       (plist-bind ((width :width)
                    (height :height))
@@ -521,7 +526,8 @@
                            (setq pacmacs--player-state (pacmacs--make-player row column)))
 
                           ((char-equal x ?g)
-                           (add-to-list 'pacmacs--ghosts (pacmacs--make-ghost row column))))))))
+                           (add-to-list 'pacmacs--ghosts (pacmacs--make-ghost row column))))))
+    (pacmacs--fill-object-board)))
 
 (provide 'pacmacs)
 

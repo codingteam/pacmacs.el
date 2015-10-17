@@ -32,6 +32,8 @@
 
 ;;; Code:
 
+(require 'dash)
+(require 'dash-functional)
 (require 'pacmacs-utils)
 
 (defun pacmacs--make-board (width height)
@@ -63,14 +65,23 @@
   (plist-bind ((width :width)
                (height :height))
       board
-    (member (cons (mod row height)
-                  (mod column width))
-            (mapcar #'(lambda (object)
-                        (plist-bind ((row :row)
-                                     (column :column))
-                            object
-                          (cons row column)))
-                    objects))))
+    (let ((wrapped-row (mod row height))
+          (wrapped-column (mod column width)))
+      (-find (-lambda (object)
+               (plist-bind ((object-row :row)
+                            (object-column :column))
+                   object
+                 (and (= object-row wrapped-row)
+                      (= object-column wrapped-column))))
+             objects))))
+
+(defun pacmacs--object-type-at-p (board row column type)
+  (let ((cell (pacmacs--cell-wrapped-get board row column)))
+    (-find (-lambda (game-object)
+             (plist-bind ((object-type :type))
+                 game-object
+               (equal object-type type)))
+           cell)))
 
 (defun pacmacs--step-point (board row column direction)
   (plist-bind ((width :width)
