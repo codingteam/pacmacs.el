@@ -1,8 +1,7 @@
 (ert-deftest pacmacs-load-image-test ()
-  (let ((default-directory "/khooy/"))
-    (with-mock
-     (mock (create-image "/khooy/pew" 'xpm nil :heuristic-mask t) => 42 :times 1)
-     (should (= 42 (pacmacs-load-image "pew"))))))
+  (with-mock
+   (mock (create-image "pew" 'xpm nil :heuristic-mask t) => 42 :times 1)
+   (should (= 42 (pacmacs-load-image "pew")))))
 
 (ert-deftest pacmacs-insert-image-test ()
   (let ((resource "khooy")

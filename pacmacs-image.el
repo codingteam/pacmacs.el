@@ -1,4 +1,4 @@
-;;; pacmacs-image.el --- Pacman for Emacs
+;;; pacmacs-image.el --- Pacman for Emacs -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2015 Codingteam
 
@@ -33,8 +33,7 @@
 ;;; Code:
 
 (defun pacmacs-load-image (filename)
-  (create-image (concat default-directory filename)
-                'xpm nil :heuristic-mask t))
+  (create-image filename 'xpm nil :heuristic-mask t))
 
 (defun pacmacs-insert-image (resource resource-vector)
   (insert-image resource " " nil resource-vector))

@@ -97,3 +97,8 @@
      (mock (pacmacs-load-image *) => input-sprite-sheet)
      (should (equal expected-output
                     (pacmacs-load-anim "foo"))))))
+
+(ert-deftest pacmacs--anim-object-list-next-frame-test ()
+  (with-mock
+   (mock (pacmacs--anim-object-next-frame 42 43) :times 5)
+   (pacmacs--anim-object-list-next-frame (make-list 5 42) 43)))

@@ -1,4 +1,4 @@
-;;; pacmacs-render.el --- Pacman for Emacs
+;;; pacmacs-render.el --- Pacman for Emacs -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2015 Codingteam
 
@@ -34,6 +34,7 @@
 
 (require 'pacmacs-image)
 (require 'pacmacs-anim)
+(require 'pacmacs-board)
 
 (defvar pacmacs--empty-cell nil)
 (defvar pacmacs--life-icon nil)

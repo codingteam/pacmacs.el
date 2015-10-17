@@ -3,9 +3,10 @@
 
 (package-file "pacmacs.el")
 
-(files "*.el")
-
-(depends-on "dash")
+(files "*.el"
+       ("maps" "maps/*.txt")
+       ("sprites" "sprites/*.json")
+       ("sprites" "sprites/*.xpm"))
 
 (development
  (depends-on "el-mock")

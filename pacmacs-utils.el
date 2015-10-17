@@ -1,4 +1,4 @@
-;;; pacmacs-utils.el --- Pacman for Emacs
+;;; pacmacs-utils.el --- Pacman for Emacs -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2015 Codingteam
 
@@ -32,9 +32,13 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
+(defconst pacmacs--base (file-name-directory load-file-name))
+
 (defmacro plist-bind (keys expr &rest body)
   (declare (indent 2) (debug (sexp form &rest form)))
-  (let ((expr-name (gensym)))
+  (let ((expr-name (cl-gensym)))
     `(let* ((,expr-name ,expr)
             ,@(mapcar #'(lambda (key)
                           (cons (car key)
@@ -50,6 +54,9 @@ side-effects."
     (plist-put plist property
                (funcall transformer value))))
 
+(defun pacmacs--find-resource-file (filename)
+  (expand-file-name filename pacmacs--base))
+
 (defun pacmacs--direction-vector (direction)
   (let ((direction-table (list 'left  (cons  0 -1)
                                'right (cons  0  1)
@@ -64,6 +71,15 @@ side-effects."
                            (( 1 .  0) . down))))
     (cdr (assoc direction-vector
                 direction-table))))
+
+(defun pacmacs--file-content (filename)
+  (with-temp-buffer
+    (insert-file-contents filename)
+    (buffer-string)))
+
+(defun pacmacs--levelname-from-filename (filename)
+  (when (string-match "\\(map[0-9]+\\)\\.txt" filename)
+    (match-string 1 filename)))
 
 (provide 'pacmacs-utils)
 
