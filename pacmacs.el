@@ -63,7 +63,7 @@
 (defvar pacmacs-wall-cells nil)
 (defvar pacmacs-pills nil)
 
-(defvar pacmacs--render-board nil)
+(defvar pacmacs--object-board nil)
 (defvar pacmacs--track-board nil)
 
 (defvar pacmacs-play-pause nil)
@@ -187,17 +187,17 @@
       (kill-buffer buffer-or-name))))
 
 (defun pacmacs--wall-at-p (row column)
-  (pacmacs--object-at-p pacmacs--render-board
+  (pacmacs--object-at-p pacmacs--object-board
                         row column
                         pacmacs-wall-cells))
 
 (defun pacmacs--pill-at-p (row column)
-  (pacmacs--object-at-p pacmacs--render-board
+  (pacmacs--object-at-p pacmacs--object-board
                         row column
                         pacmacs-pills))
 
 (defun pacmacs--ghost-at-p (row column)
-  (pacmacs--object-at-p pacmacs--render-board
+  (pacmacs--object-at-p pacmacs--object-board
                         row column
                         pacmacs--ghosts))
 
@@ -225,7 +225,7 @@
     (plist-put game-object :prev-row row)
     (plist-put game-object :prev-column column)
     (if (zerop speed-counter)
-        (let* ((new-point (pacmacs--step-point pacmacs--render-board row column direction))
+        (let* ((new-point (pacmacs--step-point pacmacs--object-board row column direction))
                (new-row (car new-point))
                (new-column (cdr new-point)))
           (plist-put game-object :speed-counter speed)
@@ -376,7 +376,7 @@
     (plist-bind ((row :row)
                  (column :column))
         anim-object
-      (pacmacs--cell-wrapped-set pacmacs--render-board row column anim-object))))
+      (pacmacs--cell-wrapped-set pacmacs--object-board row column anim-object))))
 
 (defun pacmacs--switch-to-death-state ()
   (setq pacmacs-game-state 'death)
@@ -418,7 +418,7 @@
       (when pacmacs-debug-output
         (pacmacs--render-track-board pacmacs--track-board))
 
-      (pacmacs--fill-board pacmacs--render-board nil)
+      (pacmacs--fill-board pacmacs--object-board nil)
 
       (dolist (pill pacmacs-pills)
         (pacmacs--put-object pill))
@@ -433,10 +433,10 @@
       
       (plist-bind ((width :width)
                    (height :height))
-          pacmacs--render-board
+          pacmacs--object-board
         (dotimes (row height)
           (dotimes (column width)
-            (let ((anim-object (pacmacs--cell-wrapped-get pacmacs--render-board row column)))
+            (let ((anim-object (pacmacs--cell-wrapped-get pacmacs--object-board row column)))
               (pacmacs--render-object anim-object)))
           (insert "\n")))
       (insert "\n")
@@ -497,7 +497,7 @@
     (setq pacmacs-board-width board-width)
     (setq pacmacs-board-height board-height)
 
-    (setq pacmacs--render-board (pacmacs--make-board pacmacs-board-width
+    (setq pacmacs--object-board (pacmacs--make-board pacmacs-board-width
                                                      pacmacs-board-height))
     (setq pacmacs--track-board (pacmacs--make-board pacmacs-board-width
                                                     pacmacs-board-height))
