@@ -1,6 +1,6 @@
 
 (ert-deftest pacmacs--cell-tracked-p-test ()
-  (let ((pacmacs--track-buffer (list :width 2
+  (let ((pacmacs--track-board (list :width 2
                                      :height 2
                                      :data [[nil nil]
                                             ['left 'right]])))
@@ -8,21 +8,21 @@
     (should (pacmacs--cell-tracked-p 1 0))))
 
 (ert-deftest pacmacs--track-point-test ()
-  (let ((pacmacs--track-buffer (list :width 2
+  (let ((pacmacs--track-board (list :width 2
                                      :height 2
                                      :data [[nil nil]
                                             [nil nil]])))
     (pacmacs--track-point (cons 0 0) (cons 0 1))
     (should (equal [[right nil]
                     [nil nil]]
-                   (plist-get pacmacs--track-buffer :data)))
+                   (plist-get pacmacs--track-board :data)))
     (pacmacs--track-point (cons 1 0) (cons 1 -1))
     (should (equal [[right nil]
                     [left nil]]
-                   (plist-get pacmacs--track-buffer :data)))))
+                   (plist-get pacmacs--track-board :data)))))
 
 (ert-deftest pacmacs--track-object-test ()
-  (let ((pacmacs--track-buffer (list :width 2
+  (let ((pacmacs--track-board (list :width 2
                                      :height 2
                                      :data [[right down]
                                             [up left]]))
@@ -33,7 +33,7 @@
      (pacmacs--track-object game-object))))
 
 (ert-deftest pacmacs--put-object-test ()
-  (let ((pacmacs--render-buffer (list :width 2
+  (let ((pacmacs--render-board (list :width 2
                                       :height 2
                                       :data [[nil nil]
                                              [nil nil]]))
@@ -43,4 +43,4 @@
                          :height 2
                          :data [[nil (:row 0 :column 1)]
                                 [nil nil]])
-                   pacmacs--render-buffer))))
+                   pacmacs--render-board))))
