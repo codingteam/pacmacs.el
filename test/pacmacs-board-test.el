@@ -30,18 +30,6 @@
     (should (equal expected-board
                    input-board))))
 
-(ert-deftest pacmacs--object-at-p-test ()
-  (let ((board (list :width 5
-                     :height 4))
-        (objects (-map #'(lambda (x)
-                           (list :row x
-                                 :column x))
-                       (number-sequence 0 3))))
-    (should (pacmacs--object-at-p board 0 0 objects))
-    (should (not (pacmacs--object-at-p board 0 1 objects)))
-    (should (pacmacs--object-at-p board 0 5 objects))
-    (should (not (pacmacs--object-at-p board 1 5 objects)))))
-
 (ert-deftest pacmacs--object-type-at-p-test ()
   (let ((board (pacmacs--make-board 5 4)))
     (dotimes (i 4)
