@@ -416,7 +416,7 @@
       (insert (format "Score: %d\n\n" pacmacs-score))
 
       (when pacmacs-debug-output
-        (pacmacs--render-track-board pacmacs-track-board))
+        (pacmacs--render-track-board pacmacs--track-buffer))
 
       (pacmacs--fill-board pacmacs--render-buffer nil)
 
