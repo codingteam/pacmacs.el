@@ -55,10 +55,10 @@
 
 (defvar pacmacs-score 0)
 
-(defvar pacmacs-player-state nil)
+(defvar pacmacs--player-state nil)
 (defvar pacmacs--ghosts nil)
-(defvar pacmacs-wall-cells nil)
-(defvar pacmacs-pills nil)
+(defvar pacmacs--wall-cells nil)
+(defvar pacmacs--pills nil)
 
 (defvar pacmacs--object-board nil)
 (defvar pacmacs--track-board nil)
@@ -186,12 +186,12 @@
 (defun pacmacs--wall-at-p (row column)
   (pacmacs--object-at-p pacmacs--object-board
                         row column
-                        pacmacs-wall-cells))
+                        pacmacs--wall-cells))
 
 (defun pacmacs--pill-at-p (row column)
   (pacmacs--object-at-p pacmacs--object-board
                         row column
-                        pacmacs-pills))
+                        pacmacs--pills))
 
 (defun pacmacs--ghost-at-p (row column)
   (pacmacs--object-at-p pacmacs--object-board
@@ -261,7 +261,7 @@
   (pacmacs--fill-board pacmacs--track-board nil)
   (plist-bind ((player-row :row)
                (player-column :column))
-      pacmacs-player-state
+      pacmacs--player-state
     (let ((wave (list (cons player-row player-column))))
       (while (not (null wave))
         (let ((next-wave nil))
@@ -309,36 +309,36 @@
 (defun pacmacs--detect-pill-collision ()
   (plist-bind ((row :row)
                (column :column))
-      pacmacs-player-state
+      pacmacs--player-state
     (-when-let (pill (pacmacs--pill-at-p row column))
       (setq pacmacs-score (+ pacmacs-score 10))
-      (setq pacmacs-pills
+      (setq pacmacs--pills
             (cl-remove-if #'(lambda (pill)
                               (plist-bind ((p-row :row)
                                            (p-column :column))
                                   pill
                                 (and (= row p-row)
                                      (= column p-column))))
-                          pacmacs-pills)))))
+                          pacmacs--pills)))))
 
 (defun pacmacs--ghost-collision-p ()
   (plist-bind ((row :row)
                (column :column))
-      pacmacs-player-state
+      pacmacs--player-state
     (pacmacs--ghost-at-p row column)))
 
 (defun pacmacs-play-state-logic ()
   (when (not pacmacs-play-pause)
-    (pacmacs--anim-object-next-frame pacmacs-player-state pacmacs-tick-duration-ms)
+    (pacmacs--anim-object-next-frame pacmacs--player-state pacmacs-tick-duration-ms)
     (pacmacs--anim-object-list-next-frame pacmacs--ghosts pacmacs-tick-duration-ms)
-    (pacmacs--anim-object-list-next-frame pacmacs-pills pacmacs-tick-duration-ms)
+    (pacmacs--anim-object-list-next-frame pacmacs--pills pacmacs-tick-duration-ms)
 
     (pacmacs--recalc-track-board)
-    (if pacmacs-pills
+    (if pacmacs--pills
         (progn
-          (pacmacs--step-object pacmacs-player-state)
+          (pacmacs--step-object pacmacs--player-state)
           (if (pacmacs--ghost-collision-p)
-              (progn (pacmacs--step-back-object pacmacs-player-state)
+              (progn (pacmacs--step-back-object pacmacs--player-state)
                      (pacmacs--switch-to-death-state))
             (pacmacs--detect-pill-collision)
             (pacmacs--step-ghosts)
@@ -349,13 +349,13 @@
       (pacmacs--switch-to-level-beaten-state))))
 
 (defun pacmacs-death-state-logic ()
-  (pacmacs--anim-object-next-frame pacmacs-player-state
+  (pacmacs--anim-object-next-frame pacmacs--player-state
                                    pacmacs-tick-duration-ms)
   (pacmacs--anim-object-list-next-frame pacmacs--ghosts
                                         pacmacs-tick-duration-ms)
   
   (when (= 0 (plist-get
-              (plist-get pacmacs-player-state
+              (plist-get pacmacs--player-state
                          :current-animation)
               :current-frame))
     (if (<= pacmacs-lives 0)
@@ -381,7 +381,7 @@
 (defun pacmacs--switch-to-death-state ()
   (setq pacmacs-game-state 'death)
   (cl-decf pacmacs-lives)
-  (plist-put pacmacs-player-state :current-animation
+  (plist-put pacmacs--player-state :current-animation
              (pacmacs-load-anim "Pacman-Death"))
   (dolist (ghost pacmacs--ghosts)
     (plist-put ghost :current-animation
@@ -395,10 +395,10 @@
 (defun pacmacs--switch-to-play-state ()
   (setq pacmacs-game-state 'play)
   (setq pacmacs-play-pause nil)
-  (pacmacs--reset-object-position pacmacs-player-state)
+  (pacmacs--reset-object-position pacmacs--player-state)
   (dolist (ghost pacmacs--ghosts)
     (pacmacs--reset-object-position ghost))
-  (pacmacs--switch-direction pacmacs-player-state 'right))
+  (pacmacs--switch-direction pacmacs--player-state 'right))
 
 (defun pacmacs--switch-to-prepare-state ()
   (setq pacmacs-game-state 'prepare)
@@ -411,15 +411,15 @@
 (defun pacmacs--fill-object-board ()
   (pacmacs--fill-board pacmacs--object-board nil)
 
-  (dolist (pill pacmacs-pills)
+  (dolist (pill pacmacs--pills)
     (pacmacs--put-object pill))
 
   (dolist (ghost pacmacs--ghosts)
     (pacmacs--put-object ghost))
 
-  (pacmacs--put-object pacmacs-player-state)
+  (pacmacs--put-object pacmacs--player-state)
   
-  (dolist (wall pacmacs-wall-cells)
+  (dolist (wall pacmacs--wall-cells)
     (pacmacs--put-object wall)))
 
 (defun pacmacs--render-state ()
@@ -461,22 +461,22 @@
 (defun pacmacs-up ()
   (interactive)
   (when (pacmacs--unpaused-play-state-p)
-    (pacmacs--switch-direction pacmacs-player-state 'up)))
+    (pacmacs--switch-direction pacmacs--player-state 'up)))
 
 (defun pacmacs-down ()
   (interactive)
   (when (pacmacs--unpaused-play-state-p)
-    (pacmacs--switch-direction pacmacs-player-state 'down)))
+    (pacmacs--switch-direction pacmacs--player-state 'down)))
 
 (defun pacmacs-left ()
   (interactive)
   (when (pacmacs--unpaused-play-state-p)
-    (pacmacs--switch-direction pacmacs-player-state 'left)))
+    (pacmacs--switch-direction pacmacs--player-state 'left)))
 
 (defun pacmacs-right ()
   (interactive)
   (when (pacmacs--unpaused-play-state-p)
-    (pacmacs--switch-direction pacmacs-player-state 'right)))
+    (pacmacs--switch-direction pacmacs--player-state 'right)))
 
 (defun pacmacs-pause ()
   (interactive)
@@ -503,22 +503,22 @@
     (setq pacmacs--track-board (pacmacs--make-board board-width
                                                     board-height))
 
-    (setq pacmacs-wall-cells nil)
-    (setq pacmacs-pills nil)
+    (setq pacmacs--wall-cells nil)
+    (setq pacmacs--pills nil)
     (setq pacmacs--ghosts nil)
-    (setq pacmacs-player-state nil)
+    (setq pacmacs--player-state nil)
 
     (cl-loop
      for line being the element of lines using (index row)
      do (cl-loop for x being the element of line using (index column)
                  do (cond ((char-equal x ?#)
-                           (add-to-list 'pacmacs-wall-cells (pacmacs--make-wall-cell row column)))
+                           (add-to-list 'pacmacs--wall-cells (pacmacs--make-wall-cell row column)))
 
                           ((char-equal x ?.)
-                           (add-to-list 'pacmacs-pills (pacmacs--make-pill row column)))
+                           (add-to-list 'pacmacs--pills (pacmacs--make-pill row column)))
 
                           ((char-equal x ?o)
-                           (setq pacmacs-player-state (pacmacs--make-player row column)))
+                           (setq pacmacs--player-state (pacmacs--make-player row column)))
 
                           ((char-equal x ?g)
                            (add-to-list 'pacmacs--ghosts (pacmacs--make-ghost row column))))))))
