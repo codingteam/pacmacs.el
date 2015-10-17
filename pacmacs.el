@@ -203,6 +203,11 @@
   (pacmacs--object-type-at-p pacmacs--object-board
                              row column 'ghost))
 
+(defun pacmacs-quit ()
+  (interactive)
+  (when (get-buffer pacmacs-buffer-name)
+    (pacmacs--kill-buffer-and-its-window pacmacs-buffer-name)))
+
 (defun pacmacs--cell-tracked-p (row column)
   (pacmacs--cell-wrapped-get pacmacs--track-board row column))
 
