@@ -302,7 +302,7 @@
                                (pacmacs--load-next-level)
                                (pacmacs--switch-to-prepare-state)))))
 
-  (pacmacs-render-state))
+  (pacmacs--render-state))
 
 (defun pacmacs--step-ghosts ()
   (dolist (ghost pacmacs--ghosts)
@@ -408,7 +408,7 @@
   (setq pacmacs-game-state 'level-beaten)
   (setq pacmacs-waiting-counter 1000))
 
-(defun pacmacs-render-state ()
+(defun pacmacs--render-state ()
   (with-current-buffer pacmacs-buffer-name
     (let ((inhibit-read-only t))
       (erase-buffer)
