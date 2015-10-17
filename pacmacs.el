@@ -53,12 +53,9 @@
 
 (defvar pacmacs-timer nil)
 
-(defvar pacmacs-board-width 10)
-(defvar pacmacs-board-height 10)
 (defvar pacmacs-score 0)
 
 (defvar pacmacs-player-state nil)
-
 (defvar pacmacs--ghosts nil)
 (defvar pacmacs-wall-cells nil)
 (defvar pacmacs-pills nil)
@@ -494,13 +491,10 @@
                               "\n" t))
          (board-width (apply 'max (mapcar #'length lines)))
          (board-height (length lines)))
-    (setq pacmacs-board-width board-width)
-    (setq pacmacs-board-height board-height)
-
-    (setq pacmacs--object-board (pacmacs--make-board pacmacs-board-width
-                                                     pacmacs-board-height))
-    (setq pacmacs--track-board (pacmacs--make-board pacmacs-board-width
-                                                    pacmacs-board-height))
+    (setq pacmacs--object-board (pacmacs--make-board board-width
+                                                     board-height))
+    (setq pacmacs--track-board (pacmacs--make-board board-width
+                                                    board-height))
 
     (setq pacmacs-wall-cells nil)
     (setq pacmacs-pills nil)
