@@ -42,7 +42,7 @@
           :height height
           :data board)))
 
-(defun pacmacs--cell-get (board row column)
+(defun pacmacs--cell-wrapped-get (board row column)
   (plist-bind ((width :width)
                (height :height)
                (data :data))
@@ -50,7 +50,7 @@
     (aref (aref data (mod row height))
           (mod column width))))
 
-(defun pacmacs--cell-set (board row column value)
+(defun pacmacs--cell-wrapped-set (board row column value)
   (plist-bind ((width :width)
                (height :height)
                (data :data))

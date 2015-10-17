@@ -207,7 +207,7 @@
     (pacmacs--kill-buffer-and-its-window pacmacs-buffer-name)))
 
 (defun pacmacs--cell-tracked-p (row column)
-  (pacmacs--cell-get pacmacs--track-buffer row column))
+  (pacmacs--cell-wrapped-get pacmacs--track-buffer row column))
 
 (defun pacmacs--switch-direction (game-object direction)
   (plist-bind ((direction-animations :direction-animations))
@@ -256,7 +256,7 @@
          (d-row (- end-row start-row))
          (d-column (- end-column start-column)))
     
-    (pacmacs--cell-set pacmacs--track-buffer
+    (pacmacs--cell-wrapped-set pacmacs--track-buffer
                        start-row start-column
                        (pacmacs--direction-name (cons d-row d-column)))))
 
@@ -284,7 +284,7 @@
   (plist-bind ((row :row)
                (column :column))
       game-object
-    (let ((direction (pacmacs--cell-get pacmacs--track-buffer row column)))
+    (let ((direction (pacmacs--cell-wrapped-get pacmacs--track-buffer row column)))
       (pacmacs--switch-direction game-object direction))))
 
 (defun pacmacs-tick ()
@@ -376,7 +376,7 @@
     (plist-bind ((row :row)
                  (column :column))
         anim-object
-      (pacmacs--cell-set pacmacs--render-buffer row column anim-object))))
+      (pacmacs--cell-wrapped-set pacmacs--render-buffer row column anim-object))))
 
 (defun pacmacs--switch-to-death-state ()
   (setq pacmacs-game-state 'death)
@@ -430,13 +430,13 @@
       
       (dolist (wall pacmacs-wall-cells)
         (pacmacs--put-object wall))
-
+      
       (plist-bind ((width :width)
                    (height :height))
           pacmacs--render-buffer
         (dotimes (row height)
           (dotimes (column width)
-            (let ((anim-object (pacmacs--cell-get pacmacs--render-buffer row column)))
+            (let ((anim-object (pacmacs--cell-wrapped-get pacmacs--render-buffer row column)))
               (pacmacs--render-object anim-object)))
           (insert "\n")))
       (insert "\n")
