@@ -109,7 +109,7 @@
     (setq pacmacs-timer nil)))
 
 (defun pacmacs--load-current-level ()
-  (pacmacs-load-map (aref pacmacs-levels
+  (pacmacs--load-map (aref pacmacs-levels
                           pacmacs-current-level)))
 
 (defun pacmacs--load-next-level ()
@@ -389,7 +389,7 @@
 
 (defun pacmacs--switch-to-game-over-state ()
   (setq pacmacs-game-state 'game-over)
-  (pacmacs-load-map "game-over")
+  (pacmacs--load-map "game-over")
   (pacmacs--register-new-score pacmacs-score))
 
 (defun pacmacs--switch-to-play-state ()
@@ -490,7 +490,7 @@
        (-sort #'string-lessp)
        (apply #'vector)))
 
-(defun pacmacs-load-map (map-name)
+(defun pacmacs--load-map (map-name)
   (let* ((lines (split-string (->> map-name
                                    (format "./maps/%s.txt")
                                    (pacmacs--find-resource-file)
