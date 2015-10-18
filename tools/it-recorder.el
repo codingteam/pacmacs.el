@@ -17,6 +17,7 @@
   (interactive "FFile to save the test case: ")
   (with-temp-buffer
     (-> pacmacs--recorded-actions
+        (reverse)
         (pp-to-string)
         (insert))
     (write-file filename)))
