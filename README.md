@@ -6,6 +6,12 @@
 
 Pacman for Emacs
 
+<p align="center">
+  <img src="https://cloud.githubusercontent.com/assets/5211845/10491579/9ba466b2-72a7-11e5-982c-579ed6abe1a5.gif" href="https://www.reddit.com/r/emacs/comments/3opb5k/pacmacs_a_pacman_variant_for_emacs/"/>
+</p>
+
+(thanks to [@kaushalmodi](https://github.com/kaushalmodi) for the animation)
+
 ## Requirements ##
 
 - Emacs 24.3+
@@ -47,24 +53,23 @@ Only available in the `*Pacman*` buffer.
 ## Development ##
 
 Before developing the game please remove it from Emacs if it was
-installed before.
+installed before. You'll need [Cask][cask] to install the dependencies.
 
 I usually use the following workflow when I develop this game:
 
-1. `$ git clone git://github.com/rexim/pacmacs.el.git && cd pacmacs.el`;
-2. `M-x find-file RET /path/to/pacmacs.el/pacmacs.el RET`
-3. `M-x eval-expression RET (add-to-list 'load-path default-directory) RET`;
-4. `M-x eval-buffer RET`;
-5. `M-x pacmacs-start RET`;
-6. `M-x pacmacs-quit RET`;
-7. Change something in the source code;
-8. Go to the step 4.
+1. `$ git clone git://github.com/rexim/pacmacs.el.git && cd pacmacs.el && cask install`;
+2. `$ cask exec emacs`;
+3. `M-x find-file RET /path/to/pacmacs.el/pacmacs.el RET`
+4. `M-x eval-expression RET (add-to-list 'load-path default-directory) RET`;
+5. `M-x eval-buffer RET`;
+6. `M-x pacmacs-start RET`;
+7. `M-x pacmacs-quit RET`;
+8. Change something in the source code;
+9. Go to the step 5.
 
 ## Unit Tests ##
 
-For Unit Tests you need to install
-[Cask](http://cask.readthedocs.org/en/latest/) first. To run unit
-tests:
+For Unit Tests you need to install [Cask][cask] first. To run unit tests:
 
     $ cask # only once to download development dependencies
     $ cask exec ert-runner
@@ -77,3 +82,5 @@ license. All the work in the `sprites/` directory is distributed under
 
 Check `LICENSE.md` and `sprites/LICENSE.md` files for more
 information.
+
+[cask]: http://cask.readthedocs.org/en/latest/

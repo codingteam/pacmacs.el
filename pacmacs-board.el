@@ -1,4 +1,4 @@
-;;; pacmacs-board.el --- Pacman for Emacs
+;;; pacmacs-board.el --- Pacman for Emacs -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2015 Codingteam
 
@@ -32,6 +32,8 @@
 
 ;;; Code:
 
+(require 'dash)
+(require 'dash-functional)
 (require 'pacmacs-utils)
 
 (defun pacmacs--make-board (width height)
@@ -42,7 +44,7 @@
           :height height
           :data board)))
 
-(defun pacmacs--cell-get (board row column)
+(defun pacmacs--cell-wrapped-get (board row column)
   (plist-bind ((width :width)
                (height :height)
                (data :data))
@@ -50,7 +52,7 @@
     (aref (aref data (mod row height))
           (mod column width))))
 
-(defun pacmacs--cell-set (board row column value)
+(defun pacmacs--cell-wrapped-set (board row column value)
   (plist-bind ((width :width)
                (height :height)
                (data :data))
@@ -59,18 +61,13 @@
           (mod column width)
           value)))
 
-(defun pacmacs--object-at-p (board row column objects)
-  (plist-bind ((width :width)
-               (height :height))
-      board
-    (member (cons (mod row height)
-                  (mod column width))
-            (mapcar #'(lambda (object)
-                        (plist-bind ((row :row)
-                                     (column :column))
-                            object
-                          (cons row column)))
-                    objects))))
+(defun pacmacs--object-type-at-p (board row column type)
+  (let ((cell (pacmacs--cell-wrapped-get board row column)))
+    (-find (-lambda (game-object)
+             (plist-bind ((object-type :type))
+                 game-object
+               (equal object-type type)))
+           cell)))
 
 (defun pacmacs--step-point (board row column direction)
   (plist-bind ((width :width)

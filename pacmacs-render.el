@@ -1,4 +1,4 @@
-;;; pacmacs-render.el --- Pacman for Emacs
+;;; pacmacs-render.el --- Pacman for Emacs -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2015 Codingteam
 
@@ -68,7 +68,7 @@
       track-board
     (dotimes (row height)
       (dotimes (column width)
-        (let ((x (pacmacs--cell-get track-board row column)))
+        (let ((x (pacmacs--cell-wrapped-get track-board row column)))
           (cond
            ((null x)
             (insert "."))

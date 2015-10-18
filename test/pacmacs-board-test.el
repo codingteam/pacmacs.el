@@ -10,14 +10,14 @@
     (should (equal expected-board
                    (pacmacs--make-board width height)))))
 
-(ert-deftest pacmacs--cell-get-test ()
+(ert-deftest pacmacs--cell-wrapped-get-test ()
   (let ((input-board (list :width 3
                            :height 2
                            :data [[nil nil nil]
                                   [nil 42 nil]])))
-    (should (equal 42 (pacmacs--cell-get input-board 1 1)))))
+    (should (equal 42 (pacmacs--cell-wrapped-get input-board 1 1)))))
 
-(ert-deftest pacmacs--cell-set-test ()
+(ert-deftest pacmacs--cell-wrapped-set-test ()
   (let ((input-board (list :width 3
                            :height 2
                            :data [[nil nil nil]
@@ -26,21 +26,23 @@
                               :height 2
                               :data [[nil nil nil]
                                      [nil 42 nil]])))
-    (pacmacs--cell-set input-board 1 1 42)
+    (pacmacs--cell-wrapped-set input-board 1 1 42)
     (should (equal expected-board
                    input-board))))
 
-(ert-deftest pacmacs--object-at-p-test ()
-  (let ((board (list :width 5
-                     :height 4))
-        (objects (-map #'(lambda (x)
-                           (list :row x
-                                 :column x))
-                       (number-sequence 0 3))))
-    (should (pacmacs--object-at-p board 0 0 objects))
-    (should (not (pacmacs--object-at-p board 0 1 objects)))
-    (should (pacmacs--object-at-p board 0 5 objects))
-    (should (not (pacmacs--object-at-p board 1 5 objects)))))
+(ert-deftest pacmacs--object-type-at-p-test ()
+  (let ((board (pacmacs--make-board 5 4)))
+    (dotimes (i 4)
+      (pacmacs--cell-wrapped-set
+       board i i
+       (list (list :row i
+                   :column i
+                   :type 'khooy))))
+
+    (should (pacmacs--object-type-at-p board 0 0 'khooy))
+    (should (not (pacmacs--object-type-at-p board 0 1 'khooy)))
+    (should (pacmacs--object-type-at-p board 0 5 'khooy))
+    (should (not (pacmacs--object-type-at-p board 1 5 'khooy)))))
 
 (ert-deftest pacmacs--step-point-test ()
   (let ((board (list :width 3

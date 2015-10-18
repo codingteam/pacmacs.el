@@ -1,0 +1,27 @@
+{ "frames": {
+   "Ghost 0.ase": {
+    "frame": { "x": 0, "y": 0, "w": 40, "h": 40 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 40, "h": 40 },
+    "sourceSize": { "w": 40, "h": 40 },
+    "duration": 200
+   },
+   "Ghost 1.ase": {
+    "frame": { "x": 40, "y": 0, "w": 40, "h": 40 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 40, "h": 40 },
+    "sourceSize": { "w": 40, "h": 40 },
+    "duration": 200
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.1.0-dev",
+  "image": "Red-Ghost-Win.xpm",
+  "format": "RGBA8888",
+  "size": { "w": 80, "h": 40 },
+  "scale": "1"
+ }
+}
