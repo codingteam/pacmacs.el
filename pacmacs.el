@@ -89,19 +89,23 @@
 ;;;###autoload
 (defun pacmacs-start ()
   (interactive)
+  (pacmacs--initialize-game 'pacmacs-tick)
+  (pacmacs-mode))
+
+(defun pacmacs--initialize-game (tick-function)
   (switch-to-buffer pacmacs-buffer-name)
-  (pacmacs-mode)
 
   (setq pacmacs-lives 3)
   (setq pacmacs-score 0)
   (setq pacmacs-levels (pacmacs--get-list-of-levels))
   (setq pacmacs-current-level 0)
-  
+
   (pacmacs--load-current-level)
   (pacmacs--switch-to-play-state)
 
   (unless pacmacs-timer
-    (setq pacmacs-timer (run-at-time nil (* pacmacs-tick-duration-ms 0.001) 'pacmacs-tick))))
+    (setq pacmacs-timer (run-at-time nil (* pacmacs-tick-duration-ms 0.001)
+                                     tick-function))))
 
 (defun pacmacs-destroy ()
   (when pacmacs-timer
