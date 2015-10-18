@@ -55,17 +55,6 @@
 
 (defun pacmacs--start-it-recorder ()
   (interactive)
-  (switch-to-buffer pacmacs-buffer-name)
+  (pacmacs--initialize-game 'pacmacs-record-tick)
   (pacmacs-it-recorder-mode)
-
-  (setq pacmacs-lives 3)
-  (setq pacmacs-score 0)
-  (setq pacmacs-levels (pacmacs--get-list-of-levels))
-  (setq pacmacs-current-level 0)
-  (pacmacs--reset-recorder)
-
-  (pacmacs--load-current-level)
-  (pacmacs--switch-to-play-state)
-
-  (unless pacmacs-timer
-    (setq pacmacs-timer (run-at-time nil (* pacmacs-tick-duration-ms 0.001) 'pacmacs-record-tick))))
+  (pacmacs--reset-recorder))
