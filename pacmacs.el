@@ -38,6 +38,7 @@
 
 (require 'cl-lib)
 (require 'dash)
+(require 'f)
 
 (require 'pacmacs-anim)
 (require 'pacmacs-board)
@@ -508,7 +509,7 @@
   (let* ((lines (split-string (->> map-name
                                    (format "./maps/%s.txt")
                                    (pacmacs--find-resource-file)
-                                   (pacmacs--file-content))
+                                   (f-read-text))
                               "\n" t))
          (board-width (apply 'max (mapcar #'length lines)))
          (board-height (length lines)))

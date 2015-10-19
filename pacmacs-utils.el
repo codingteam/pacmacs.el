@@ -72,11 +72,6 @@ side-effects."
     (cdr (assoc direction-vector
                 direction-table))))
 
-(defun pacmacs--file-content (filename)
-  (with-temp-buffer
-    (insert-file-contents filename)
-    (buffer-string)))
-
 (defun pacmacs--levelname-from-filename (filename)
   (when (string-match "\\(map[0-9]+\\)\\.txt" filename)
     (match-string 1 filename)))

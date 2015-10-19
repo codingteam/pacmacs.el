@@ -32,6 +32,7 @@
 
 ;;; Code:
 
+(require 'f)
 (require 'dash)
 (require 'dash-functional)
 
@@ -53,7 +54,7 @@
 (defun pacmacs--read-score-table ()
   (when (file-exists-p pacmacs--score-file-name)
     (-> pacmacs--score-file-name
-        (pacmacs--file-content)
+        (f-read-text)
         (read-from-string)
         (car))))
 
