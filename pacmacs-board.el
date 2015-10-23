@@ -69,6 +69,20 @@
                (equal object-type type)))
            cell)))
 
+(defun pacmacs--object-at-p (board row column objects)
+  (plist-bind ((width :width)
+               (height :height))
+      board
+    (let ((wrapped-row (mod row height))
+          (wrapped-column (mod column width)))
+      (-find (-lambda (object)
+               (plist-bind ((object-row :row)
+                            (object-column :column))
+                   object
+                 (and (= object-row wrapped-row)
+                      (= object-column wrapped-column))))
+             objects))))
+
 (defun pacmacs--step-point (board row column direction)
   (plist-bind ((width :width)
                (height :height))
