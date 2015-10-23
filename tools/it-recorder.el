@@ -6,6 +6,7 @@
 
 (defvar pacmacs--tick-counter 0)
 (defvar pacmacs--recorded-actions nil)
+(defvar pacmacs--tick-times nil)
 
 (defun pacmacs--record-action (action-name)
   (add-to-list 'pacmacs--recorded-actions
@@ -56,7 +57,10 @@
 
 (defun pacmacs-replay-tick ()
   (cl-incf pacmacs--tick-counter)
-  (pacmacs-tick)
+
+  (add-to-list 'pacmacs--tick-times
+               (pacmacs--measure-time
+                (pacmacs-tick)))
 
   (if (not pacmacs--recorded-actions)
       (pacmacs-quit)
@@ -83,4 +87,5 @@
   (pacmacs-mode)
 
   (setq pacmacs--recorded-actions (pacmacs--load-test-case filename))
-  (setq pacmacs--tick-counter 0))
+  (setq pacmacs--tick-counter 0)
+  (setq pacmacs--tick-times nil))
