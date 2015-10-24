@@ -59,7 +59,6 @@
 (defvar pacmacs--player-state nil)
 (defvar pacmacs--ghosts nil)
 (defvar pacmacs--pills nil)
-(defvar pacmacs--big-pills nil)
 
 (defvar pacmacs--object-list nil)
 (defvar pacmacs--object-board nil)
@@ -526,7 +525,6 @@
     (setq pacmacs--pills (cdr (assoc 'pill pacmacs--object-list)))
     (setq pacmacs--ghosts (cdr (assoc 'ghost pacmacs--object-list)))
     (setq pacmacs--player-state (cadr (assoc 'player pacmacs--object-list)))
-    (setq pacmacs--big-pills (cdr (assoc 'big-pill pacmacs--object-list)))
 
     (pacmacs--fill-object-board)))
 
