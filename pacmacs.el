@@ -143,39 +143,29 @@
 (defun pacmacs--make-big-pill (row column)
   (pacmacs--make-pill row column "Big-Pill" 'big-pill))
 
-(defun pacmacs--make-ghost (row column)
+
+(defun pacmacs--make-character (row column anim-prefix speed type)
   (list :row row
         :column column
         :init-row row
         :init-column column
         :prev-row row
         :prev-column column
-        :direction 'right
-        :current-animation (pacmacs-load-anim "Red-Ghost-Right")
-        :direction-animations (list 'left  (pacmacs-load-anim "Red-Ghost-Left")
-                                    'right (pacmacs-load-anim "Red-Ghost-Right")
-                                    'up    (pacmacs-load-anim "Red-Ghost-Up")
-                                    'down  (pacmacs-load-anim "Red-Ghost-Down"))
-        :speed 1
+        :directory 'right
+        :current-animation (pacmacs-load-anim (concat anim-prefix "-Right"))
+        :direction-animations (-interleave '(left right up down)
+                                           (-map (-compose #'pacmacs-load-anim
+                                                           (-partial #'concat anim-prefix "-"))
+                                                 (list "Left" "Right" "Up" "Down")))
+        :speed speed
         :speed-counter 0
-        :type 'ghost))
+        :type type))
+
+(defun pacmacs--make-ghost (row column)
+  (pacmacs--make-character row column "Red-Ghost" 1 'ghost))
 
 (defun pacmacs--make-player (row column)
-  (list :row row
-        :column column
-        :init-row row
-        :init-column column
-        :prev-row row
-        :prev-column column
-        :direction 'right
-        :current-animation (pacmacs-load-anim "Pacman-Chomping-Right")
-        :direction-animations (list 'left  (pacmacs-load-anim "Pacman-Chomping-Left")
-                                    'right (pacmacs-load-anim "Pacman-Chomping-Right")
-                                    'up    (pacmacs-load-anim "Pacman-Chomping-Up")
-                                    'down  (pacmacs-load-anim "Pacman-Chomping-Down"))
-        :speed 0
-        :speed-counter 0
-        :type 'player))
+  (pacmacs--make-character row column "Pacman-Chomping" 0 'player))
 
 (defun pacmacs--reset-object-position (game-object)
   (plist-bind ((init-row :init-row)
