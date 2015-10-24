@@ -58,10 +58,10 @@
 
 (defvar pacmacs--player-state nil)
 (defvar pacmacs--ghosts nil)
-(defvar pacmacs--wall-cells nil)
 (defvar pacmacs--pills nil)
 (defvar pacmacs--big-pills nil)
 
+(defvar pacmacs--object-list nil)
 (defvar pacmacs--object-board nil)
 (defvar pacmacs--track-board nil)
 
@@ -423,21 +423,9 @@
   (setq pacmacs-waiting-counter 1000))
 
 (defun pacmacs--fill-object-board ()
-  (pacmacs--fill-board pacmacs--object-board nil)
-
-  (dolist (pill pacmacs--pills)
-    (pacmacs--put-object pill))
-
-  (dolist (ghost pacmacs--ghosts)
-    (pacmacs--put-object ghost))
-
-  (pacmacs--put-object pacmacs--player-state)
-  
-  (dolist (wall pacmacs--wall-cells)
-    (pacmacs--put-object wall))
-
-  (dolist (big-pill pacmacs--big-pills)
-    (pacmacs--put-object big-pill)))
+  (-each pacmacs--object-list
+    (-lambda ((_ . objects))
+      (-each objects #'pacmacs--put-object))))
 
 (defun pacmacs--render-state ()
   (with-current-buffer pacmacs-buffer-name
@@ -505,6 +493,17 @@
        (-sort #'string-lessp)
        (apply #'vector)))
 
+(defun pacmacs--lines-to-objects (lines)
+  (apply #'append
+         (cl-loop
+          for line being the element of lines using (index row)
+          collect (cl-loop for x being the element of line using (index column)
+                           collect (cond ((char-equal x ?#) (pacmacs--make-wall-cell row column))
+                                         ((char-equal x ?.) (pacmacs--make-regular-pill row column))
+                                         ((char-equal x ?+) (pacmacs--make-big-pill row column))
+                                         ((char-equal x ?o) (pacmacs--make-player row column))
+                                         ((char-equal x ?g) (pacmacs--make-ghost row column)))))))
+
 (defun pacmacs--load-map (map-name)
   (let* ((lines (split-string (->> map-name
                                    (format "./maps/%s.txt")
@@ -518,29 +517,17 @@
     (setq pacmacs--track-board (pacmacs--make-board board-width
                                                     board-height))
 
-    (setq pacmacs--wall-cells nil)
-    (setq pacmacs--pills nil)
-    (setq pacmacs--ghosts nil)
-    (setq pacmacs--player-state nil)
-    (setq pacmacs--big-pills nil)
+    (setq pacmacs--object-list
+          (->> lines
+               (pacmacs--lines-to-objects)
+               (-remove #'null)
+               (-group-by (-partial (-flip #'plist-get) :type))))
 
-    (cl-loop
-     for line being the element of lines using (index row)
-     do (cl-loop for x being the element of line using (index column)
-                 do (cond ((char-equal x ?#)
-                           (add-to-list 'pacmacs--wall-cells (pacmacs--make-wall-cell row column)))
+    (setq pacmacs--pills (cdr (assoc 'pill pacmacs--object-list)))
+    (setq pacmacs--ghosts (cdr (assoc 'ghost pacmacs--object-list)))
+    (setq pacmacs--player-state (cadr (assoc 'player pacmacs--object-list)))
+    (setq pacmacs--big-pills (cdr (assoc 'big-pill pacmacs--object-list)))
 
-                          ((char-equal x ?.)
-                           (add-to-list 'pacmacs--pills (pacmacs--make-regular-pill row column)))
-
-                          ((char-equal x ?+)
-                           (add-to-list 'pacmacs--big-pills (pacmacs--make-big-pill row column)))
-
-                          ((char-equal x ?o)
-                           (setq pacmacs--player-state (pacmacs--make-player row column)))
-
-                          ((char-equal x ?g)
-                           (add-to-list 'pacmacs--ghosts (pacmacs--make-ghost row column))))))
     (pacmacs--fill-object-board)))
 
 (provide 'pacmacs)
