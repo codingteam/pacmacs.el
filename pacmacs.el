@@ -244,10 +244,10 @@
       (plist-put game-object :speed-counter (1- speed-counter)))))
 
 (defun pacmacs--possible-ways (row column)
-  (list (cons (1+ row) column)
-        (cons row (1+ column))
-        (cons (1- row) column)
-        (cons row (1- column))))
+  (list (cons (1+ row) column)          ;down
+        (cons row (1+ column))          ;right
+        (cons (1- row) column)          ;up
+        (cons row (1- column))))        ;left
 
 (defun pacmacs--filter-candidates (p)
   (let ((row (car p))
@@ -456,7 +456,16 @@
           (dotimes (column width)
             (let ((anim-object (car (pacmacs--cell-wrapped-get pacmacs--object-board
                                                                row column))))
-              (pacmacs--render-object anim-object)))
+              (plist-bind ((type :type))
+                  anim-object
+                (if (not (equal type 'wall))
+                    (pacmacs--render-object anim-object)
+                  (pacmacs-insert-image (apply #'pacmacs--create-wall-block
+                                               40 40 "blue"
+                                               (-map (-lambda ((row . column))
+                                                       (not (pacmacs--wall-at-p row column)))
+                                                     (pacmacs--possible-ways row column)))
+                                        '(0 0 40 40))))))
           (insert "\n")))
       (insert "\n")
       (dotimes (i pacmacs-lives)

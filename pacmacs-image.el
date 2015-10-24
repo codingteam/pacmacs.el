@@ -46,6 +46,45 @@
    :foreground color
    :background color))
 
+(defun pacmacs--create-wall-block (width height color bottom right top left)
+  (let ((wall-block (make-vector
+                     width nil)))
+
+    (dotimes (i width)
+      (aset wall-block i (make-bool-vector height nil)))
+    
+    (when left
+      (dotimes (i height)
+        (aset (aref wall-block i) 0 t)
+        (aset (aref wall-block i) 1 t)
+        (aset (aref wall-block i) 2 t)
+        ))
+
+    (when right
+      (dotimes (i height)
+        (aset (aref wall-block i) (1- width) t)
+        (aset (aref wall-block i) (- width 2) t)
+        (aset (aref wall-block i) (- width 3) t)
+        ))
+
+    (when top
+      (dotimes (i width)
+        (aset (aref wall-block 0) i t)
+        (aset (aref wall-block 1) i t)
+        (aset (aref wall-block 2) i t)
+        ))
+    
+    (when bottom
+      (dotimes (i width)
+        (aset (aref wall-block (1- height)) i t)
+        (aset (aref wall-block (- height 2)) i t)
+        (aset (aref wall-block (- height 3)) i t)
+        ))
+
+    (create-image wall-block 'xbm t :width width :height height
+                  :foreground color
+                  :background nil)))
+
 (defun pacmacs-create-transparent-block (width height)
   (create-image
    (make-vector
