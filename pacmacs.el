@@ -60,6 +60,7 @@
 (defvar pacmacs--ghosts nil)
 (defvar pacmacs--wall-cells nil)
 (defvar pacmacs--pills nil)
+(defvar pacmacs--big-pills nil)
 
 (defvar pacmacs--object-board nil)
 (defvar pacmacs--track-board nil)
@@ -130,11 +131,17 @@
         :column column
         :type 'wall))
 
-(defun pacmacs--make-pill (row column)
-  (list :current-animation (pacmacs-load-anim "Pill")
+(defun pacmacs--make-pill (row column anim-name type)
+  (list :current-animation (pacmacs-load-anim anim-name)
         :row row
         :column column
-        :type 'pill))
+        :type type))
+
+(defun pacmacs--make-regular-pill (row column)
+  (pacmacs--make-pill row column "Pill" 'pill))
+
+(defun pacmacs--make-big-pill (row column)
+  (pacmacs--make-pill row column "Big-Pill" 'big-pill))
 
 (defun pacmacs--make-ghost (row column)
   (list :row row
@@ -437,7 +444,10 @@
   (pacmacs--put-object pacmacs--player-state)
   
   (dolist (wall pacmacs--wall-cells)
-    (pacmacs--put-object wall)))
+    (pacmacs--put-object wall))
+
+  (dolist (big-pill pacmacs--big-pills)
+    (pacmacs--put-object big-pill)))
 
 (defun pacmacs--render-state ()
   (with-current-buffer pacmacs-buffer-name
@@ -522,6 +532,7 @@
     (setq pacmacs--pills nil)
     (setq pacmacs--ghosts nil)
     (setq pacmacs--player-state nil)
+    (setq pacmacs--big-pills nil)
 
     (cl-loop
      for line being the element of lines using (index row)
@@ -530,7 +541,10 @@
                            (add-to-list 'pacmacs--wall-cells (pacmacs--make-wall-cell row column)))
 
                           ((char-equal x ?.)
-                           (add-to-list 'pacmacs--pills (pacmacs--make-pill row column)))
+                           (add-to-list 'pacmacs--pills (pacmacs--make-regular-pill row column)))
+
+                          ((char-equal x ?+)
+                           (add-to-list 'pacmacs--big-pills (pacmacs--make-big-pill row column)))
 
                           ((char-equal x ?o)
                            (setq pacmacs--player-state (pacmacs--make-player row column)))
