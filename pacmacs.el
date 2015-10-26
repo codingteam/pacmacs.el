@@ -461,7 +461,7 @@
                 (if (not (equal type 'wall))
                     (pacmacs--render-object anim-object)
                   (pacmacs-insert-image (apply #'pacmacs--create-wall-block
-                                               40 40 "blue"
+                                               40 40 "#5555ff"
                                                (-map (-lambda ((row . column))
                                                        (not (pacmacs--wall-at-p row column)))
                                                      (pacmacs--possible-ways row column)))
