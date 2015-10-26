@@ -20,11 +20,19 @@
     (with-mock
      (mock (make-bool-vector height t) => bool-vector-result :times 1)
      (mock (make-vector width bool-vector-result) => make-vector-result :times 1)
-     (mock (create-image make-vector-result
-                         'xbm t
-                         :width width :height height
-                         :foreground color
-                         :background color) => create-image-result :times 1)
+
+     (if (not pacmacs--flip-xbm-bits)
+         (mock (create-image make-vector-result
+                             'xbm t
+                             :width width :height height
+                             :foreground color
+                             :background nil) => create-image-result :times 1)
+       (mock (create-image make-vector-result
+                           'xbm t
+                           :width width :height height
+                           :foreground nil
+                           :background color) => create-image-result :times 1))
+
      (should (equal create-image-result
                     (pacmacs-create-color-block width height color))))))
 
