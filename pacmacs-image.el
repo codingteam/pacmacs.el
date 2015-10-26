@@ -32,6 +32,8 @@
 
 ;;; Code:
 
+(defconst pacmacs--flip-xbm-bits (eq system-type 'windows-nt))
+
 (defun pacmacs-load-image (filename)
   (create-image filename 'xpm nil :heuristic-mask t))
 
@@ -39,12 +41,18 @@
   (insert-image resource " " nil resource-vector))
 
 (defun pacmacs-create-color-block (width height color)
-  (create-image
+  (apply
+   #'create-image
    (make-vector
     width (make-bool-vector height t))
    'xbm t :width width :height height
-   :foreground color
-   :background color))
+   (if (not pacmacs--flip-xbm-bits)
+       (list
+        :foreground color
+        :background nil)
+     (list
+      :foreground nil
+      :background color))))
 
 (defun pacmacs-create-transparent-block (width height)
   (create-image
