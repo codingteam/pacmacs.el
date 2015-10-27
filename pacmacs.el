@@ -464,7 +464,11 @@
                                                40 40 "#5555ff"
                                                (-map (-lambda ((row . column))
                                                        (not (pacmacs--wall-at-p row column)))
-                                                     (pacmacs--possible-ways row column)))
+                                                     (append (pacmacs--possible-ways row column)
+                                                             (list (cons (1- row) (1- column)) ;left-upper
+                                                                   (cons (1- row) (1+ column)) ;right-upper
+                                                                   (cons (1+ row) (1- column)) ;left-bottom
+                                                                   (cons (1+ row) (1+ column)))))) ;right-bottom
                                         '(0 0 40 40))))))
           (insert "\n")))
       (insert "\n")

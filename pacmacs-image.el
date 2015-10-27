@@ -54,40 +54,58 @@
       :foreground nil
       :background color))))
 
-(defun pacmacs--create-wall-block (width height color bottom right top left)
+(defun pacmacs--put-dot (bits row column weight)
+  (dotimes (i weight)
+    (dotimes (j weight)
+      (aset (aref bits (+ i row)) (+ j column) t))))
+
+(defun pacmacs--create-wall-block (width
+                                   height color
+                                   bottom right top left
+                                   left-upper right-upper
+                                   left-bottom right-bottom)
   (let ((wall-block (make-vector
-                     width nil)))
+                     width nil))
+        (weight 3))
 
     (dotimes (i width)
       (aset wall-block i (make-bool-vector height nil)))
-    
+
+    (when left-upper
+      (pacmacs--put-dot wall-block 0 0 weight))
+
+    (when right-upper
+      (pacmacs--put-dot wall-block 0 (- width weight) weight))
+
+    (when left-bottom
+      (pacmacs--put-dot wall-block (- height weight) 0 weight))
+
+    (when right-bottom
+      (pacmacs--put-dot wall-block (- height weight) (- width weight) weight))
+
     (when left
       (dotimes (i height)
         (aset (aref wall-block i) 0 t)
         (aset (aref wall-block i) 1 t)
-        (aset (aref wall-block i) 2 t)
-        ))
+        (aset (aref wall-block i) 2 t)))
 
     (when right
       (dotimes (i height)
         (aset (aref wall-block i) (1- width) t)
         (aset (aref wall-block i) (- width 2) t)
-        (aset (aref wall-block i) (- width 3) t)
-        ))
+        (aset (aref wall-block i) (- width 3) t)))
 
     (when top
       (dotimes (i width)
         (aset (aref wall-block 0) i t)
         (aset (aref wall-block 1) i t)
-        (aset (aref wall-block 2) i t)
-        ))
+        (aset (aref wall-block 2) i t)))
     
     (when bottom
       (dotimes (i width)
         (aset (aref wall-block (1- height)) i t)
         (aset (aref wall-block (- height 2)) i t)
-        (aset (aref wall-block (- height 3)) i t)
-        ))
+        (aset (aref wall-block (- height 3)) i t)))
 
     (create-image wall-block 'xbm t :width width :height height
                   :foreground color
