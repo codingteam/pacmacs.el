@@ -58,9 +58,10 @@
 
 (defvar pacmacs--player-state nil)
 (defvar pacmacs--ghosts nil)
+(defvar pacmacs--wall-cells nil)
 (defvar pacmacs--pills nil)
+(defvar pacmacs--big-pills nil)
 
-(defvar pacmacs--object-list nil)
 (defvar pacmacs--object-board nil)
 (defvar pacmacs--track-board nil)
 
@@ -142,29 +143,39 @@
 (defun pacmacs--make-big-pill (row column)
   (pacmacs--make-pill row column "Big-Pill" 'big-pill))
 
-
-(defun pacmacs--make-character (row column anim-prefix speed type)
+(defun pacmacs--make-ghost (row column)
   (list :row row
         :column column
         :init-row row
         :init-column column
         :prev-row row
         :prev-column column
-        :directory 'right
-        :current-animation (pacmacs-load-anim (concat anim-prefix "-Right"))
-        :direction-animations (-interleave '(left right up down)
-                                           (-map (-compose #'pacmacs-load-anim
-                                                           (-partial #'concat anim-prefix "-"))
-                                                 (list "Left" "Right" "Up" "Down")))
-        :speed speed
+        :direction 'right
+        :current-animation (pacmacs-load-anim "Red-Ghost-Right")
+        :direction-animations (list 'left  (pacmacs-load-anim "Red-Ghost-Left")
+                                    'right (pacmacs-load-anim "Red-Ghost-Right")
+                                    'up    (pacmacs-load-anim "Red-Ghost-Up")
+                                    'down  (pacmacs-load-anim "Red-Ghost-Down"))
+        :speed 1
         :speed-counter 0
-        :type type))
-
-(defun pacmacs--make-ghost (row column)
-  (pacmacs--make-character row column "Red-Ghost" 1 'ghost))
+        :type 'ghost))
 
 (defun pacmacs--make-player (row column)
-  (pacmacs--make-character row column "Pacman-Chomping" 0 'player))
+  (list :row row
+        :column column
+        :init-row row
+        :init-column column
+        :prev-row row
+        :prev-column column
+        :direction 'right
+        :current-animation (pacmacs-load-anim "Pacman-Chomping-Right")
+        :direction-animations (list 'left  (pacmacs-load-anim "Pacman-Chomping-Left")
+                                    'right (pacmacs-load-anim "Pacman-Chomping-Right")
+                                    'up    (pacmacs-load-anim "Pacman-Chomping-Up")
+                                    'down  (pacmacs-load-anim "Pacman-Chomping-Down"))
+        :speed 0
+        :speed-counter 0
+        :type 'player))
 
 (defun pacmacs--reset-object-position (game-object)
   (plist-bind ((init-row :init-row)
@@ -422,9 +433,21 @@
   (setq pacmacs-waiting-counter 1000))
 
 (defun pacmacs--fill-object-board ()
-  (-each pacmacs--object-list
-    (-lambda ((_ . objects))
-      (-each objects #'pacmacs--put-object))))
+  (pacmacs--fill-board pacmacs--object-board nil)
+
+  (dolist (pill pacmacs--pills)
+    (pacmacs--put-object pill))
+
+  (dolist (ghost pacmacs--ghosts)
+    (pacmacs--put-object ghost))
+
+  (pacmacs--put-object pacmacs--player-state)
+  
+  (dolist (wall pacmacs--wall-cells)
+    (pacmacs--put-object wall))
+
+  (dolist (big-pill pacmacs--big-pills)
+    (pacmacs--put-object big-pill)))
 
 (defun pacmacs--render-state ()
   (with-current-buffer pacmacs-buffer-name
@@ -492,17 +515,6 @@
        (-sort #'string-lessp)
        (apply #'vector)))
 
-(defun pacmacs--lines-to-objects (lines)
-  (apply #'append
-         (cl-loop
-          for line being the element of lines using (index row)
-          collect (cl-loop for x being the element of line using (index column)
-                           collect (cond ((char-equal x ?#) (pacmacs--make-wall-cell row column))
-                                         ((char-equal x ?.) (pacmacs--make-regular-pill row column))
-                                         ((char-equal x ?+) (pacmacs--make-big-pill row column))
-                                         ((char-equal x ?o) (pacmacs--make-player row column))
-                                         ((char-equal x ?g) (pacmacs--make-ghost row column)))))))
-
 (defun pacmacs--load-map (map-name)
   (let* ((lines (split-string (->> map-name
                                    (format "./maps/%s.txt")
@@ -516,16 +528,29 @@
     (setq pacmacs--track-board (pacmacs--make-board board-width
                                                     board-height))
 
-    (setq pacmacs--object-list
-          (->> lines
-               (pacmacs--lines-to-objects)
-               (-remove #'null)
-               (-group-by (-partial (-flip #'plist-get) :type))))
+    (setq pacmacs--wall-cells nil)
+    (setq pacmacs--pills nil)
+    (setq pacmacs--ghosts nil)
+    (setq pacmacs--player-state nil)
+    (setq pacmacs--big-pills nil)
 
-    (setq pacmacs--pills (cdr (assoc 'pill pacmacs--object-list)))
-    (setq pacmacs--ghosts (cdr (assoc 'ghost pacmacs--object-list)))
-    (setq pacmacs--player-state (cadr (assoc 'player pacmacs--object-list)))
+    (cl-loop
+     for line being the element of lines using (index row)
+     do (cl-loop for x being the element of line using (index column)
+                 do (cond ((char-equal x ?#)
+                           (add-to-list 'pacmacs--wall-cells (pacmacs--make-wall-cell row column)))
 
+                          ((char-equal x ?.)
+                           (add-to-list 'pacmacs--pills (pacmacs--make-regular-pill row column)))
+
+                          ((char-equal x ?+)
+                           (add-to-list 'pacmacs--big-pills (pacmacs--make-big-pill row column)))
+
+                          ((char-equal x ?o)
+                           (setq pacmacs--player-state (pacmacs--make-player row column)))
+
+                          ((char-equal x ?g)
+                           (add-to-list 'pacmacs--ghosts (pacmacs--make-ghost row column))))))
     (pacmacs--fill-object-board)))
 
 (provide 'pacmacs)
