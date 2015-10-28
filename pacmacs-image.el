@@ -54,7 +54,7 @@
       :foreground nil
       :background color))))
 
-(defun pacmacs--put-dot (bits row column weight)
+(defun pacmacs--put-bits-dot (bits row column weight)
   (dotimes (i weight)
     (dotimes (j weight)
       (aset (aref bits (+ i row)) (+ j column) t))))
@@ -72,16 +72,16 @@
       (aset wall-block i (make-bool-vector height nil)))
 
     (when left-upper
-      (pacmacs--put-dot wall-block 0 0 weight))
+      (pacmacs--put-bits-dot wall-block 0 0 weight))
 
     (when right-upper
-      (pacmacs--put-dot wall-block 0 (- width weight) weight))
+      (pacmacs--put-bits-dot wall-block 0 (- width weight) weight))
 
     (when left-bottom
-      (pacmacs--put-dot wall-block (- height weight) 0 weight))
+      (pacmacs--put-bits-dot wall-block (- height weight) 0 weight))
 
     (when right-bottom
-      (pacmacs--put-dot wall-block (- height weight) (- width weight) weight))
+      (pacmacs--put-bits-dot wall-block (- height weight) (- width weight) weight))
 
     (when left
       (dotimes (i height)
