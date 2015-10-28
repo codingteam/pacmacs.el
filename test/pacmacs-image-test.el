@@ -51,3 +51,16 @@
                          :height height) => create-image-result :times 1)
      (should (equal create-image-result
                     (pacmacs-create-transparent-block width height))))))
+
+(ert-deftest pacmacs--put-bits-dot-test ()
+  (let ((input-bits (pacmacs--construct-2d-bool-vector
+                     '((nil nil nil)
+                       (nil nil nil)
+                       (nil nil nil))))
+        (expected-bits (pacmacs--construct-2d-bool-vector
+                        '((t   t   nil)
+                          (t   t   nil)
+                          (nil nil nil)))))
+    (pacmacs--put-bits-dot input-bits 0 0 2)
+    (should (equal expected-bits
+                   input-bits))))

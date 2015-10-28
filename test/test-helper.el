@@ -2,8 +2,22 @@
                                         ;this
 (require 'el-mock)
 (require 'undercover)
+(require 'dash)
 
 (undercover "*.el")
+
+(defun pacmacs--list-to-bool-vector (xs)
+  (let* ((index 0)
+         (size (length xs))
+         (result (make-bool-vector (length xs) nil)))
+    (dolist (x xs)
+      (aset result index x)
+      (cl-incf index))
+    result))
+
+(defun pacmacs--construct-2d-bool-vector (data)
+  (apply #'vector
+         (-map #'pacmacs--list-to-bool-vector data)))
 
 (add-to-list 'load-path ".")
 (load "pacmacs.el")
