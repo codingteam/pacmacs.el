@@ -15,9 +15,15 @@
       (cl-incf index))
     result))
 
+(defun pacmacs--bool-vector-to-list (xs)
+  (-map #'identity xs))
+
 (defun pacmacs--construct-2d-bool-vector (data)
   (apply #'vector
          (-map #'pacmacs--list-to-bool-vector data)))
+
+(defun pacmacs--bits-to-lists (bits)
+  (-map #'pacmacs--bool-vector-to-list bits))
 
 (add-to-list 'load-path ".")
 (load "pacmacs.el")

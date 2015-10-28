@@ -59,6 +59,16 @@
     (dotimes (j weight)
       (aset (aref bits (+ i row)) (+ j column) t))))
 
+(defun pacmacs--put-vertical-bar (bits column height weight)
+  (dotimes (w weight)
+    (dotimes (i height)
+      (aset (aref bits i) (+ column w) t))))
+
+(defun pacmacs--put-horizontal-bar (bits row width weight)
+  (dotimes (w weight)
+    (dotimes (i width)
+      (aset (aref bits (+ row w)) i t))))
+
 (defun pacmacs--create-wall-block (width
                                    height color
                                    bottom right top left
