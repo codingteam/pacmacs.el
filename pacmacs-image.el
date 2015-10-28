@@ -94,28 +94,16 @@
       (pacmacs--put-bits-dot wall-block (- height weight) (- width weight) weight))
 
     (when left
-      (dotimes (i height)
-        (aset (aref wall-block i) 0 t)
-        (aset (aref wall-block i) 1 t)
-        (aset (aref wall-block i) 2 t)))
+      (pacmacs--put-vertical-bar wall-block 0 height weight))
 
     (when right
-      (dotimes (i height)
-        (aset (aref wall-block i) (1- width) t)
-        (aset (aref wall-block i) (- width 2) t)
-        (aset (aref wall-block i) (- width 3) t)))
+      (pacmacs--put-vertical-bar wall-block (- width weight) height weight))
 
     (when top
-      (dotimes (i width)
-        (aset (aref wall-block 0) i t)
-        (aset (aref wall-block 1) i t)
-        (aset (aref wall-block 2) i t)))
+      (pacmacs--put-horizontal-bar wall-block 0 width weight))
     
     (when bottom
-      (dotimes (i width)
-        (aset (aref wall-block (1- height)) i t)
-        (aset (aref wall-block (- height 2)) i t)
-        (aset (aref wall-block (- height 3)) i t)))
+      (pacmacs--put-horizontal-bar wall-block (- height weight) width weight))
 
     (create-image wall-block 'xbm t :width width :height height
                   :foreground color
