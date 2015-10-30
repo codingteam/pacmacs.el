@@ -124,8 +124,7 @@
   (pacmacs--load-current-level))
 
 (defun pacmacs--make-wall-cell (row column)
-  (list :current-animation (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
-                                              (pacmacs-create-color-block 40 40 "red"))
+  (list :current-animation nil
         :row row
         :column column
         :type 'wall))
@@ -456,20 +455,7 @@
           (dotimes (column width)
             (let ((anim-object (car (pacmacs--cell-wrapped-get pacmacs--object-board
                                                                row column))))
-              (plist-bind ((type :type))
-                  anim-object
-                (if (not (equal type 'wall))
-                    (pacmacs--render-object anim-object)
-                  (pacmacs-insert-image (apply #'pacmacs--create-wall-block
-                                               40 40 "#5555ff"
-                                               (-map (-lambda ((row . column))
-                                                       (not (pacmacs--wall-at-p row column)))
-                                                     (append (pacmacs--possible-ways row column)
-                                                             (list (cons (1- row) (1- column)) ;left-upper
-                                                                   (cons (1- row) (1+ column)) ;right-upper
-                                                                   (cons (1+ row) (1- column)) ;left-bottom
-                                                                   (cons (1+ row) (1+ column)))))) ;right-bottom
-                                        '(0 0 40 40))))))
+              (pacmacs--render-object anim-object)))
           (insert "\n")))
       (insert "\n")
       (dotimes (i pacmacs-lives)
@@ -550,7 +536,24 @@
 
                           ((char-equal x ?g)
                            (add-to-list 'pacmacs--ghosts (pacmacs--make-ghost row column))))))
-    (pacmacs--fill-object-board)))
+
+    (pacmacs--fill-object-board)
+
+    (dolist (wall pacmacs--wall-cells)
+      (plist-bind ((row :row)
+                   (column :column))
+          wall
+        (plist-put wall :current-animation
+                   (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
+                                      (apply #'pacmacs--create-wall-block
+                                             40 40 "#5555ff"
+                                             (-map (-lambda ((row . column))
+                                                     (not (pacmacs--wall-at-p row column)))
+                                                   (append (pacmacs--possible-ways row column)
+                                                           (list (cons (1- row) (1- column))
+                                                                 (cons (1- row) (1+ column))
+                                                                 (cons (1+ row) (1- column))
+                                                                 (cons (1+ row) (1+ column))))))))))))
 
 (provide 'pacmacs)
 
