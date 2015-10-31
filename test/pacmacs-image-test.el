@@ -51,3 +51,42 @@
                          :height height) => create-image-result :times 1)
      (should (equal create-image-result
                     (pacmacs-create-transparent-block width height))))))
+
+(ert-deftest pacmacs--put-bits-dot-test ()
+  (let ((input-bits (pacmacs--construct-2d-bool-vector
+                     '((nil nil nil)
+                       (nil nil nil)
+                       (nil nil nil))))
+        (expected-bits (pacmacs--construct-2d-bool-vector
+                        '((t   t   nil)
+                          (t   t   nil)
+                          (nil nil nil)))))
+    (pacmacs--put-bits-dot input-bits 0 0 2)
+    (should (equal expected-bits
+                   input-bits))))
+
+(ert-deftest pacmacs--put-vertical-bar-test ()
+  (let ((input-bits (pacmacs--construct-2d-bool-vector
+                     '((nil nil nil)
+                       (nil nil nil)
+                       (nil nil nil))))
+        (expected-bits (pacmacs--construct-2d-bool-vector
+                        '((t t nil)
+                          (t t nil)
+                          (t t nil)))))
+    (pacmacs--put-vertical-bar input-bits 0 3 2)
+    (should (equal (pacmacs--bits-to-lists expected-bits)
+                   (pacmacs--bits-to-lists input-bits)))))
+
+(ert-deftest pacmacs--put-horizontal-bar-test ()
+  (let ((input-bits (pacmacs--construct-2d-bool-vector
+                     '((nil nil nil)
+                       (nil nil nil)
+                       (nil nil nil))))
+        (expected-bits (pacmacs--construct-2d-bool-vector
+                        '((t   t   t)
+                          (t   t   t)
+                          (nil nil nil)))))
+    (pacmacs--put-horizontal-bar input-bits 0 3 2)
+    (should (equal (pacmacs--bits-to-lists expected-bits)
+                   (pacmacs--bits-to-lists input-bits)))))
