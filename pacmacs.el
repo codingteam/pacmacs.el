@@ -510,6 +510,14 @@
        (-sort #'string-lessp)
        (apply #'vector)))
 
+(defun pacmacs--wall-tile-at (row column)
+  (apply #'pacmacs--create-wall-tile
+         40 40 "#5555ff"
+         (-map (-lambda ((row . column))
+                 (not (pacmacs--wall-at-p row column)))
+               (append (pacmacs--possible-side-ways row column)
+                       (pacmacs--possible-diagonal-ways row column)))))
+
 (defun pacmacs--load-map (map-name)
   (let* ((lines (split-string (->> map-name
                                    (format "./maps/%s.txt")
@@ -551,12 +559,7 @@
           wall
         (plist-put wall :current-animation
                    (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
-                                      (apply #'pacmacs--create-wall-block
-                                             40 40 "#5555ff"
-                                             (-map (-lambda ((row . column))
-                                                     (not (pacmacs--wall-at-p row column)))
-                                                   (append (pacmacs--possible-side-ways row column)
-                                                           (pacmacs--possible-diagonal-ways row column))))))))))
+                                      (pacmacs--wall-tile-at row column)))))))
 
 (provide 'pacmacs)
 

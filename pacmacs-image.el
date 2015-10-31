@@ -80,13 +80,13 @@
                            (if bit 1 0))))
     result))
 
-(defun pacmacs--create-wall-block (width
-                                   height color
+(defun pacmacs--create-wall-tile (width
+                                  height color
 
-                                   bottom right
-                                   top left
-                                   left-upper right-upper
-                                   left-bottom right-bottom)
+                                  bottom right
+                                  top left
+                                  left-upper right-upper
+                                  left-bottom right-bottom)
   (let ((cache-index
          (pacmacs--bit-list-to-integer
           (list bottom right top left
