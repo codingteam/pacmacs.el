@@ -242,11 +242,17 @@
             (pacmacs--put-object game-object)))
       (plist-put game-object :speed-counter (1- speed-counter)))))
 
-(defun pacmacs--possible-ways (row column)
+(defun pacmacs--possible-side-ways (row column)
   (list (cons (1+ row) column)          ;down
         (cons row (1+ column))          ;right
         (cons (1- row) column)          ;up
         (cons row (1- column))))        ;left
+
+(defun pacmacs--possible-diagonal-ways (row column)
+  (list (cons (1- row) (1- column))
+        (cons (1- row) (1+ column))
+        (cons (1+ row) (1- column))
+        (cons (1+ row) (1+ column))))
 
 (defun pacmacs--filter-candidates (p)
   (let ((row (car p))
@@ -279,7 +285,7 @@
           (dolist (p wave)
             (let* ((row (car p))
                    (column (cdr p))
-                   (possible-ways (pacmacs--possible-ways row column))
+                   (possible-ways (pacmacs--possible-side-ways row column))
                    (candidate-ways
                     (cl-remove-if #'pacmacs--filter-candidates possible-ways)))
               (dolist (candidate-way candidate-ways)
@@ -549,11 +555,8 @@
                                              40 40 "#5555ff"
                                              (-map (-lambda ((row . column))
                                                      (not (pacmacs--wall-at-p row column)))
-                                                   (append (pacmacs--possible-ways row column)
-                                                           (list (cons (1- row) (1- column))
-                                                                 (cons (1- row) (1+ column))
-                                                                 (cons (1+ row) (1- column))
-                                                                 (cons (1+ row) (1+ column))))))))))))
+                                                   (append (pacmacs--possible-side-ways row column)
+                                                           (pacmacs--possible-diagonal-ways row column))))))))))
 
 (provide 'pacmacs)
 
