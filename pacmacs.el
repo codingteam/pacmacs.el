@@ -512,7 +512,7 @@
 
 (defun pacmacs--wall-tile-at (row column)
   (apply #'pacmacs--create-wall-tile
-         40 40 "#5555ff"
+         40 40
          (-map (-lambda ((row . column))
                  (not (pacmacs--wall-at-p row column)))
                (append (pacmacs--possible-side-ways row column)
