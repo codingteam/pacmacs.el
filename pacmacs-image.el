@@ -156,12 +156,6 @@
                                'xpm t))
                pacmacs--wall-blocks))))
 
-(defun pacmacs-create-transparent-block (width height)
-  (create-image
-   (make-vector
-    width (make-bool-vector height nil))
-   'xbm t :width width :height height))
-
 (provide 'pacmacs-image)
 
 ;;; pacmacs-anim.el ends here
