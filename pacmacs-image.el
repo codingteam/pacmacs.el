@@ -80,8 +80,24 @@
                            (if bit 1 0))))
     result))
 
-(defun pacmacs--create-wall-tile (width
-                                  height color
+(defun pacmacs--bits-to-xpm (bits width height)
+  (concat
+   "/* XPM */\n"
+   "static char *tile[] = {\n"
+   "/**/\n"
+   (format "\"%d %d 2 1\",\n" width height)
+   "\"  c None\",\n"
+   "\". c #5555ff\",\n"
+   "/* pixels */\n"
+   (mapconcat
+    (lambda (row)
+      (format "\"%s\""
+       (mapconcat (-lambda (bit) (if bit "." " ")) row "")))
+    bits
+    ",\n")
+   "\n};"))
+
+(defun pacmacs--create-wall-tile (width height
 
                                   bottom right
                                   top left
@@ -110,7 +126,7 @@
                      (weight 3))
 
                  (dotimes (i width)
-                   (aset wall-block i (make-bool-vector height nil)))
+                   (aset wall-block i (make-vector height nil)))
 
                  (when left-upper
                    (pacmacs--put-bits-dot wall-block 0 0 weight))
@@ -136,16 +152,9 @@
                  (when bottom
                    (pacmacs--put-horizontal-bar wall-block (- height weight) width weight))
 
-                 (create-image wall-block 'xbm t :width width :height height
-                               :foreground color
-                               :background nil))
+                 (create-image (pacmacs--bits-to-xpm wall-block width height)
+                               'xpm t))
                pacmacs--wall-blocks))))
-
-(defun pacmacs-create-transparent-block (width height)
-  (create-image
-   (make-vector
-    width (make-bool-vector height nil))
-   'xbm t :width width :height height))
 
 (provide 'pacmacs-image)
 

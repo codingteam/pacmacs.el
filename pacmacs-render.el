@@ -36,13 +36,14 @@
 (require 'pacmacs-anim)
 (require 'pacmacs-board)
 
-(defvar pacmacs--empty-cell nil)
 (defvar pacmacs--life-icon nil)
 
 (defun pacmacs--render-empty-cell ()
-  (when (not pacmacs--empty-cell)
-    (setq pacmacs--empty-cell (pacmacs-create-transparent-block 40 40)))
-  (pacmacs-insert-image pacmacs--empty-cell '(0 0 40 40)))
+  (pacmacs-insert-image (pacmacs--create-wall-tile
+                         40 40
+                         nil nil nil nil
+                         nil nil nil nil)
+                        '(0 0 40 40)))
 
 (defun pacmacs--render-life-icon ()
   (when (not pacmacs--life-icon)
