@@ -6,11 +6,9 @@
 
 Pacman for Emacs
 
-<p align="center">
-  <img src="https://cloud.githubusercontent.com/assets/5211845/10491579/9ba466b2-72a7-11e5-982c-579ed6abe1a5.gif" href="https://www.reddit.com/r/emacs/comments/3opb5k/pacmacs_a_pacman_variant_for_emacs/"/>
-</p>
-
-(thanks to [@kaushalmodi](https://github.com/kaushalmodi) for the animation)
+<p align="center"><img src="http://i.imgur.com/CIf2XBc.png" href="http://i.imgur.com/CIf2XBc.png" /></p>
+<p align="center"><img src="http://i.imgur.com/BXjXKnU.png" href="http://i.imgur.com/BXjXKnU.png" /></p>
+<p align="center"><img src="http://i.imgur.com/nGhK9ih.png" href="http://i.imgur.com/nGhK9ih.png" /></p>
 
 ## Requirements ##
 
