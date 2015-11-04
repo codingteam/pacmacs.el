@@ -452,7 +452,9 @@
                    (height :height))
           pacmacs--object-board
         (dotimes (row height)
+          (ignore row)
           (dotimes (column width)
+            (ignore column)
             (insert " "))
           (insert "\n"))))))
 

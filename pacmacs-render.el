@@ -60,7 +60,7 @@
 (defun pacmacs--replace-anim (start end anim)
   (let* ((sprite-sheet (plist-get anim :sprite-sheet))
          (current-frame (plist-get (pacmacs-anim-get-frame anim) :frame)))
-    (put-text-property start end
+    (put-text-property start end 'display
                        (list (cons 'slice current-frame)
                              sprite-sheet))))
 
