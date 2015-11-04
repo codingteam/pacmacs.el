@@ -444,16 +444,23 @@
   (dolist (wall pacmacs--wall-cells)
     (pacmacs--put-object wall)))
 
-(defun pacmacs--render-state ()
+(defun pacmacs--prerender-game-board ()
   (with-current-buffer pacmacs-buffer-name
     (let ((inhibit-read-only t))
       (erase-buffer)
+      (plist-bind ((width :width)
+                   (height :height))
+          pacmacs--object-board
+        (dotimes (row height)
+          (dotimes (column width)
+            (insert " "))
+          (insert "\n"))))))
 
-      (insert (format "Score: %d\n\n" pacmacs-score))
-
-      (when pacmacs-debug-output
-        (pacmacs--render-track-board pacmacs--track-board))
-
+(defun pacmacs--render-state ()
+  (with-current-buffer pacmacs-buffer-name
+    (let ((inhibit-read-only t))
+      ;; (erase-buffer)
+      
       (plist-bind ((width :width)
                    (height :height))
           pacmacs--object-board
@@ -461,17 +468,20 @@
           (dotimes (column width)
             (let ((anim-object (car (pacmacs--cell-wrapped-get pacmacs--object-board
                                                                row column))))
-              (pacmacs--render-object anim-object)))
-          (insert "\n")))
-      (insert "\n")
-      (dotimes (i pacmacs-lives)
-        (ignore i)
-        (pacmacs--render-life-icon))
+              (pacmacs--render-object anim-object)))))
+      ;; (insert (format "Score: %d\n\n" pacmacs-score))
 
-      (when (equal pacmacs-game-state 'game-over)
-        (-> (pacmacs--read-score-table)
-            (pacmacs--sort-score-table)
-            (pacmacs--render-score-table)))
+      ;; (when pacmacs-debug-output
+      ;;   (pacmacs--render-track-board pacmacs--track-board))
+
+      ;; (dotimes (i pacmacs-lives)
+      ;;   (ignore i)
+      ;;   (pacmacs--render-life-icon))
+
+      ;; (when (equal pacmacs-game-state 'game-over)
+      ;;   (-> (pacmacs--read-score-table)
+      ;;       (pacmacs--sort-score-table)
+      ;;       (pacmacs--render-score-table)))
       (goto-char 0))))
 
 (defun pacmacs--unpaused-play-state-p ()
@@ -559,7 +569,9 @@
           wall
         (plist-put wall :current-animation
                    (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
-                                      (pacmacs--wall-tile-at row column)))))))
+                                      (pacmacs--wall-tile-at row column)))))
+
+    (pacmacs--prerender-game-board)))
 
 (provide 'pacmacs)
 

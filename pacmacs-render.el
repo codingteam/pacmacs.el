@@ -57,6 +57,13 @@
          (current-frame (plist-get (pacmacs-anim-get-frame anim) :frame)))
     (pacmacs-insert-image sprite-sheet current-frame)))
 
+(defun pacmacs--replace-anim (start end anim)
+  (let* ((sprite-sheet (plist-get anim :sprite-sheet))
+         (current-frame (plist-get (pacmacs-anim-get-frame anim) :frame)))
+    (put-text-property start end
+                       (list (cons 'slice current-frame)
+                             sprite-sheet))))
+
 (defun pacmacs--render-object (anim-object)
   (if anim-object
       (let* ((anim (plist-get anim-object :current-animation)))
