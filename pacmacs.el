@@ -466,11 +466,16 @@
       (plist-bind ((width :width)
                    (height :height))
           pacmacs--object-board
-        (dotimes (row height)
-          (dotimes (column width)
-            (let ((anim-object (car (pacmacs--cell-wrapped-get pacmacs--object-board
-                                                               row column))))
-              (pacmacs--render-object anim-object)))))
+        (let ((tile-pos 1))
+          (dotimes (row height)
+            (dotimes (column width)
+              (let ((anim-object (car (pacmacs--cell-wrapped-get pacmacs--object-board
+                                                                 row column))))
+                (if anim-object
+                    (pacmacs--replace-object anim-object tile-pos (1+ tile-pos))
+                  (pacmacs--replace-empty-cell tile-pos (1+ tile-pos))))
+              (cl-incf tile-pos))
+            (cl-incf tile-pos))))
       ;; (insert (format "Score: %d\n\n" pacmacs-score))
 
       ;; (when pacmacs-debug-output

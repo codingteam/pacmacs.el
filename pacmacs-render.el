@@ -45,6 +45,13 @@
                          nil nil nil nil)
                         '(0 0 40 40)))
 
+(defun pacmacs--replace-empty-cell (start end)
+  (add-text-properties start end
+                       `(display ,(pacmacs--create-wall-tile
+                                   40 40
+                                   nil nil nil nil
+                                   nil nil nil nil))))
+
 (defun pacmacs--render-life-icon ()
   (when (not pacmacs--life-icon)
     (setq pacmacs--life-icon
@@ -60,15 +67,20 @@
 (defun pacmacs--replace-anim (start end anim)
   (let* ((sprite-sheet (plist-get anim :sprite-sheet))
          (current-frame (plist-get (pacmacs-anim-get-frame anim) :frame)))
-    (put-text-property start end 'display
-                       (list (cons 'slice current-frame)
-                             sprite-sheet))))
+    (add-text-properties start end `(display
+                                     ((slice . ,current-frame)
+                                      ,sprite-sheet)))))
 
 (defun pacmacs--render-object (anim-object)
   (if anim-object
       (let* ((anim (plist-get anim-object :current-animation)))
         (pacmacs--render-anim anim))
     (pacmacs--render-empty-cell)))
+
+(defun pacmacs--replace-object (anim-object start end)
+  (plist-bind ((anim :current-animation))
+      anim-object
+    (pacmacs--replace-anim start end anim)))
 
 (defun pacmacs--render-track-board (track-board)
   (plist-bind ((width :width)
