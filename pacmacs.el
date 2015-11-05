@@ -95,6 +95,7 @@
 
 (defun pacmacs--initialize-game (tick-function)
   (switch-to-buffer pacmacs-buffer-name)
+  (buffer-disable-undo pacmacs-buffer-name)
 
   (setq pacmacs-lives 3)
   (setq pacmacs-score 0)
