@@ -47,10 +47,11 @@
 
 (defun pacmacs--replace-empty-cell (start end)
   (add-text-properties start end
-                       `(display ,(pacmacs--create-wall-tile
-                                   40 40
-                                   nil nil nil nil
-                                   nil nil nil nil))))
+                       `(display ((slice . (0 0 40 40))
+                                  ,(pacmacs--create-wall-tile
+                                    40 40
+                                    nil nil nil nil
+                                    nil nil nil nil)))))
 
 (defun pacmacs--render-life-icon ()
   (when (not pacmacs--life-icon)
