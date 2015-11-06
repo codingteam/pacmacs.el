@@ -103,6 +103,9 @@
             (insert "v")))))
       (insert "\n"))))
 
+(defun pacmacs--render-score (start end score)
+  (put-text-property start end 'display (format "Score: %d" score)))
+
 (provide 'pacmacs-render)
 
 ;;; pacmacs-render.el ends here

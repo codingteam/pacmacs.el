@@ -448,6 +448,7 @@
   (with-current-buffer pacmacs-buffer-name
     (let ((inhibit-read-only t))
       (erase-buffer)
+      (insert " \n")
       (plist-bind ((width :width)
                    (height :height))
           pacmacs--object-board
@@ -461,12 +462,12 @@
 (defun pacmacs--render-state ()
   (with-current-buffer pacmacs-buffer-name
     (let ((inhibit-read-only t))
-      ;; (erase-buffer)
+      (pacmacs--render-score 1 2 pacmacs-score)
       
       (plist-bind ((width :width)
                    (height :height))
           pacmacs--object-board
-        (let ((tile-pos 1))
+        (let ((tile-pos 3))
           (dotimes (row height)
             (dotimes (column width)
               (let ((anim-object (car (pacmacs--cell-wrapped-get pacmacs--object-board
@@ -476,7 +477,6 @@
                   (pacmacs--replace-empty-cell tile-pos (1+ tile-pos))))
               (cl-incf tile-pos))
             (cl-incf tile-pos))))
-      ;; (insert (format "Score: %d\n\n" pacmacs-score))
 
       ;; (when pacmacs-debug-output
       ;;   (pacmacs--render-track-board pacmacs--track-board))
