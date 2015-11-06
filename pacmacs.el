@@ -457,7 +457,8 @@
           (dotimes (column width)
             (ignore column)
             (insert " "))
-          (insert "\n"))))))
+          (insert "\n")))
+      (insert "  \n"))))
 
 (defun pacmacs--render-state ()
   (with-current-buffer pacmacs-buffer-name
@@ -477,6 +478,16 @@
                   (pacmacs--replace-empty-cell tile-pos (1+ tile-pos))))
               (cl-incf tile-pos))
             (cl-incf tile-pos))))
+
+      (plist-bind ((width :width)
+                   (height :height))
+          pacmacs--object-board
+        (let ((lives-counter-place (+ 3 (* (1+ width) height))))
+          (delete-region lives-counter-place (point-max))
+          (goto-char lives-counter-place)
+          (dotimes (i pacmacs-lives)
+            (ignore i)
+            (pacmacs--render-life-icon))))
 
       ;; (when pacmacs-debug-output
       ;;   (pacmacs--render-track-board pacmacs--track-board))

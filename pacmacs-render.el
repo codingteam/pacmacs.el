@@ -60,17 +60,27 @@
     (plist-put pacmacs--life-icon :current-frame 2))
   (pacmacs--render-anim pacmacs--life-icon))
 
+(defun pacmacs--replace-life-icon (start end)
+  (when (not pacmacs--life-icon)
+    (setq pacmacs--life-icon
+          (pacmacs-load-anim "Pacman-Chomping-Right"))
+    (plist-put pacmacs--life-icon :current-frame 2))
+  (pacmacs--replace-anim start end pacmacs--life-icon))
+
 (defun pacmacs--render-anim (anim)
   (let* ((sprite-sheet (plist-get anim :sprite-sheet))
          (current-frame (plist-get (pacmacs-anim-get-frame anim) :frame)))
     (pacmacs-insert-image sprite-sheet current-frame)))
 
+(defun pacmacs--render-image (start end image)
+  (add-text-properties start end `(display ,image)))
+
 (defun pacmacs--replace-anim (start end anim)
   (let* ((sprite-sheet (plist-get anim :sprite-sheet))
          (current-frame (plist-get (pacmacs-anim-get-frame anim) :frame)))
-    (add-text-properties start end `(display
-                                     ((slice . ,current-frame)
-                                      ,sprite-sheet)))))
+    (pacmacs--render-image start end 
+                           `((slice . ,current-frame)
+                             ,sprite-sheet))))
 
 (defun pacmacs--render-object (anim-object)
   (if anim-object
