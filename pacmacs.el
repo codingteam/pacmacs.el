@@ -351,6 +351,7 @@
     (pacmacs--anim-object-next-frame pacmacs--player-state pacmacs-tick-duration-ms)
     (pacmacs--anim-object-list-next-frame pacmacs--ghosts pacmacs-tick-duration-ms)
     (pacmacs--anim-object-list-next-frame pacmacs--pills pacmacs-tick-duration-ms)
+    (pacmacs--anim-object-list-next-frame pacmacs--big-pills pacmacs-tick-duration-ms)
 
     (pacmacs--recalc-track-board)
     (if pacmacs--pills
