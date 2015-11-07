@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/rexim/pacmacs.el.svg?branch=master)](https://travis-ci.org/rexim/pacmacs.el)
-[![Coverage Status](https://coveralls.io/repos/rexim/pacmacs.el/badge.svg?branch=master&service=github)](https://coveralls.io/github/rexim/pacmacs.el?branch=master)
+[![Build Status](https://travis-ci.org/codingteam/pacmacs.el.svg?branch=master)](https://travis-ci.org/codingteam/pacmacs.el)
+[![Coverage Status](https://coveralls.io/repos/codingteam/pacmacs.el/badge.svg?branch=master&service=github)](https://coveralls.io/github/codingteam/pacmacs.el?branch=master)
 [![MELPA](http://melpa.org/packages/pacmacs-badge.svg)](http://melpa.org/#/pacmacs)
 
 # Pacmacs #
@@ -55,7 +55,7 @@ installed before. You'll need [Cask][cask] to install the dependencies.
 
 I usually use the following workflow when I develop this game:
 
-1. `$ git clone git://github.com/rexim/pacmacs.el.git && cd pacmacs.el && cask install`;
+1. `$ git clone git://github.com/codingteam/pacmacs.el.git && cd pacmacs.el && cask install`;
 2. `$ cask exec emacs`;
 3. `M-x find-file RET /path/to/pacmacs.el/pacmacs.el RET`
 4. `M-x eval-expression RET (add-to-list 'load-path default-directory) RET`;
