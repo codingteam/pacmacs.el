@@ -75,6 +75,9 @@
   (define-key pacmacs-it-recorder-mode-map (kbd "<left>") 'pacmacs-record-left)
   (define-key pacmacs-it-recorder-mode-map (kbd "<right>") 'pacmacs-record-right))
 
+(defun pacmacs--average-tick-time ()
+  (/ (-sum pacmacs--tick-times) (length pacmacs--tick-times)))
+
 (defun pacmacs--start-it-recorder ()
   (interactive)
   (pacmacs--initialize-game 'pacmacs-record-tick)
