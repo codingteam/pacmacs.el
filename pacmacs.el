@@ -130,17 +130,18 @@
         :column column
         :type 'wall))
 
-(defun pacmacs--make-pill (row column anim-name)
+(defun pacmacs--make-pill (row column anim-name points)
   (list :current-animation (pacmacs-load-anim anim-name)
         :row row
         :column column
-        :type 'pill))
+        :type 'pill
+        :points points))
 
 (defun pacmacs--make-regular-pill (row column)
-  (pacmacs--make-pill row column "Pill"))
+  (pacmacs--make-pill row column "Pill" 10))
 
 (defun pacmacs--make-big-pill (row column)
-  (pacmacs--make-pill row column "Big-Pill"))
+  (pacmacs--make-pill row column "Big-Pill" 50))
 
 (defun pacmacs--make-ghost (row column)
   (list :row row
@@ -335,7 +336,7 @@
                (column :column))
       pacmacs--player-state
     (-when-let (pill (pacmacs--pill-at-p row column))
-      (setq pacmacs-score (+ pacmacs-score 10))
+      (setq pacmacs-score (+ pacmacs-score (plist-get pill :points)))
       (setq pacmacs--pills (-remove (-partial #'eql pill) pacmacs--pills))
       (pacmacs--remove-object pill))))
 
