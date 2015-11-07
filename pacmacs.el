@@ -60,7 +60,6 @@
 (defvar pacmacs--ghosts nil)
 (defvar pacmacs--wall-cells nil)
 (defvar pacmacs--pills nil)
-(defvar pacmacs--big-pills nil)
 
 (defvar pacmacs--object-board nil)
 (defvar pacmacs--track-board nil)
@@ -131,17 +130,17 @@
         :column column
         :type 'wall))
 
-(defun pacmacs--make-pill (row column anim-name type)
+(defun pacmacs--make-pill (row column anim-name)
   (list :current-animation (pacmacs-load-anim anim-name)
         :row row
         :column column
-        :type type))
+        :type 'pill))
 
 (defun pacmacs--make-regular-pill (row column)
-  (pacmacs--make-pill row column "Pill" 'pill))
+  (pacmacs--make-pill row column "Pill"))
 
 (defun pacmacs--make-big-pill (row column)
-  (pacmacs--make-pill row column "Big-Pill" 'big-pill))
+  (pacmacs--make-pill row column "Big-Pill"))
 
 (defun pacmacs--make-ghost (row column)
   (list :row row
@@ -351,7 +350,6 @@
     (pacmacs--anim-object-next-frame pacmacs--player-state pacmacs-tick-duration-ms)
     (pacmacs--anim-object-list-next-frame pacmacs--ghosts pacmacs-tick-duration-ms)
     (pacmacs--anim-object-list-next-frame pacmacs--pills pacmacs-tick-duration-ms)
-    (pacmacs--anim-object-list-next-frame pacmacs--big-pills pacmacs-tick-duration-ms)
 
     (pacmacs--recalc-track-board)
     (if pacmacs--pills
@@ -451,10 +449,7 @@
   (pacmacs--put-object pacmacs--player-state)
   
   (dolist (wall pacmacs--wall-cells)
-    (pacmacs--put-object wall))
-
-  (dolist (big-pill pacmacs--big-pills)
-    (pacmacs--put-object big-pill)))
+    (pacmacs--put-object wall)))
 
 (defun pacmacs--render-state ()
   (with-current-buffer pacmacs-buffer-name
@@ -547,7 +542,6 @@
     (setq pacmacs--pills nil)
     (setq pacmacs--ghosts nil)
     (setq pacmacs--player-state nil)
-    (setq pacmacs--big-pills nil)
 
     (cl-loop
      for line being the element of lines using (index row)
@@ -559,7 +553,7 @@
                            (add-to-list 'pacmacs--pills (pacmacs--make-regular-pill row column)))
 
                           ((char-equal x ?+)
-                           (add-to-list 'pacmacs--big-pills (pacmacs--make-big-pill row column)))
+                           (add-to-list 'pacmacs--pills (pacmacs--make-big-pill row column)))
 
                           ((char-equal x ?o)
                            (setq pacmacs--player-state (pacmacs--make-player row column)))
