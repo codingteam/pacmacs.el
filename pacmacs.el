@@ -96,6 +96,7 @@
 
 (defun pacmacs--initialize-game (tick-function)
   (switch-to-buffer pacmacs-buffer-name)
+  (buffer-disable-undo pacmacs-buffer-name)
 
   (setq pacmacs-lives 3)
   (setq pacmacs-score 0)
@@ -125,8 +126,7 @@
   (pacmacs--load-current-level))
 
 (defun pacmacs--make-wall-cell (row column)
-  (list :current-animation (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
-                                              (pacmacs-create-color-block 40 40 "red"))
+  (list :current-animation nil
         :row row
         :column column
         :type 'wall))
@@ -250,11 +250,17 @@
             (pacmacs--put-object game-object)))
       (plist-put game-object :speed-counter (1- speed-counter)))))
 
-(defun pacmacs--possible-ways (row column)
-  (list (cons (1+ row) column)
-        (cons row (1+ column))
-        (cons (1- row) column)
-        (cons row (1- column))))
+(defun pacmacs--possible-side-ways (row column)
+  (list (cons (1+ row) column)          ;down
+        (cons row (1+ column))          ;right
+        (cons (1- row) column)          ;up
+        (cons row (1- column))))        ;left
+
+(defun pacmacs--possible-diagonal-ways (row column)
+  (list (cons (1- row) (1- column))
+        (cons (1- row) (1+ column))
+        (cons (1+ row) (1- column))
+        (cons (1+ row) (1+ column))))
 
 (defun pacmacs--filter-candidates (p)
   (let ((row (car p))
@@ -287,7 +293,7 @@
           (dolist (p wave)
             (let* ((row (car p))
                    (column (cdr p))
-                   (possible-ways (pacmacs--possible-ways row column))
+                   (possible-ways (pacmacs--possible-side-ways row column))
                    (candidate-ways
                     (cl-remove-if #'pacmacs--filter-candidates possible-ways)))
               (dolist (candidate-way candidate-ways)
@@ -515,6 +521,14 @@
        (-sort #'string-lessp)
        (apply #'vector)))
 
+(defun pacmacs--wall-tile-at (row column)
+  (apply #'pacmacs--create-wall-tile
+         40 40
+         (-map (-lambda ((row . column))
+                 (not (pacmacs--wall-at-p row column)))
+               (append (pacmacs--possible-side-ways row column)
+                       (pacmacs--possible-diagonal-ways row column)))))
+
 (defun pacmacs--load-map (map-name)
   (let* ((lines (split-string (->> map-name
                                    (format "./maps/%s.txt")
@@ -551,7 +565,16 @@
 
                           ((char-equal x ?g)
                            (add-to-list 'pacmacs--ghosts (pacmacs--make-ghost row column))))))
-    (pacmacs--fill-object-board)))
+
+    (pacmacs--fill-object-board)
+
+    (dolist (wall pacmacs--wall-cells)
+      (plist-bind ((row :row)
+                   (column :column))
+          wall
+        (plist-put wall :current-animation
+                   (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
+                                      (pacmacs--wall-tile-at row column)))))))
 
 (provide 'pacmacs)
 
