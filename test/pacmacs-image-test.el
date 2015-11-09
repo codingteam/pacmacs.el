@@ -73,3 +73,16 @@
                                4 4))
    (pacmacs--create-wall-tile 4 4 t t nil nil
                               nil nil nil nil)))
+
+(ert-deftest pacmacs--bits-to-xpm-test ()
+  (should (string= (concat "/* XPM */\n"
+                           "static char *tile[] = {\n"
+                           "/**/\n\"2 2 2 1\",\n"
+                           "\"  c None\",\n"
+                           "\". c #5555ff\",\n"
+                           "/* pixels */\n"
+                           "\"..\",\n"
+                           "\"  \"\n};")
+                   (pacmacs--bits-to-xpm [[t t]
+                                          [nil nil]]
+                                         2 2))))
