@@ -48,3 +48,14 @@
     (pacmacs--put-horizontal-bar input-bits 0 3 2)
     (should (equal (pacmacs--bits-to-lists expected-bits)
                    (pacmacs--bits-to-lists input-bits)))))
+
+(ert-deftest pacmacs--bit-list-to-integer-test ()
+  (let ((data '((nil         . 0)
+                ((t)         . 1)
+                ((t nil)     . 2)
+                ((t t)       . 3)
+                ((t nil nil) . 4))))
+    (-each data
+      (-lambda ((bit-list . number))
+        (should (= number (pacmacs--bit-list-to-integer
+                           bit-list)))))))
