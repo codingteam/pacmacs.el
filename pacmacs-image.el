@@ -34,7 +34,6 @@
 
 (require 'dash)
 
-(defconst pacmacs--flip-xbm-bits (eq system-type 'windows-nt))
 (defvar pacmacs--wall-blocks
   (make-hash-table))
 
@@ -43,20 +42,6 @@
 
 (defun pacmacs-insert-image (resource resource-vector)
   (insert-image resource " " nil resource-vector))
-
-(defun pacmacs-create-color-block (width height color)
-  (apply
-   #'create-image
-   (make-vector
-    width (make-bool-vector height t))
-   'xbm t :width width :height height
-   (if (not pacmacs--flip-xbm-bits)
-       (list
-        :foreground color
-        :background nil)
-     (list
-      :foreground nil
-      :background color))))
 
 (defun pacmacs--put-bits-dot (bits row column weight)
   (dotimes (i weight)
