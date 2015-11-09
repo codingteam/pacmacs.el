@@ -82,32 +82,30 @@
     ",\n")
    "\n};"))
 
-(defun pacmacs--create-wall-tile (width height
+(defun pacmacs--normalize-wall-bits (wall-bits)
+  (-let (((bottom right top left left-upper right-upper left-bottom right-bottom)
+          wall-bits))
+    (list bottom right top left
+          (and left-upper   (not left)  (not top))
+          (and right-upper  (not right) (not top))
+          (and left-bottom  (not left)  (not bottom))
+          (and right-bottom (not right) (not bottom)))))
 
+(defun pacmacs--create-wall-tile (width height
                                   bottom right
                                   top left
                                   left-upper right-upper
                                   left-bottom right-bottom)
-  (let ((cache-index
-         (pacmacs--bit-list-to-integer
-          (list bottom right top left
-                (and left-upper
-                     (not left)
-                     (not top))
-                (and right-upper
-                     (not right)
-                     (not top))
-                (and left-bottom
-                     (not left)
-                     (not bottom))
-                (and right-bottom
-                     (not right)
-                     (not bottom))))))
+  (let* ((wall-bits (list bottom right top left
+                          left-upper right-upper
+                          left-bottom right-bottom))
+         (cache-index (-> wall-bits
+                          (pacmacs--normalize-wall-bits)
+                          (pacmacs--bit-list-to-integer))))
     (-if-let (cached-tile (gethash cache-index pacmacs--wall-blocks))
         cached-tile
       (puthash cache-index
-               (let ((wall-block (make-vector
-                                  width nil))
+               (let ((wall-block (make-vector width nil))
                      (weight 3))
 
                  (dotimes (i width)

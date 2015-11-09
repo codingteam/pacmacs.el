@@ -86,3 +86,11 @@
                    (pacmacs--bits-to-xpm [[t t]
                                           [nil nil]]
                                          2 2))))
+
+(ert-deftest pacmacs--normalize-wall-bits-test ()
+  (should (equal '(nil nil nil nil t nil t nil)
+                 (pacmacs--normalize-wall-bits
+                  '(nil nil nil nil t nil t nil))))
+  (should (equal '(t t t t nil nil nil nil)
+                 (pacmacs--normalize-wall-bits
+                  '(t t t t nil t nil t)))))
