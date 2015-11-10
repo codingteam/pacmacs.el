@@ -96,4 +96,7 @@
                   '(t t t t nil t nil t))))
   (should (equal '(t t t t nil nil nil nil)
                  (pacmacs--normalize-wall-bits
-                  '(t t t t t nil t nil)))))
+                  '(t t t t t nil t nil))))
+  (should (equal '(t t t t nil nil nil nil)
+                 (pacmacs--normalize-wall-bits
+                  '(t t t t t t t t)))))
