@@ -1,8 +1,9 @@
 PILL=Pill.json Pill.xpm
 BIG_PILL=Big-Pill.json Big-Pill.xpm
 PACMAN_DEATH=Pacman-Death.json Pacman-Death.xpm
+TERRIFIED_GHOST=Terrified-Ghost.json Terrified-Ghost.xpm
 
-all: $(PILL) $(BIG_PILL) $(PACMAN_DEATH) Makefile
+all: $(PILL) $(BIG_PILL) $(PACMAN_DEATH) $(TERRIFIED_GHOST) Makefile
 
 Pill.json: Pill.raw.json
 	jq ".meta.image |= \"Pill.xpm\"" Pill.raw.json > Pill.json
@@ -30,3 +31,12 @@ Pacman-Death.xpm: Pacman-Death.png
 
 Pacman-Death.raw%json Pacman-Death%png: src/Pacman-Death.ase
 	aseprite -b src/Pacman-Death.ase --sheet Pacman-Death$*png --data Pacman-Death.raw$*json
+
+Terrified-Ghost.json: Terrified-Ghost.raw.json
+	jq ".meta.image |= \"Terrified-Ghost.xpm\"" Terrified-Ghost.raw.json > Terrified-Ghost.json
+
+Terrified-Ghost.xpm: Terrified-Ghost.png
+	convert Terrified-Ghost.png Terrified-Ghost.xpm
+
+Terrified-Ghost.raw%json Terrified-Ghost%png: src/Terrified-Ghost.ase
+	aseprite -b src/Terrified-Ghost.ase --sheet Terrified-Ghost$*png --data Terrified-Ghost.raw$*json

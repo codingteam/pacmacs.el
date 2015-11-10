@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "scale": "1",
+    "size": {
+      "h": 40,
+      "w": 80
+    },
+    "format": "RGBA8888",
+    "image": "Terrified-Ghost.xpm",
+    "version": "1.1.0-dev",
+    "app": "http://www.aseprite.org/"
+  },
+  "frames": {
+    "Terrified-Ghost 1.ase": {
+      "duration": 200,
+      "sourceSize": {
+        "h": 40,
+        "w": 40
+      },
+      "spriteSourceSize": {
+        "h": 40,
+        "w": 40,
+        "y": 0,
+        "x": 0
+      },
+      "trimmed": false,
+      "rotated": false,
+      "frame": {
+        "h": 40,
+        "w": 40,
+        "y": 0,
+        "x": 40
+      }
+    },
+    "Terrified-Ghost 0.ase": {
+      "duration": 200,
+      "sourceSize": {
+        "h": 40,
+        "w": 40
+      },
+      "spriteSourceSize": {
+        "h": 40,
+        "w": 40,
+        "y": 0,
+        "x": 0
+      },
+      "trimmed": false,
+      "rotated": false,
+      "frame": {
+        "h": 40,
+        "w": 40,
+        "y": 0,
+        "x": 0
+      }
+    }
+  }
+}
