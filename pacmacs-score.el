@@ -72,9 +72,9 @@
 
 (defun pacmacs--render-score-table (score-table)
   (let ((max-nickname-length
-         (--> (pacmacs--read-score-table)
-              (-map (-compose #'length #'car) it)
-              (apply #'max it))))
+         (->> score-table
+              (-map (-compose #'length #'car))
+              (apply #'max))))
     (insert "Best Scores:\n------------\n")
     (-each score-table
       (-lambda ((nickname . score))
