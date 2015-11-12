@@ -9,3 +9,19 @@
                           ("bar" . 10))))
     (should (equal expected-table
                    (pacmacs--sort-score-table input-table)))))
+
+(ert-deftest pacmacs--render-score-table-test ()
+  (let ((input-table '(("foo" . 40)
+                       ("hello" . 30)
+                       ("world" . 20)
+                       ("bar" . 10)))
+        (expected-string (concat "Best Scores:\n"
+                                 "------------\n"
+                                 "foo   40\n"
+                                 "hello 30\n"
+                                 "world 20\n"
+                                 "bar   10\n")))
+    (with-temp-buffer
+      (pacmacs--render-score-table input-table)
+      (should (equal expected-string
+                     (buffer-string))))))
