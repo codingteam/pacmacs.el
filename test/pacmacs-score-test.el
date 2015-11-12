@@ -1,0 +1,11 @@
+(ert-deftest pacmacs--sort-score-table-test ()
+  (let ((input-table '(("hello" . 30)
+                       ("world" . 20)
+                       ("foo" . 40)
+                       ("bar" . 10)))
+        (expected-table '(("foo" . 40)
+                          ("hello" . 30)
+                          ("world" . 20)
+                          ("bar" . 10))))
+    (should (equal expected-table
+                   (pacmacs--sort-score-table input-table)))))
