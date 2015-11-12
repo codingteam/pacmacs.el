@@ -2,8 +2,9 @@ PILL=Pill.json Pill.xpm
 BIG_PILL=Big-Pill.json Big-Pill.xpm
 PACMAN_DEATH=Pacman-Death.json Pacman-Death.xpm
 TERRIFIED_GHOST=Terrified-Ghost.json Terrified-Ghost.xpm
+BLINKING_TERRIFIED_GHOST=Blinking-Terrified-Ghost.json Blinking-Terrified-Ghost.xpm
 
-all: $(PILL) $(BIG_PILL) $(PACMAN_DEATH) $(TERRIFIED_GHOST) Makefile
+all: $(PILL) $(BIG_PILL) $(PACMAN_DEATH) $(TERRIFIED_GHOST) $(BLINKING_TERRIFIED_GHOST) Makefile
 
 Pill.json: Pill.raw.json
 	jq ".meta.image |= \"Pill.xpm\"" Pill.raw.json > Pill.json
@@ -40,3 +41,12 @@ Terrified-Ghost.xpm: Terrified-Ghost.png
 
 Terrified-Ghost.raw%json Terrified-Ghost%png: src/Terrified-Ghost.ase
 	aseprite -b src/Terrified-Ghost.ase --sheet Terrified-Ghost$*png --data Terrified-Ghost.raw$*json
+
+Blinking-Terrified-Ghost.json: Blinking-Terrified-Ghost.raw.json
+	jq ".meta.image |= \"Blinking-Terrified-Ghost.xpm\"" Blinking-Terrified-Ghost.raw.json > Blinking-Terrified-Ghost.json
+
+Blinking-Terrified-Ghost.xpm: Blinking-Terrified-Ghost.png
+	convert Blinking-Terrified-Ghost.png Blinking-Terrified-Ghost.xpm
+
+Blinking-Terrified-Ghost.raw%json Blinking-Terrified-Ghost%png: src/Blinking-Terrified-Ghost.ase
+	aseprite -b src/Blinking-Terrified-Ghost.ase --sheet Blinking-Terrified-Ghost$*png --data Blinking-Terrified-Ghost.raw$*json

@@ -1,0 +1,141 @@
+{
+  "meta": {
+    "scale": "1",
+    "size": {
+      "h": 40,
+      "w": 240
+    },
+    "format": "RGBA8888",
+    "image": "Blinking-Terrified-Ghost.xpm",
+    "version": "1.1.0-dev",
+    "app": "http://www.aseprite.org/"
+  },
+  "frames": {
+    "Blinking-Terrified-Ghost 5.ase": {
+      "duration": 200,
+      "sourceSize": {
+        "h": 40,
+        "w": 40
+      },
+      "spriteSourceSize": {
+        "h": 40,
+        "w": 40,
+        "y": 0,
+        "x": 0
+      },
+      "trimmed": false,
+      "rotated": false,
+      "frame": {
+        "h": 40,
+        "w": 40,
+        "y": 0,
+        "x": 200
+      }
+    },
+    "Blinking-Terrified-Ghost 4.ase": {
+      "duration": 200,
+      "sourceSize": {
+        "h": 40,
+        "w": 40
+      },
+      "spriteSourceSize": {
+        "h": 40,
+        "w": 40,
+        "y": 0,
+        "x": 0
+      },
+      "trimmed": false,
+      "rotated": false,
+      "frame": {
+        "h": 40,
+        "w": 40,
+        "y": 0,
+        "x": 160
+      }
+    },
+    "Blinking-Terrified-Ghost 3.ase": {
+      "duration": 200,
+      "sourceSize": {
+        "h": 40,
+        "w": 40
+      },
+      "spriteSourceSize": {
+        "h": 40,
+        "w": 40,
+        "y": 0,
+        "x": 0
+      },
+      "trimmed": false,
+      "rotated": false,
+      "frame": {
+        "h": 40,
+        "w": 40,
+        "y": 0,
+        "x": 120
+      }
+    },
+    "Blinking-Terrified-Ghost 2.ase": {
+      "duration": 200,
+      "sourceSize": {
+        "h": 40,
+        "w": 40
+      },
+      "spriteSourceSize": {
+        "h": 40,
+        "w": 40,
+        "y": 0,
+        "x": 0
+      },
+      "trimmed": false,
+      "rotated": false,
+      "frame": {
+        "h": 40,
+        "w": 40,
+        "y": 0,
+        "x": 80
+      }
+    },
+    "Blinking-Terrified-Ghost 1.ase": {
+      "duration": 200,
+      "sourceSize": {
+        "h": 40,
+        "w": 40
+      },
+      "spriteSourceSize": {
+        "h": 40,
+        "w": 40,
+        "y": 0,
+        "x": 0
+      },
+      "trimmed": false,
+      "rotated": false,
+      "frame": {
+        "h": 40,
+        "w": 40,
+        "y": 0,
+        "x": 40
+      }
+    },
+    "Blinking-Terrified-Ghost 0.ase": {
+      "duration": 200,
+      "sourceSize": {
+        "h": 40,
+        "w": 40
+      },
+      "spriteSourceSize": {
+        "h": 40,
+        "w": 40,
+        "y": 0,
+        "x": 0
+      },
+      "trimmed": false,
+      "rotated": false,
+      "frame": {
+        "h": 40,
+        "w": 40,
+        "y": 0,
+        "x": 0
+      }
+    }
+  }
+}
