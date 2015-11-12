@@ -143,6 +143,21 @@
 (defun pacmacs--make-big-pill (row column)
   (pacmacs--make-pill row column "Big-Pill" 50))
 
+(defun pacmacs--switch-direction-animation (animation-prefix)
+  (let ((direction-animations (-mapcat
+                               (-lambda (direction)
+                                 (->> direction
+                                      (symbol-name)
+                                      (capitalize)
+                                      (concat animation-prefix "-")
+                                      (pacmacs-load-anim)
+                                      (list direction)))
+                               '(left right up down))))
+    (-lambda (game-object direction)
+      (plist-put game-object :direction direction)
+      (let* ((animation (plist-get direction-animations direction)))
+        (plist-put game-object :current-animation animation)))))
+
 (defun pacmacs--make-ghost (row column)
   (list :row row
         :column column
@@ -152,10 +167,7 @@
         :prev-column column
         :direction 'right
         :current-animation (pacmacs-load-anim "Red-Ghost-Right")
-        :direction-animations (list 'left  (pacmacs-load-anim "Red-Ghost-Left")
-                                    'right (pacmacs-load-anim "Red-Ghost-Right")
-                                    'up    (pacmacs-load-anim "Red-Ghost-Up")
-                                    'down  (pacmacs-load-anim "Red-Ghost-Down"))
+        :switch-direction-callback (pacmacs--switch-direction-animation "Red-Ghost")
         :speed 1
         :speed-counter 0
         :type 'ghost))
@@ -169,10 +181,7 @@
         :prev-column column
         :direction 'right
         :current-animation (pacmacs-load-anim "Pacman-Chomping-Right")
-        :direction-animations (list 'left  (pacmacs-load-anim "Pacman-Chomping-Left")
-                                    'right (pacmacs-load-anim "Pacman-Chomping-Right")
-                                    'up    (pacmacs-load-anim "Pacman-Chomping-Up")
-                                    'down  (pacmacs-load-anim "Pacman-Chomping-Down"))
+        :switch-direction-callback (pacmacs--switch-direction-animation "Pacman-Chomping")
         :speed 0
         :speed-counter 0
         :type 'player))
@@ -224,10 +233,9 @@
   (pacmacs--cell-wrapped-get pacmacs--track-board row column))
 
 (defun pacmacs--switch-direction (game-object direction)
-  (plist-bind ((direction-animations :direction-animations))
+  (plist-bind ((switch-direction-callback :switch-direction-callback))
       game-object
-    (plist-put game-object :direction direction)
-    (plist-put game-object :current-animation (plist-get direction-animations direction))))
+    (funcall switch-direction-callback game-object direction)))
 
 (defun pacmacs--step-object (game-object)
   (plist-bind ((row :row)
