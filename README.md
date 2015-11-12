@@ -56,15 +56,15 @@ installed before. You'll need [Cask][cask] to install the dependencies.
 I usually use the following workflow when I develop this game:
 
 1. `$ git clone git://github.com/codingteam/pacmacs.el.git && cd pacmacs.el`;
-2. `$ cask install`
+2. `$ cask install`;
 3. `$ cask exec emacs`;
-4. `M-x find-file RET /path/to/pacmacs.el/pacmacs.el RET`
+4. `M-x find-file RET /path/to/pacmacs.el/pacmacs.el RET`;
 5. `M-x eval-expression RET (add-to-list 'load-path default-directory) RET`;
 6. `M-x eval-buffer RET`;
 7. `M-x pacmacs-start RET`;
 8. `M-x pacmacs-quit RET`;
 9. Change something in the source code;
-10. Go to the step 6.
+10. Go to the step `6`.
 
 ## Unit Tests ##
 
