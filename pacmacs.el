@@ -58,6 +58,7 @@
 
 (defvar pacmacs--player-state nil)
 (defvar pacmacs--ghosts nil)
+(defvar pacmacs--terrified-ghosts nil)
 (defvar pacmacs--wall-cells nil)
 (defvar pacmacs--pills nil)
 
@@ -550,6 +551,7 @@
     (setq pacmacs--wall-cells nil)
     (setq pacmacs--pills nil)
     (setq pacmacs--ghosts nil)
+    (setq pacmacs--terrified-ghosts nil)
     (setq pacmacs--player-state nil)
 
     (cl-loop
