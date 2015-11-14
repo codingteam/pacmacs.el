@@ -341,7 +341,7 @@
 
   (cond
    ((equal pacmacs-game-state 'play)
-    (pacmacs-play-state-logic))
+    (pacmacs--play-state-logic))
    ((equal pacmacs-game-state 'death)
     (pacmacs-death-state-logic))
    ((equal pacmacs-game-state 'prepare)
@@ -373,7 +373,7 @@
       pacmacs--player-state
     (pacmacs--ghost-at-p row column)))
 
-(defun pacmacs-play-state-logic ()
+(defun pacmacs--play-state-logic ()
   (when (not pacmacs-play-pause)
     (pacmacs--anim-object-next-frame pacmacs--player-state pacmacs-tick-duration-ms)
     (pacmacs--anim-object-list-next-frame pacmacs--ghosts pacmacs-tick-duration-ms)
