@@ -336,6 +336,13 @@
     (let ((direction (pacmacs--cell-wrapped-get pacmacs--track-board row column)))
       (pacmacs--switch-direction game-object direction))))
 
+(defun pacmacs--back-track-object (game-object)
+  (plist-bind ((row :row)
+               (column :column))
+      game-object
+    (let ((direction (pacmacs--cell-wrapped-get pacmacs--track-board row column)))
+      (pacmacs--switch-direction game-object (pacmacs--opposite-direction-name direction)))))
+
 (defun pacmacs-tick ()
   (interactive)
 
@@ -358,6 +365,11 @@
     (pacmacs--track-object ghost)
     (pacmacs--step-object ghost)))
 
+(defun pacmacs--step-terrified-ghosts ()
+  (dolist (terrified-ghost pacmacs--terrified-ghosts)
+    (pacmacs--back-track-object terrified-ghost)
+    (pacmacs--step-object terrified-ghost)))
+
 (defun pacmacs--detect-pill-collision ()
   (plist-bind ((row :row)
                (column :column))
@@ -378,6 +390,7 @@
     (pacmacs--anim-object-next-frame pacmacs--player-state pacmacs-tick-duration-ms)
     (pacmacs--anim-object-list-next-frame pacmacs--ghosts pacmacs-tick-duration-ms)
     (pacmacs--anim-object-list-next-frame pacmacs--pills pacmacs-tick-duration-ms)
+    (pacmacs--anim-object-list-next-frame pacmacs--terrified-ghosts pacmacs-tick-duration-ms)
 
     (pacmacs--recalc-track-board)
     (if pacmacs--pills
@@ -388,6 +401,7 @@
                      (pacmacs--switch-to-death-state))
             (pacmacs--detect-pill-collision)
             (pacmacs--step-ghosts)
+            (pacmacs--step-terrified-ghosts)
             (when (pacmacs--ghost-collision-p)
               (dolist (ghost pacmacs--ghosts)
                 (pacmacs--step-back-object ghost))

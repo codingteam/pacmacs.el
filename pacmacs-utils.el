@@ -72,6 +72,13 @@ side-effects."
     (cdr (assoc direction-vector
                 direction-table))))
 
+(defun pacmacs--opposite-direction-name (direction-name)
+  (cl-case direction-name
+    ('left 'right)
+    ('right 'left)
+    ('up 'down)
+    ('down 'up)))
+
 (defun pacmacs--levelname-from-filename (filename)
   (when (string-match "\\(map[0-9]+\\)\\.txt" filename)
     (match-string 1 filename)))
