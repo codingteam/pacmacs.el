@@ -159,6 +159,24 @@
       (let* ((animation (plist-get direction-animations direction)))
         (plist-put game-object :current-animation animation)))))
 
+(defun pacmacs--switch-direction-callback (game-object direction)
+  (plist-put game-object :direction direction))
+
+(defun pacmacs--make-terrified-ghost (row column)
+  (list :row row
+        :column column
+        :init-row row
+        :init-column column
+        :prev-row row
+        :prev-column column
+        :direction 'right
+        :current-animation (pacmacs-load-anim "Terrified-Ghost")
+        :switch-direction-callback #'pacmacs--switch-direction-callback
+        :speed 1
+        :speed-counter 0
+        :type 'terrified-ghost
+        :terrified-counter 5000))
+
 (defun pacmacs--make-ghost (row column)
   (list :row row
         :column column
