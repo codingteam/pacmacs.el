@@ -144,7 +144,7 @@
 (defun pacmacs--make-big-pill (row column)
   (pacmacs--make-pill row column "Big-Pill" 50))
 
-(defun pacmacs--switch-direction-animation (animation-prefix)
+(defun pacmacs--switch-direction-animation-callback (animation-prefix)
   (let ((direction-animations (-mapcat
                                (-lambda (direction)
                                  (->> direction
@@ -168,7 +168,7 @@
         :prev-column column
         :direction 'right
         :current-animation (pacmacs-load-anim "Red-Ghost-Right")
-        :switch-direction-callback (pacmacs--switch-direction-animation "Red-Ghost")
+        :switch-direction-callback (pacmacs--switch-direction-animation-callback "Red-Ghost")
         :speed 1
         :speed-counter 0
         :type 'ghost))
@@ -182,7 +182,7 @@
         :prev-column column
         :direction 'right
         :current-animation (pacmacs-load-anim "Pacman-Chomping-Right")
-        :switch-direction-callback (pacmacs--switch-direction-animation "Pacman-Chomping")
+        :switch-direction-callback (pacmacs--switch-direction-animation-callback "Pacman-Chomping")
         :speed 0
         :speed-counter 0
         :type 'player))
