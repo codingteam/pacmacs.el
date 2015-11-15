@@ -336,13 +336,6 @@
     (let ((direction (pacmacs--cell-wrapped-get pacmacs--track-board row column)))
       (pacmacs--switch-direction game-object direction))))
 
-(defun pacmacs--back-track-object (game-object)
-  (plist-bind ((row :row)
-               (column :column))
-      game-object
-    (let ((direction (pacmacs--cell-wrapped-get pacmacs--track-board row column)))
-      (pacmacs--switch-direction game-object (pacmacs--opposite-direction-name direction)))))
-
 (defun pacmacs-tick ()
   (interactive)
 
@@ -365,10 +358,36 @@
     (pacmacs--track-object ghost)
     (pacmacs--step-object ghost)))
 
+(defun pacmacs--run-away-direction (game-object-1 game-object-2)
+  (plist-bind ((row-1 :row)
+               (column-1 :column))
+      game-object-1
+    (plist-bind ((row-2 :row)
+                 (column-2 :column))
+        game-object-2
+      (let* ((current-distance (pacmacs--squared-distance row-1 column-1
+                                                          row-2 column-2))
+             (possible-ways
+              (->> (pacmacs--possible-side-ways row-1 column-1)
+                   (-remove (-lambda ((row . column))
+                              (or (pacmacs--wall-at-p row column)
+                                  (> current-distance
+                                     (pacmacs--squared-distance row column
+                                                                row-2 column-2))))))))
+        (-when-let ((row . column) (car possible-ways))
+          (pacmacs--direction-name (cons (- row row-1)
+                                         (- column column-1))))))))
+
 (defun pacmacs--step-terrified-ghosts ()
   (dolist (terrified-ghost pacmacs--terrified-ghosts)
-    (pacmacs--back-track-object terrified-ghost)
-    (pacmacs--step-object terrified-ghost)))
+    (plist-bind ((row :row)
+                 (column :column))
+        terrified-ghost
+      (-when-let (direction (pacmacs--run-away-direction
+                             terrified-ghost
+                             pacmacs--player-state))
+        (pacmacs--switch-direction terrified-ghost direction))
+      (pacmacs--step-object terrified-ghost))))
 
 (defun pacmacs--detect-pill-collision ()
   (plist-bind ((row :row)
