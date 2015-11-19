@@ -144,6 +144,13 @@
 (defun pacmacs--make-big-pill (row column)
   (pacmacs--make-pill row column "Big-Pill" 50 'big-pill))
 
+(defun pacmacs--decrease-terrified-timers ()
+  (dolist (terrified-ghost pacmacs--terrified-ghosts)
+    (plist-map terrified-ghost :terrified-timer
+               (-lambda (terrified-timer)
+                 (cl-decf terrified-timer
+                          pacmacs-tick-duration-ms)))))
+
 (defun pacmacs--switch-direction-animation-callback (animation-prefix)
   (let ((direction-animations (-mapcat
                                (-lambda (direction)
@@ -175,7 +182,7 @@
         :speed 1
         :speed-counter 0
         :type 'terrified-ghost
-        :terrified-counter 5000))
+        :terrified-timer 5000))
 
 (defun pacmacs--make-ghost (row column)
   (list :row row
@@ -402,6 +409,15 @@
   (pacmacs--create-game-object row column 'pacmacs--ghosts
                                #'pacmacs--make-ghost))
 
+(defun pacmacs--replace-filtered-game-objects (list-name replacing-constructor predicate)
+  (let ((game-objects (symbol-value list-name)))
+    (dolist (game-object (-filter predicate game-objects))
+      (plist-bind ((row :row)
+                 (column :column))
+          game-object
+        (funcall replacing-constructor row column))
+      (pacmacs--remove-object game-object))
+    (set list-name (-remove predicate game-objects))))
 
 (defun pacmacs--replace-game-objects (list-name replacing-constructor)
   (dolist (game-object (symbol-value list-name))
@@ -419,6 +435,13 @@
 (defun pacmacs--unterrify-all-ghosts ()
   (pacmacs--replace-game-objects 'pacmacs--terrified-ghosts
                                  #'pacmacs--create-ghost))
+
+(defun pacmacs--unterrify-timed-out-ghosts ()
+  (pacmacs--replace-filtered-game-objects
+   'pacmacs--terrified-ghosts
+   #'pacmacs--create-ghost
+   (-lambda (terrified-ghost)
+     (<= (plist-get terrified-ghost :terrified-timer) 0))))
 
 (defun pacmacs--detect-pill-collision ()
   (plist-bind ((row :row)
@@ -446,6 +469,7 @@
     (pacmacs--anim-object-list-next-frame pacmacs--terrified-ghosts pacmacs-tick-duration-ms)
 
     (pacmacs--recalc-track-board)
+    (pacmacs--unterrify-timed-out-ghosts)
     (if pacmacs--pills
         (progn
           (pacmacs--step-object pacmacs--player-state)
@@ -455,6 +479,7 @@
             (pacmacs--detect-pill-collision)
             (pacmacs--step-ghosts)
             (pacmacs--step-terrified-ghosts)
+            (pacmacs--decrease-terrified-timers)
             (when (pacmacs--ghost-collision-p)
               (dolist (ghost pacmacs--ghosts)
                 (pacmacs--step-back-object ghost))
