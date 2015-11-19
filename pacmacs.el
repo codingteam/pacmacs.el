@@ -253,6 +253,10 @@
   (pacmacs--object-type-at-p pacmacs--object-board
                              row column 'ghost))
 
+(defun pacmacs--terrified-ghost-at-p (row column)
+  (pacmacs--object-type-at-p pacmacs--object-board
+                             row column 'terrified-ghost))
+
 (defun pacmacs-quit ()
   (interactive)
   (when (get-buffer pacmacs-buffer-name)
@@ -455,6 +459,16 @@
       (when (equal (plist-get pill :type) 'big-pill)
         (pacmacs--terrify-all-ghosts)))))
 
+(defun pacmacs--detect-terrified-ghost-collision ()
+  (plist-bind ((row :row)
+               (column :column))
+      pacmacs--player-state
+    (-when-let (terrified-ghost (pacmacs--terrified-ghost-at-p row column))
+      (setq pacmacs-score (+ pacmacs-score 200))
+      (setq pacmacs--terrified-ghosts (-remove (-partial #'eql terrified-ghost)
+                                               pacmacs--terrified-ghosts))
+      (pacmacs--remove-object terrified-ghost))))
+
 (defun pacmacs--ghost-collision-p ()
   (plist-bind ((row :row)
                (column :column))
@@ -473,12 +487,14 @@
     (if pacmacs--pills
         (progn
           (pacmacs--step-object pacmacs--player-state)
+          (pacmacs--detect-terrified-ghost-collision)
           (if (pacmacs--ghost-collision-p)
               (progn (pacmacs--step-back-object pacmacs--player-state)
                      (pacmacs--switch-to-death-state))
             (pacmacs--detect-pill-collision)
             (pacmacs--step-ghosts)
             (pacmacs--step-terrified-ghosts)
+            (pacmacs--detect-terrified-ghost-collision)
             (pacmacs--decrease-terrified-timers)
             (when (pacmacs--ghost-collision-p)
               (dolist (ghost pacmacs--ghosts)
