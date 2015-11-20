@@ -414,16 +414,6 @@
   (pacmacs--create-game-object row column 'pacmacs--ghosts
                                #'pacmacs--make-ghost))
 
-(defun pacmacs--replace-filtered-game-objects (list-name replacing-constructor predicate)
-  (let ((game-objects (symbol-value list-name)))
-    (dolist (game-object (-filter predicate game-objects))
-      (plist-bind ((row :row)
-                 (column :column))
-          game-object
-        (funcall replacing-constructor row column))
-      (pacmacs--remove-object game-object))
-    (set list-name (-remove predicate game-objects))))
-
 (defun pacmacs--replace-game-objects (game-objects new-constructor old-destructor)
   (dolist (game-object game-objects)
     (plist-bind ((row :row)
@@ -439,11 +429,15 @@
   (setq pacmacs--ghosts nil))
 
 (defun pacmacs--unterrify-timed-out-ghosts ()
-  (pacmacs--replace-filtered-game-objects
-   'pacmacs--terrified-ghosts
-   #'pacmacs--create-ghost
-   (-lambda (terrified-ghost)
-     (<= (plist-get terrified-ghost :terrified-timer) 0))))
+  (let ((timed-out-predicate
+         (-lambda (terrified-ghost)
+           (<= (plist-get terrified-ghost :terrified-timer) 0))))
+    (pacmacs--replace-game-objects
+     (-filter timed-out-predicate pacmacs--terrified-ghosts)
+     #'pacmacs--create-ghost
+     #'pacmacs--remove-object)
+    (setq pacmacs--terrified-ghosts (-remove timed-out-predicate
+                                             pacmacs--terrified-ghosts))))
 
 (defun pacmacs--detect-pill-collision ()
   (plist-bind ((row :row)
