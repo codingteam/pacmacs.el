@@ -44,3 +44,13 @@
                          :data [[nil ((:row 0 :column 1))]
                                 [nil nil]])
                    pacmacs--object-board))))
+
+(ert-deftest pacmacs--decrease-terrified-timers-test ()
+  (let ((pacmacs--terrified-ghosts '((:terrified-timer 1000)
+                                     (:terrified-timer 400)))
+        (pacmacs-tick-duration-ms 200)
+        (expected-outcome '((:terrified-timer 800)
+                            (:terrified-timer 200))))
+    (pacmacs--decrease-terrified-timers)
+    (should (equal expected-outcome
+                   pacmacs--terrified-ghosts))))
