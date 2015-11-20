@@ -10,3 +10,7 @@
   (should (equal "map06" (pacmacs--levelname-from-filename "map06.txt")))
   (should (not (pacmacs--levelname-from-filename "."))))
 
+
+(ert-deftest pacmacs--squared-distance-test ()
+  (should (= (pacmacs--squared-distance 1 1 3 3)
+             8)))
