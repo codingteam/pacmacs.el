@@ -372,7 +372,7 @@
     (pacmacs--track-object ghost)
     (pacmacs--step-object ghost)))
 
-(defun pacmacs--run-away-direction (runner bogey)
+(defun pacmacs--run-away-direction (runner bogey blocked-tile-predicate)
   (plist-bind ((runner-row :row)
                (runner-column :column))
       runner
@@ -384,7 +384,7 @@
              (possible-ways
               (->> (pacmacs--possible-side-ways runner-row runner-column)
                    (-remove (-lambda ((row . column))
-                              (or (pacmacs--wall-at-p row column)
+                              (or (funcall blocked-tile-predicate row column)
                                   (> current-distance
                                      (pacmacs--squared-distance row column
                                                                 bogey-row bogey-column))))))))
@@ -396,7 +396,8 @@
   (dolist (terrified-ghost pacmacs--terrified-ghosts)
     (-when-let (direction (pacmacs--run-away-direction
                            terrified-ghost
-                           pacmacs--player-state))
+                           pacmacs--player-state
+                           #'pacmacs--wall-at-p))
       (pacmacs--switch-direction terrified-ghost direction))
     (pacmacs--step-object terrified-ghost)))
 
