@@ -372,25 +372,25 @@
     (pacmacs--track-object ghost)
     (pacmacs--step-object ghost)))
 
-(defun pacmacs--run-away-direction (game-object-1 game-object-2)
-  (plist-bind ((row-1 :row)
-               (column-1 :column))
-      game-object-1
-    (plist-bind ((row-2 :row)
-                 (column-2 :column))
-        game-object-2
-      (let* ((current-distance (pacmacs--squared-distance row-1 column-1
-                                                          row-2 column-2))
+(defun pacmacs--run-away-direction (runner bogey)
+  (plist-bind ((runner-row :row)
+               (runner-column :column))
+      runner
+    (plist-bind ((bogey-row :row)
+                 (bogey-column :column))
+        bogey
+      (let* ((current-distance (pacmacs--squared-distance runner-row runner-column
+                                                          bogey-row bogey-column))
              (possible-ways
-              (->> (pacmacs--possible-side-ways row-1 column-1)
+              (->> (pacmacs--possible-side-ways runner-row runner-column)
                    (-remove (-lambda ((row . column))
                               (or (pacmacs--wall-at-p row column)
                                   (> current-distance
                                      (pacmacs--squared-distance row column
-                                                                row-2 column-2))))))))
+                                                                bogey-row bogey-column))))))))
         (-when-let ((row . column) (car possible-ways))
-          (pacmacs--direction-name (cons (- row row-1)
-                                         (- column column-1))))))))
+          (pacmacs--direction-name (cons (- row runner-row)
+                                         (- column runner-column))))))))
 
 (defun pacmacs--step-terrified-ghosts ()
   (dolist (terrified-ghost pacmacs--terrified-ghosts)
