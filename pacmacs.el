@@ -424,18 +424,19 @@
       (pacmacs--remove-object game-object))
     (set list-name (-remove predicate game-objects))))
 
-(defun pacmacs--replace-game-objects (list-name replacing-constructor)
-  (dolist (game-object (symbol-value list-name))
+(defun pacmacs--replace-game-objects (game-objects new-constructor old-destructor)
+  (dolist (game-object game-objects)
     (plist-bind ((row :row)
                  (column :column))
         game-object
-      (funcall replacing-constructor row column))
-    (pacmacs--remove-object game-object))
-  (set list-name nil))
+      (funcall new-constructor row column))
+    (funcall old-destructor game-object)))
 
 (defun pacmacs--terrify-all-ghosts ()
-  (pacmacs--replace-game-objects 'pacmacs--ghosts
-                                 #'pacmacs--create-terrified-ghost))
+  (pacmacs--replace-game-objects pacmacs--ghosts
+                                 #'pacmacs--create-terrified-ghost
+                                 #'pacmacs--remove-object)
+  (setq pacmacs--ghosts nil))
 
 (defun pacmacs--unterrify-timed-out-ghosts ()
   (pacmacs--replace-filtered-game-objects
