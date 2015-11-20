@@ -436,10 +436,6 @@
   (pacmacs--replace-game-objects 'pacmacs--ghosts
                                  #'pacmacs--create-terrified-ghost))
 
-(defun pacmacs--unterrify-all-ghosts ()
-  (pacmacs--replace-game-objects 'pacmacs--terrified-ghosts
-                                 #'pacmacs--create-ghost))
-
 (defun pacmacs--unterrify-timed-out-ghosts ()
   (pacmacs--replace-filtered-game-objects
    'pacmacs--terrified-ghosts
