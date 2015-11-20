@@ -58,6 +58,7 @@
 
 (defvar pacmacs--player-state nil)
 (defvar pacmacs--ghosts nil)
+(defvar pacmacs--terrified-ghosts nil)
 (defvar pacmacs--wall-cells nil)
 (defvar pacmacs--pills nil)
 
@@ -130,18 +131,58 @@
         :column column
         :type 'wall))
 
-(defun pacmacs--make-pill (row column anim-name points)
+(defun pacmacs--make-pill (row column anim-name points type)
   (list :current-animation (pacmacs-load-anim anim-name)
         :row row
         :column column
-        :type 'pill
+        :type type
         :points points))
 
 (defun pacmacs--make-regular-pill (row column)
-  (pacmacs--make-pill row column "Pill" 10))
+  (pacmacs--make-pill row column "Pill" 10 'pill))
 
 (defun pacmacs--make-big-pill (row column)
-  (pacmacs--make-pill row column "Big-Pill" 50))
+  (pacmacs--make-pill row column "Big-Pill" 50 'big-pill))
+
+(defun pacmacs--decrease-terrified-timers ()
+  (dolist (terrified-ghost pacmacs--terrified-ghosts)
+    (plist-map terrified-ghost :terrified-timer
+               (-lambda (terrified-timer)
+                 (cl-decf terrified-timer
+                          pacmacs-tick-duration-ms)))))
+
+(defun pacmacs--switch-direction-animation-callback (animation-prefix)
+  (let ((direction-animations (-mapcat
+                               (-lambda (direction)
+                                 (->> direction
+                                      (symbol-name)
+                                      (capitalize)
+                                      (concat animation-prefix "-")
+                                      (pacmacs-load-anim)
+                                      (list direction)))
+                               '(left right up down))))
+    (-lambda (game-object direction)
+      (plist-put game-object :direction direction)
+      (let* ((animation (plist-get direction-animations direction)))
+        (plist-put game-object :current-animation animation)))))
+
+(defun pacmacs--switch-direction-callback (game-object direction)
+  (plist-put game-object :direction direction))
+
+(defun pacmacs--make-terrified-ghost (row column)
+  (list :row row
+        :column column
+        :init-row row
+        :init-column column
+        :prev-row row
+        :prev-column column
+        :direction 'right
+        :current-animation (pacmacs-load-anim "Terrified-Ghost")
+        :switch-direction-callback #'pacmacs--switch-direction-callback
+        :speed 1
+        :speed-counter 0
+        :type 'terrified-ghost
+        :terrified-timer 5000))
 
 (defun pacmacs--make-ghost (row column)
   (list :row row
@@ -152,10 +193,7 @@
         :prev-column column
         :direction 'right
         :current-animation (pacmacs-load-anim "Red-Ghost-Right")
-        :direction-animations (list 'left  (pacmacs-load-anim "Red-Ghost-Left")
-                                    'right (pacmacs-load-anim "Red-Ghost-Right")
-                                    'up    (pacmacs-load-anim "Red-Ghost-Up")
-                                    'down  (pacmacs-load-anim "Red-Ghost-Down"))
+        :switch-direction-callback (pacmacs--switch-direction-animation-callback "Red-Ghost")
         :speed 1
         :speed-counter 0
         :type 'ghost))
@@ -169,10 +207,7 @@
         :prev-column column
         :direction 'right
         :current-animation (pacmacs-load-anim "Pacman-Chomping-Right")
-        :direction-animations (list 'left  (pacmacs-load-anim "Pacman-Chomping-Left")
-                                    'right (pacmacs-load-anim "Pacman-Chomping-Right")
-                                    'up    (pacmacs-load-anim "Pacman-Chomping-Up")
-                                    'down  (pacmacs-load-anim "Pacman-Chomping-Down"))
+        :switch-direction-callback (pacmacs--switch-direction-animation-callback "Pacman-Chomping")
         :speed 0
         :speed-counter 0
         :type 'player))
@@ -208,12 +243,19 @@
                              row column 'wall))
 
 (defun pacmacs--pill-at-p (row column)
-  (pacmacs--object-type-at-p pacmacs--object-board
-                             row column 'pill))
+  (-if-let (pill (pacmacs--object-type-at-p pacmacs--object-board
+                                            row column 'pill))
+      pill
+    (pacmacs--object-type-at-p pacmacs--object-board
+                               row column 'big-pill)))
 
 (defun pacmacs--ghost-at-p (row column)
   (pacmacs--object-type-at-p pacmacs--object-board
                              row column 'ghost))
+
+(defun pacmacs--terrified-ghost-at-p (row column)
+  (pacmacs--object-type-at-p pacmacs--object-board
+                             row column 'terrified-ghost))
 
 (defun pacmacs-quit ()
   (interactive)
@@ -224,10 +266,9 @@
   (pacmacs--cell-wrapped-get pacmacs--track-board row column))
 
 (defun pacmacs--switch-direction (game-object direction)
-  (plist-bind ((direction-animations :direction-animations))
+  (plist-bind ((switch-direction-callback :switch-direction-callback))
       game-object
-    (plist-put game-object :direction direction)
-    (plist-put game-object :current-animation (plist-get direction-animations direction))))
+    (funcall switch-direction-callback game-object direction)))
 
 (defun pacmacs--step-object (game-object)
   (plist-bind ((row :row)
@@ -314,7 +355,7 @@
 
   (cond
    ((equal pacmacs-game-state 'play)
-    (pacmacs-play-state-logic))
+    (pacmacs--play-state-logic))
    ((equal pacmacs-game-state 'death)
     (pacmacs-death-state-logic))
    ((equal pacmacs-game-state 'prepare)
@@ -331,6 +372,73 @@
     (pacmacs--track-object ghost)
     (pacmacs--step-object ghost)))
 
+(defun pacmacs--run-away-direction (runner bogey blocked-tile-predicate)
+  (plist-bind ((runner-row :row)
+               (runner-column :column))
+      runner
+    (plist-bind ((bogey-row :row)
+                 (bogey-column :column))
+        bogey
+      (let* ((current-distance (pacmacs--squared-distance runner-row runner-column
+                                                          bogey-row bogey-column))
+             (possible-ways
+              (->> (pacmacs--possible-side-ways runner-row runner-column)
+                   (-remove (-lambda ((row . column))
+                              (or (funcall blocked-tile-predicate row column)
+                                  (> current-distance
+                                     (pacmacs--squared-distance row column
+                                                                bogey-row bogey-column))))))))
+        (-when-let ((row . column) (car possible-ways))
+          (pacmacs--direction-name (cons (- row runner-row)
+                                         (- column runner-column))))))))
+
+(defun pacmacs--step-terrified-ghosts ()
+  (dolist (terrified-ghost pacmacs--terrified-ghosts)
+    (-when-let (direction (pacmacs--run-away-direction
+                           terrified-ghost
+                           pacmacs--player-state
+                           #'pacmacs--wall-at-p))
+      (pacmacs--switch-direction terrified-ghost direction))
+    (pacmacs--step-object terrified-ghost)))
+
+(defun pacmacs--create-game-object (row column list-name constructor)
+  (let ((game-object (funcall constructor row column)))
+    (add-to-list list-name game-object)
+    (pacmacs--put-object game-object)))
+
+(defun pacmacs--create-terrified-ghost (row column)
+  (pacmacs--create-game-object row column 'pacmacs--terrified-ghosts
+                               #'pacmacs--make-terrified-ghost))
+
+(defun pacmacs--create-ghost (row column)
+  (pacmacs--create-game-object row column 'pacmacs--ghosts
+                               #'pacmacs--make-ghost))
+
+(defun pacmacs--replace-game-objects (game-objects new-constructor old-destructor)
+  (dolist (game-object game-objects)
+    (plist-bind ((row :row)
+                 (column :column))
+        game-object
+      (funcall new-constructor row column))
+    (funcall old-destructor game-object)))
+
+(defun pacmacs--terrify-all-ghosts ()
+  (pacmacs--replace-game-objects pacmacs--ghosts
+                                 #'pacmacs--create-terrified-ghost
+                                 #'pacmacs--remove-object)
+  (setq pacmacs--ghosts nil))
+
+(defun pacmacs--unterrify-timed-out-ghosts ()
+  (let ((timed-out-predicate
+         (-lambda (terrified-ghost)
+           (<= (plist-get terrified-ghost :terrified-timer) 0))))
+    (pacmacs--replace-game-objects
+     (-filter timed-out-predicate pacmacs--terrified-ghosts)
+     #'pacmacs--create-ghost
+     #'pacmacs--remove-object)
+    (setq pacmacs--terrified-ghosts (-remove timed-out-predicate
+                                             pacmacs--terrified-ghosts))))
+
 (defun pacmacs--detect-pill-collision ()
   (plist-bind ((row :row)
                (column :column))
@@ -338,7 +446,20 @@
     (-when-let (pill (pacmacs--pill-at-p row column))
       (setq pacmacs-score (+ pacmacs-score (plist-get pill :points)))
       (setq pacmacs--pills (-remove (-partial #'eql pill) pacmacs--pills))
-      (pacmacs--remove-object pill))))
+      (pacmacs--remove-object pill)
+
+      (when (equal (plist-get pill :type) 'big-pill)
+        (pacmacs--terrify-all-ghosts)))))
+
+(defun pacmacs--detect-terrified-ghost-collision ()
+  (plist-bind ((row :row)
+               (column :column))
+      pacmacs--player-state
+    (-when-let (terrified-ghost (pacmacs--terrified-ghost-at-p row column))
+      (setq pacmacs-score (+ pacmacs-score 200))
+      (setq pacmacs--terrified-ghosts (-remove (-partial #'eql terrified-ghost)
+                                               pacmacs--terrified-ghosts))
+      (pacmacs--remove-object terrified-ghost))))
 
 (defun pacmacs--ghost-collision-p ()
   (plist-bind ((row :row)
@@ -346,21 +467,27 @@
       pacmacs--player-state
     (pacmacs--ghost-at-p row column)))
 
-(defun pacmacs-play-state-logic ()
+(defun pacmacs--play-state-logic ()
   (when (not pacmacs-play-pause)
     (pacmacs--anim-object-next-frame pacmacs--player-state pacmacs-tick-duration-ms)
     (pacmacs--anim-object-list-next-frame pacmacs--ghosts pacmacs-tick-duration-ms)
     (pacmacs--anim-object-list-next-frame pacmacs--pills pacmacs-tick-duration-ms)
+    (pacmacs--anim-object-list-next-frame pacmacs--terrified-ghosts pacmacs-tick-duration-ms)
 
     (pacmacs--recalc-track-board)
+    (pacmacs--unterrify-timed-out-ghosts)
     (if pacmacs--pills
         (progn
           (pacmacs--step-object pacmacs--player-state)
+          (pacmacs--detect-terrified-ghost-collision)
           (if (pacmacs--ghost-collision-p)
               (progn (pacmacs--step-back-object pacmacs--player-state)
                      (pacmacs--switch-to-death-state))
             (pacmacs--detect-pill-collision)
             (pacmacs--step-ghosts)
+            (pacmacs--step-terrified-ghosts)
+            (pacmacs--detect-terrified-ghost-collision)
+            (pacmacs--decrease-terrified-timers)
             (when (pacmacs--ghost-collision-p)
               (dolist (ghost pacmacs--ghosts)
                 (pacmacs--step-back-object ghost))
@@ -542,6 +669,7 @@
     (setq pacmacs--wall-cells nil)
     (setq pacmacs--pills nil)
     (setq pacmacs--ghosts nil)
+    (setq pacmacs--terrified-ghosts nil)
     (setq pacmacs--player-state nil)
 
     (cl-loop
