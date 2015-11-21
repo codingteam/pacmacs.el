@@ -158,8 +158,9 @@
     (plist-bind ((terrified-timer :terrified-timer))
         terrified-ghost
       (when
-          ;; FIXME: In Emacs 24.3 `<=` accepts only arguments. Please
-          ;; rewrite this when Emacs 24.3 is finally dropped.
+          ;; FIXME: In Emacs 24.3 `<=` accepts only 2
+          ;; arguments. Please rewrite this when Emacs 24.3 is finally
+          ;; dropped.
           (and (<= (- terrified-timer pacmacs-tick-duration-ms)
                    pacmacs--ghost-blinking-threshold-ms)
                (<= pacmacs--ghost-blinking-threshold-ms
