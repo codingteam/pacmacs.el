@@ -49,6 +49,7 @@
 
 (defconst pacmacs-buffer-name "*Pacmacs*")
 (defconst pacmacs-tick-duration-ms 100)
+(defconst pacmacs--ghost-blinking-threshold 2500)
 
 (defvar pacmacs-debug-output nil)
 
@@ -150,6 +151,17 @@
                (-lambda (terrified-timer)
                  (cl-decf terrified-timer
                           pacmacs-tick-duration-ms)))))
+
+(defun pacmacs--handle-ghost-blinking-threshold ()
+  (dolist (terrified-ghost pacmacs--terrified-ghosts)
+    (plist-bind ((terrified-timer :terrified-timer))
+        terrified-ghost
+      (when (<= (- terrified-timer pacmacs-tick-duration-ms)
+                pacmacs--ghost-blinking-threshold
+                terrified-timer)
+        (plist-put terrified-ghost
+                   :current-animation
+                   (pacmacs-load-anim "Blinking-Terrified-Ghost"))))))
 
 (defun pacmacs--switch-direction-animation-callback (animation-prefix)
   (let ((direction-animations (-mapcat
@@ -475,7 +487,11 @@
     (pacmacs--anim-object-list-next-frame pacmacs--terrified-ghosts pacmacs-tick-duration-ms)
 
     (pacmacs--recalc-track-board)
+
     (pacmacs--unterrify-timed-out-ghosts)
+    (pacmacs--decrease-terrified-timers)
+    (pacmacs--handle-ghost-blinking-threshold)
+
     (if pacmacs--pills
         (progn
           (pacmacs--step-object pacmacs--player-state)
@@ -487,7 +503,6 @@
             (pacmacs--step-ghosts)
             (pacmacs--step-terrified-ghosts)
             (pacmacs--detect-terrified-ghost-collision)
-            (pacmacs--decrease-terrified-timers)
             (when (pacmacs--ghost-collision-p)
               (dolist (ghost pacmacs--ghosts)
                 (pacmacs--step-back-object ghost))
