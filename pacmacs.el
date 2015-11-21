@@ -49,7 +49,7 @@
 
 (defconst pacmacs-buffer-name "*Pacmacs*")
 (defconst pacmacs-tick-duration-ms 100)
-(defconst pacmacs--ghost-blinking-threshold 2500)
+(defconst pacmacs--ghost-blinking-threshold-ms 2500)
 (defconst pacmacs--ghost-terrified-time-ms 5000)
 
 (defvar pacmacs-debug-output nil)
@@ -158,7 +158,7 @@
     (plist-bind ((terrified-timer :terrified-timer))
         terrified-ghost
       (when (<= (- terrified-timer pacmacs-tick-duration-ms)
-                pacmacs--ghost-blinking-threshold
+                pacmacs--ghost-blinking-threshold-ms
                 terrified-timer)
         (plist-put terrified-ghost
                    :current-animation
