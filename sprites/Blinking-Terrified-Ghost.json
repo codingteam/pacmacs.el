@@ -3,7 +3,7 @@
     "scale": "1",
     "size": {
       "h": 40,
-      "w": 240
+      "w": 160
     },
     "format": "RGBA8888",
     "image": "Blinking-Terrified-Ghost.xpm",
@@ -11,48 +11,6 @@
     "app": "http://www.aseprite.org/"
   },
   "frames": {
-    "Blinking-Terrified-Ghost 5.ase": {
-      "duration": 200,
-      "sourceSize": {
-        "h": 40,
-        "w": 40
-      },
-      "spriteSourceSize": {
-        "h": 40,
-        "w": 40,
-        "y": 0,
-        "x": 0
-      },
-      "trimmed": false,
-      "rotated": false,
-      "frame": {
-        "h": 40,
-        "w": 40,
-        "y": 0,
-        "x": 200
-      }
-    },
-    "Blinking-Terrified-Ghost 4.ase": {
-      "duration": 200,
-      "sourceSize": {
-        "h": 40,
-        "w": 40
-      },
-      "spriteSourceSize": {
-        "h": 40,
-        "w": 40,
-        "y": 0,
-        "x": 0
-      },
-      "trimmed": false,
-      "rotated": false,
-      "frame": {
-        "h": 40,
-        "w": 40,
-        "y": 0,
-        "x": 160
-      }
-    },
     "Blinking-Terrified-Ghost 3.ase": {
       "duration": 200,
       "sourceSize": {
