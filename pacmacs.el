@@ -50,6 +50,7 @@
 (defconst pacmacs-buffer-name "*Pacmacs*")
 (defconst pacmacs-tick-duration-ms 100)
 (defconst pacmacs--ghost-blinking-threshold 2500)
+(defconst pacmacs--ghost-terrified-time-ms 5000)
 
 (defvar pacmacs-debug-output nil)
 
@@ -194,7 +195,7 @@
         :speed 1
         :speed-counter 0
         :type 'terrified-ghost
-        :terrified-timer 5000))
+        :terrified-timer pacmacs--ghost-terrified-time-ms))
 
 (defun pacmacs--make-ghost (row column)
   (list :row row
