@@ -12,7 +12,7 @@ Pacman for Emacs
 
 ## Requirements ##
 
-- Emacs 24.3+
+- Emacs 24.4+
 - Emacs should have displaying images support
 - Emacs should have the [XPM](https://en.wikipedia.org/wiki/X_PixMap) image format support
 
