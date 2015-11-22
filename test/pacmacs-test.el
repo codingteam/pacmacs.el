@@ -8,13 +8,14 @@
     (should (pacmacs--cell-tracked-p 1 0))))
 
 (ert-deftest pacmacs--track-object-test ()
-  (let ((pacmacs--track-board (list :width 2
-                                     :height 2
-                                     :data [[right down]
-                                            [up left]]))
+  (let ((pacmacs--track-board (list :width 3
+                                    :height 2
+                                    :data [[2 1 2]
+                                           [2 0 2]]))
         (game-object (list :row 0
                            :column 0)))
     (with-mock
+     (mock (pacmacs--wall-at-p * *) => nil)
      (mock (pacmacs--switch-direction (list :row 0 :column 0) 'right) :times 1)
      (pacmacs--track-object game-object))))
 
