@@ -6,7 +6,7 @@
 ;; Maintainer: Alexey Kutepov <reximkut@gmail.com>
 ;; URL: http://github.com/rexim/pacmacs.el
 ;; Version: 0.0.1
-;; Package-Requires: ((dash "2.11.0") (dash-functional "1.2.0") (cl-lib "0.5") (f "0.18.0"))
+;; Package-Requires: ((emacs "24.4") (dash "2.11.0") (dash-functional "1.2.0") (cl-lib "0.5") (f "0.18.0"))
 
 ;; Permission is hereby granted, free of charge, to any person
 ;; obtaining a copy of this software and associated documentation
@@ -157,14 +157,9 @@
   (dolist (terrified-ghost pacmacs--terrified-ghosts)
     (plist-bind ((terrified-timer :terrified-timer))
         terrified-ghost
-      (when
-          ;; FIXME: In Emacs 24.3 `<=` accepts only 2
-          ;; arguments. Please rewrite this when Emacs 24.3 is finally
-          ;; dropped.
-          (and (<= terrified-timer
-                   pacmacs--ghost-blinking-threshold-ms)
-               (<= pacmacs--ghost-blinking-threshold-ms
-                   (+ terrified-timer pacmacs-tick-duration-ms)))
+      (when (<= terrified-timer
+                pacmacs--ghost-blinking-threshold-ms
+                (+ terrified-timer pacmacs-tick-duration-ms))
         (plist-put terrified-ghost
                    :current-animation
                    (pacmacs-load-anim "Blinking-Terrified-Ghost"))))))
