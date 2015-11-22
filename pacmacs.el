@@ -157,14 +157,9 @@
   (dolist (terrified-ghost pacmacs--terrified-ghosts)
     (plist-bind ((terrified-timer :terrified-timer))
         terrified-ghost
-      (when
-          ;; FIXME: In Emacs 24.3 `<=` accepts only 2
-          ;; arguments. Please rewrite this when Emacs 24.3 is finally
-          ;; dropped.
-          (and (<= terrified-timer
-                   pacmacs--ghost-blinking-threshold-ms)
-               (<= pacmacs--ghost-blinking-threshold-ms
-                   (+ terrified-timer pacmacs-tick-duration-ms)))
+      (when (<= terrified-timer
+                pacmacs--ghost-blinking-threshold-ms
+                (+ terrified-timer pacmacs-tick-duration-ms))
         (plist-put terrified-ghost
                    :current-animation
                    (pacmacs-load-anim "Blinking-Terrified-Ghost"))))))
