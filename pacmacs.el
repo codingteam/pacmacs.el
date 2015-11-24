@@ -355,27 +355,40 @@
                     (append next-wave candidate-ways))))
           (setq wave next-wave))))))
 
-(defun pacmacs--track-object (game-object)
+(defun pacmacs--track-object-direction (game-object sort-comparator)
   (plist-bind ((row :row)
                (column :column))
       game-object
-    (let* ((candidate-ways (-remove (-lambda ((candidate-row . candidate-column))
-                                      (pacmacs--wall-at-p candidate-row candidate-column))
-                                    (pacmacs--possible-side-ways row column)))
+    (let* ((candidate-ways (cons
+                            (cons row column)
+                            (-remove (-lambda ((candidate-row . candidate-column))
+                                       (pacmacs--wall-at-p candidate-row candidate-column))
+                                     (pacmacs--possible-side-ways row column))))
            (candidate-distances (-map (-lambda ((candidate-row . candidate-column))
                                         (pacmacs--cell-wrapped-get pacmacs--track-board
                                                                    candidate-row
                                                                    candidate-column))
                                       candidate-ways))
            (next-tile (->> (-zip candidate-distances candidate-ways)
-                           (-sort (-lambda ((distance-1 . _) (distance-2 . _))
-                                    (< distance-1 distance-2)))
-                           (car)
-                           (cdr))))
+                           (-sort sort-comparator)
+                           (cdar))))
       (when next-tile
         (->> (pacmacs--vector- next-tile (cons row column))
-             (pacmacs--direction-name)
-             (pacmacs--switch-direction game-object))))))
+             (pacmacs--direction-name))))))
+
+(defun pacmacs--track-object (game-object)
+  (-when-let (direction (pacmacs--track-object-direction
+                         game-object
+                         (-lambda ((distance-1 . _) (distance-2 . _))
+                           (< distance-1 distance-2))))
+    (pacmacs--switch-direction game-object direction)))
+
+(defun pacmacs--back-track-object (game-object)
+  (-when-let (direction (pacmacs--track-object-direction
+                         game-object
+                         (-lambda ((distance-1 . _) (distance-2 . _))
+                           (> distance-1 distance-2))))
+    (pacmacs--switch-direction game-object direction)))
 
 (defun pacmacs-tick ()
   (interactive)
@@ -399,33 +412,9 @@
     (pacmacs--track-object ghost)
     (pacmacs--step-object ghost)))
 
-(defun pacmacs--run-away-direction (runner bogey blocked-tile-predicate)
-  (plist-bind ((runner-row :row)
-               (runner-column :column))
-      runner
-    (plist-bind ((bogey-row :row)
-                 (bogey-column :column))
-        bogey
-      (let* ((current-distance (pacmacs--squared-distance runner-row runner-column
-                                                          bogey-row bogey-column))
-             (possible-ways
-              (->> (pacmacs--possible-side-ways runner-row runner-column)
-                   (-remove (-lambda ((row . column))
-                              (or (funcall blocked-tile-predicate row column)
-                                  (> current-distance
-                                     (pacmacs--squared-distance row column
-                                                                bogey-row bogey-column))))))))
-        (-when-let ((row . column) (car possible-ways))
-          (pacmacs--direction-name (cons (- row runner-row)
-                                         (- column runner-column))))))))
-
 (defun pacmacs--step-terrified-ghosts ()
   (dolist (terrified-ghost pacmacs--terrified-ghosts)
-    (-when-let (direction (pacmacs--run-away-direction
-                           terrified-ghost
-                           pacmacs--player-state
-                           #'pacmacs--wall-at-p))
-      (pacmacs--switch-direction terrified-ghost direction))
+    (pacmacs--back-track-object terrified-ghost)
     (pacmacs--step-object terrified-ghost)))
 
 (defun pacmacs--create-game-object (row column list-name constructor)

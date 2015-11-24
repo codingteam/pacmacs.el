@@ -42,18 +42,6 @@
     (should (equal expected-outcome
                    pacmacs--terrified-ghosts))))
 
-(ert-deftest pacmacs--run-away-direction-test ()
-  (let ((runner '(:row 2 :column 2))
-        (bogey '(:row 2 :column 3))
-        (walls '((1 . 2)
-                 (3 . 2)))
-        (blocked-tile-predicate (-lambda (row column)
-                                  (-find (-partial #'equal (cons row column))
-                                         walls))))
-    (should (equal (pacmacs--run-away-direction runner bogey
-                                                blocked-tile-predicate)
-                   'left))))
-
 (ert-deftest pacmacs--replace-game-objects-test ()
   (let* ((game-objects '((:row 10 :column 20)
                          (:row 30 :column 40)))
