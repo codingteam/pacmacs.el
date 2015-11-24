@@ -38,10 +38,6 @@
     (cons (funcall operation row1 row2)
           (funcall operation column1 column2))))
 
-(defun pacmacs--vector+ (vector1 vector2)
-  (pacmacs--vector-components-operation
-   vector1 vector2 #'+))
-
 (defun pacmacs--vector- (vector1 vector2)
   (pacmacs--vector-components-operation
    vector1 vector2 #'-))
