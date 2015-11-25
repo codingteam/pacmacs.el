@@ -70,17 +70,10 @@
     (dotimes (row height)
       (dotimes (column width)
         (let ((x (pacmacs--cell-wrapped-get track-board row column)))
-          (cond
-           ((null x)
-            (insert "."))
-           ((equal x 'left)
-            (insert "<"))
-           ((equal x 'right)
-            (insert ">"))
-           ((equal x 'up)
-            (insert "^"))
-           ((equal x 'down)
-            (insert "v")))))
+          (insert "\t")
+          (if x
+              (insert (int-to-string x))
+            (insert "."))))
       (insert "\n"))))
 
 (provide 'pacmacs-render)

@@ -46,6 +46,7 @@
 (require 'pacmacs-utils)
 (require 'pacmacs-render)
 (require 'pacmacs-score)
+(require 'pacmacs-vector)
 
 (defconst pacmacs-buffer-name "*Pacmacs*")
 (defconst pacmacs-tick-duration-ms 100)
@@ -322,46 +323,72 @@
     (or (pacmacs--wall-at-p row column)
         (pacmacs--cell-tracked-p row column))))
 
-(defun pacmacs--track-point (start end)
-  (let* ((start-row (car start))
-         (start-column (cdr start))
-
-         (end-row (car end))
-         (end-column (cdr end))
-
-         (d-row (- end-row start-row))
-         (d-column (- end-column start-column)))
-    
-    (pacmacs--cell-wrapped-set pacmacs--track-board
-                       start-row start-column
-                       (pacmacs--direction-name (cons d-row d-column)))))
-
 (defun pacmacs--recalc-track-board ()
   (pacmacs--fill-board pacmacs--track-board nil)
   (plist-bind ((player-row :row)
                (player-column :column))
       pacmacs--player-state
     (let ((wave (list (cons player-row player-column))))
+      (pacmacs--cell-wrapped-set pacmacs--track-board
+                                 player-row player-column
+                                 0)
       (while (not (null wave))
         (let ((next-wave nil))
-          (dolist (p wave)
-            (let* ((row (car p))
-                   (column (cdr p))
-                   (possible-ways (pacmacs--possible-side-ways row column))
+          (dolist (current-tile wave)
+            (let* ((current-row (car current-tile))
+                   (current-column (cdr current-tile))
+                   (possible-ways (pacmacs--possible-side-ways current-row
+                                                               current-column))
                    (candidate-ways
-                    (cl-remove-if #'pacmacs--filter-candidates possible-ways)))
-              (dolist (candidate-way candidate-ways)
-                (pacmacs--track-point candidate-way p))
+                    (cl-remove-if #'pacmacs--filter-candidates
+                                  possible-ways))
+                   (candidate-distance (1+ (pacmacs--cell-wrapped-get
+                                            pacmacs--track-board
+                                            current-row current-column))))
+              (-each candidate-ways
+                (-lambda ((candidate-row . candidate-column))
+                  (pacmacs--cell-wrapped-set pacmacs--track-board
+                                             candidate-row
+                                             candidate-column
+                                             candidate-distance)))
               (setq next-wave
                     (append next-wave candidate-ways))))
           (setq wave next-wave))))))
 
-(defun pacmacs--track-object (game-object)
+(defun pacmacs--track-object-direction (game-object distance-comparator)
   (plist-bind ((row :row)
                (column :column))
       game-object
-    (let ((direction (pacmacs--cell-wrapped-get pacmacs--track-board row column)))
-      (pacmacs--switch-direction game-object direction))))
+    (let* ((candidate-ways (cons
+                            (cons row column)
+                            (-remove (-lambda ((candidate-row . candidate-column))
+                                       (pacmacs--wall-at-p candidate-row candidate-column))
+                                     (pacmacs--possible-side-ways row column))))
+           (candidate-distances (-map (-lambda ((candidate-row . candidate-column))
+                                        (pacmacs--cell-wrapped-get pacmacs--track-board
+                                                                   candidate-row
+                                                                   candidate-column))
+                                      candidate-ways))
+           (next-tile (->> (-zip candidate-distances candidate-ways)
+                           (-sort (-lambda ((distance-1 . _) (distance-2 . _))
+                                    (funcall distance-comparator
+                                             distance-1 distance-2)))
+                           (cdar))))
+      (when next-tile
+        (->> (pacmacs--vector- next-tile (cons row column))
+             (pacmacs--direction-name))))))
+
+(defun pacmacs--track-object (game-object distance-comparator)
+  (-when-let (direction (pacmacs--track-object-direction
+                         game-object
+                         distance-comparator))
+    (pacmacs--switch-direction game-object direction)))
+
+(defun pacmacs--track-object-to-player (game-object)
+  (pacmacs--track-object game-object #'<))
+
+(defun pacmacs--track-object-from-player (game-object)
+  (pacmacs--track-object game-object #'>))
 
 (defun pacmacs-tick ()
   (interactive)
@@ -382,36 +409,12 @@
 
 (defun pacmacs--step-ghosts ()
   (dolist (ghost pacmacs--ghosts)
-    (pacmacs--track-object ghost)
+    (pacmacs--track-object-to-player ghost)
     (pacmacs--step-object ghost)))
-
-(defun pacmacs--run-away-direction (runner bogey blocked-tile-predicate)
-  (plist-bind ((runner-row :row)
-               (runner-column :column))
-      runner
-    (plist-bind ((bogey-row :row)
-                 (bogey-column :column))
-        bogey
-      (let* ((current-distance (pacmacs--squared-distance runner-row runner-column
-                                                          bogey-row bogey-column))
-             (possible-ways
-              (->> (pacmacs--possible-side-ways runner-row runner-column)
-                   (-remove (-lambda ((row . column))
-                              (or (funcall blocked-tile-predicate row column)
-                                  (> current-distance
-                                     (pacmacs--squared-distance row column
-                                                                bogey-row bogey-column))))))))
-        (-when-let ((row . column) (car possible-ways))
-          (pacmacs--direction-name (cons (- row runner-row)
-                                         (- column runner-column))))))))
 
 (defun pacmacs--step-terrified-ghosts ()
   (dolist (terrified-ghost pacmacs--terrified-ghosts)
-    (-when-let (direction (pacmacs--run-away-direction
-                           terrified-ghost
-                           pacmacs--player-state
-                           #'pacmacs--wall-at-p))
-      (pacmacs--switch-direction terrified-ghost direction))
+    (pacmacs--track-object-from-player terrified-ghost)
     (pacmacs--step-object terrified-ghost)))
 
 (defun pacmacs--create-game-object (row column list-name constructor)
