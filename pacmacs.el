@@ -355,7 +355,7 @@
                     (append next-wave candidate-ways))))
           (setq wave next-wave))))))
 
-(defun pacmacs--track-object-direction (game-object sort-comparator)
+(defun pacmacs--track-object-direction (game-object distance-comparator)
   (plist-bind ((row :row)
                (column :column))
       game-object
@@ -370,25 +370,25 @@
                                                                    candidate-column))
                                       candidate-ways))
            (next-tile (->> (-zip candidate-distances candidate-ways)
-                           (-sort sort-comparator)
+                           (-sort (-lambda ((distance-1 . _) (distance-2 . _))
+                                    (funcall distance-comparator
+                                             distance-1 distance-2)))
                            (cdar))))
       (when next-tile
         (->> (pacmacs--vector- next-tile (cons row column))
              (pacmacs--direction-name))))))
 
-(defun pacmacs--track-object (game-object)
+(defun pacmacs--track-object (game-object distance-comparator)
   (-when-let (direction (pacmacs--track-object-direction
                          game-object
-                         (-lambda ((distance-1 . _) (distance-2 . _))
-                           (< distance-1 distance-2))))
+                         distance-comparator))
     (pacmacs--switch-direction game-object direction)))
 
-(defun pacmacs--back-track-object (game-object)
-  (-when-let (direction (pacmacs--track-object-direction
-                         game-object
-                         (-lambda ((distance-1 . _) (distance-2 . _))
-                           (> distance-1 distance-2))))
-    (pacmacs--switch-direction game-object direction)))
+(defun pacmacs--track-object-to-player (game-object)
+  (pacmacs--track-object game-object #'<))
+
+(defun pacmacs--track-object-from-player (game-object)
+  (pacmacs--track-object game-object #'>))
 
 (defun pacmacs-tick ()
   (interactive)
@@ -409,12 +409,12 @@
 
 (defun pacmacs--step-ghosts ()
   (dolist (ghost pacmacs--ghosts)
-    (pacmacs--track-object ghost)
+    (pacmacs--track-object-to-player ghost)
     (pacmacs--step-object ghost)))
 
 (defun pacmacs--step-terrified-ghosts ()
   (dolist (terrified-ghost pacmacs--terrified-ghosts)
-    (pacmacs--back-track-object terrified-ghost)
+    (pacmacs--track-object-from-player terrified-ghost)
     (pacmacs--step-object terrified-ghost)))
 
 (defun pacmacs--create-game-object (row column list-name constructor)
