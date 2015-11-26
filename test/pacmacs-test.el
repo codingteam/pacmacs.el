@@ -81,3 +81,11 @@
                       (:terrified-timer 1001 :current-animation 3)
                       (:terrified-timer 899 :current-animation 4))
                     pacmacs--terrified-ghosts)))))
+
+(ert-deftest pacmacs--load-next-level-test ()
+  (let ((pacmacs-current-level 2)
+        (pacmacs-levels [1 2 3]))
+    (with-mock
+     (mock (pacmacs--load-current-level) => nil)
+     (pacmacs--load-next-level)
+     (should (= 0 pacmacs-current-level)))))
