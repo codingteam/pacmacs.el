@@ -438,22 +438,42 @@
       (funcall new-constructor row column))
     (funcall old-destructor game-object)))
 
+(defun pacmacs--terrified-ghost-timed-out-p (terrified-ghost)
+  (<= (plist-get terrified-ghost :terrified-timer) 0))
+
+(defun pacmacs--terrify-ghost (ghost)
+  (plist-put ghost :current-animation
+             (pacmacs-load-anim "Terrified-Ghost"))
+  (plist-put ghost :switch-direction-callback
+             #'pacmacs--switch-direction-callback)
+  (plist-put ghost :type 'terrified-ghost)
+  (plist-put ghost :terrified-timer
+             pacmacs--ghost-terrified-time-ms)
+  ghost)
+
+(defun pacmacs--unterrify-ghost (terrified-ghost)
+  (plist-put terrified-ghost :switch-direction-callback
+             (pacmacs--switch-direction-animation-callback "Red-Ghost"))
+  (plist-put terrified-ghost :type 'ghost)
+  (pacmacs--switch-direction terrified-ghost
+                             (plist-get terrified-ghost :direction))
+  terrified-ghost)
+
 (defun pacmacs--terrify-all-ghosts ()
-  (pacmacs--replace-game-objects pacmacs--ghosts
-                                 #'pacmacs--create-terrified-ghost
-                                 #'pacmacs--remove-object)
+  (dolist (ghost pacmacs--ghosts)
+    (add-to-list 'pacmacs--terrified-ghosts
+                 (pacmacs--terrify-ghost ghost)))
   (setq pacmacs--ghosts nil))
 
 (defun pacmacs--unterrify-timed-out-ghosts ()
-  (let ((timed-out-predicate
-         (-lambda (terrified-ghost)
-           (<= (plist-get terrified-ghost :terrified-timer) 0))))
-    (pacmacs--replace-game-objects
-     (-filter timed-out-predicate pacmacs--terrified-ghosts)
-     #'pacmacs--create-ghost
-     #'pacmacs--remove-object)
-    (setq pacmacs--terrified-ghosts (-remove timed-out-predicate
-                                             pacmacs--terrified-ghosts))))
+  (dolist (terrified-ghost (-filter #'pacmacs--terrified-ghost-timed-out-p
+                                    pacmacs--terrified-ghosts))
+    (add-to-list 'pacmacs--ghosts
+                 (pacmacs--unterrify-ghost terrified-ghost)))
+
+  (setq pacmacs--terrified-ghosts
+        (-remove #'pacmacs--terrified-ghost-timed-out-p
+                 pacmacs--terrified-ghosts)))
 
 (defun pacmacs--detect-pill-collision ()
   (plist-bind ((row :row)
