@@ -107,3 +107,12 @@
 
      (should (equal ghost
                     (pacmacs--unterrify-ghost terrified-ghost))))))
+
+(ert-deftest pacmacs--terrified-ghost-timed-out-p-test ()
+  (should (not
+          (pacmacs--terrified-ghost-timed-out-p
+           (list :terrified-timer 60065))))
+  (should (pacmacs--terrified-ghost-timed-out-p
+           (list :terrified-timer 0)))
+  (should (pacmacs--terrified-ghost-timed-out-p
+           (list :terrified-timer -1))))
