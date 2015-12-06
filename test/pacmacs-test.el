@@ -42,30 +42,6 @@
     (should (equal expected-outcome
                    pacmacs--terrified-ghosts))))
 
-(ert-deftest pacmacs--replace-game-objects-test ()
-  (let* ((game-objects '((:row 10 :column 20)
-                         (:row 30 :column 40)))
-         (replaced-objects nil)
-         (destroyed-objects nil)
-         (new-constructor (-lambda (row column)
-                            (setq replaced-objects
-                                  (cons (list :row (1+ row)
-                                              :column (1+ column))
-                                        replaced-objects))))
-         (old-destructor (-lambda (game-object)
-                           (setq destroyed-objects (cons game-object
-                                                         destroyed-objects)))))
-    (pacmacs--replace-game-objects game-objects new-constructor old-destructor)
-    (should (equal '((:row 10 :column 20)
-                     (:row 30 :column 40))
-                   game-objects))
-    (should (equal '((:row 31 :column 41)
-                     (:row 11 :column 21))
-                   replaced-objects))
-    (should (equal '((:row 30 :column 40)
-                     (:row 10 :column 20))
-                   destroyed-objects))))
-
 (ert-deftest pacmacs--handle-ghost-blinking-threshold-test ()
   (let ((pacmacs--terrified-ghosts '((:terrified-timer 900 :current-animation 1)
                                      (:terrified-timer 999 :current-animation 2)

@@ -430,14 +430,6 @@
   (pacmacs--create-game-object row column 'pacmacs--ghosts
                                #'pacmacs--make-ghost))
 
-(defun pacmacs--replace-game-objects (game-objects new-constructor old-destructor)
-  (dolist (game-object game-objects)
-    (plist-bind ((row :row)
-                 (column :column))
-        game-object
-      (funcall new-constructor row column))
-    (funcall old-destructor game-object)))
-
 (defun pacmacs--terrified-ghost-timed-out-p (terrified-ghost)
   (<= (plist-get terrified-ghost :terrified-timer) 0))
 
