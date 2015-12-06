@@ -10,8 +10,8 @@
 (defun att-replayer-finished ()
   (f-write (format "Average Tick Time: %fms" (pacmacs--average-tick-time))
            'utf-8
-           att--result-file-path)
+           att-result-file-path)
   (kill-emacs 0))
 
-(add-hook 'pacmacs-replay-finished-hook #'performance-replayer-finished)
+(add-hook 'pacmacs-replay-finished-hook #'att-replayer-finished)
 (pacmacs--start-it-replayer att-it-case-path)
