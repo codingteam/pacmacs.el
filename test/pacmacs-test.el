@@ -42,30 +42,6 @@
     (should (equal expected-outcome
                    pacmacs--terrified-ghosts))))
 
-(ert-deftest pacmacs--replace-game-objects-test ()
-  (let* ((game-objects '((:row 10 :column 20)
-                         (:row 30 :column 40)))
-         (replaced-objects nil)
-         (destroyed-objects nil)
-         (new-constructor (-lambda (row column)
-                            (setq replaced-objects
-                                  (cons (list :row (1+ row)
-                                              :column (1+ column))
-                                        replaced-objects))))
-         (old-destructor (-lambda (game-object)
-                           (setq destroyed-objects (cons game-object
-                                                         destroyed-objects)))))
-    (pacmacs--replace-game-objects game-objects new-constructor old-destructor)
-    (should (equal '((:row 10 :column 20)
-                     (:row 30 :column 40))
-                   game-objects))
-    (should (equal '((:row 31 :column 41)
-                     (:row 11 :column 21))
-                   replaced-objects))
-    (should (equal '((:row 30 :column 40)
-                     (:row 10 :column 20))
-                   destroyed-objects))))
-
 (ert-deftest pacmacs--handle-ghost-blinking-threshold-test ()
   (let ((pacmacs--terrified-ghosts '((:terrified-timer 900 :current-animation 1)
                                      (:terrified-timer 999 :current-animation 2)
@@ -89,3 +65,54 @@
      (mock (pacmacs--load-current-level) => nil)
      (pacmacs--load-next-level)
      (should (= 0 pacmacs-current-level)))))
+
+(ert-deftest pacmacs--terrify-ghost-test ()
+  (let* ((pacmacs--ghost-terrified-time-ms 60065)
+         (ghost (list :property-1 1
+                      :property-2 2
+                      :current-animation 'ghost-animation
+                      :switch-direction-callback 'ghost-direction-switcher
+                      :type 'ghost))
+         (terrified-ghost (list :property-1 1
+                                :property-2 2
+                                :current-animation 'terrified-ghost-animation
+                                :switch-direction-callback 'pacmacs--switch-direction-callback
+                                :type 'terrified-ghost
+                                :terrified-timer pacmacs--ghost-terrified-time-ms)))
+    (with-mock
+     (mock (pacmacs-load-anim "Terrified-Ghost") => 'terrified-ghost-animation)
+     (should (equal terrified-ghost
+                    (pacmacs--terrify-ghost ghost))))))
+
+(ert-deftest pacmacs--unterrify-ghost-test ()
+  (let* ((pacmacs--ghost-terrified-time-ms 60065)
+         (terrified-ghost (list :property-1 1
+                                :property-2 2
+                                :direction 'right
+                                :current-animation 'terrified-ghost-animation
+                                :switch-direction-callback 'terrified-ghost-direction-switcher
+                                :type 'terrified-ghost
+                                :terrified-timer pacmacs--ghost-terrified-time-ms))
+         (ghost (list :property-1 1
+                      :property-2 2
+                      :direction 'right
+                      :current-animation 'terrified-ghost-animation
+                      :switch-direction-callback 'ghost-direction-switcher
+                      :type 'ghost
+                      :terrified-timer pacmacs--ghost-terrified-time-ms)))
+    (with-mock
+     (mock (pacmacs--switch-direction * 'right))
+     (mock (pacmacs--switch-direction-animation-callback "Red-Ghost")
+           => 'ghost-direction-switcher)
+
+     (should (equal ghost
+                    (pacmacs--unterrify-ghost terrified-ghost))))))
+
+(ert-deftest pacmacs--terrified-ghost-timed-out-p-test ()
+  (should (not
+          (pacmacs--terrified-ghost-timed-out-p
+           (list :terrified-timer 60065))))
+  (should (pacmacs--terrified-ghost-timed-out-p
+           (list :terrified-timer 0)))
+  (should (pacmacs--terrified-ghost-timed-out-p
+           (list :terrified-timer -1))))
