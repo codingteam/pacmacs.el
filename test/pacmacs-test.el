@@ -65,3 +65,21 @@
      (mock (pacmacs--load-current-level) => nil)
      (pacmacs--load-next-level)
      (should (= 0 pacmacs-current-level)))))
+
+(ert-deftest pacmacs--terrify-ghost-test ()
+  (let* ((pacmacs--ghost-terrified-time-ms 60065)
+         (ghost (list :property-1 1
+                      :property-2 2
+                      :current-animation 'ghost-animation
+                      :switch-direction-callback 'ghost-direction-switcher
+                      :type 'ghost))
+         (terrified-ghost (list :property-1 1
+                                :property-2 2
+                                :current-animation 'terrified-ghost-animation
+                                :switch-direction-callback 'pacmacs--switch-direction-callback
+                                :type 'terrified-ghost
+                                :terrified-timer pacmacs--ghost-terrified-time-ms)))
+    (with-mock
+     (mock (pacmacs-load-anim "Terrified-Ghost") => 'terrified-ghost-animation)
+     (should (equal terrified-ghost
+                    (pacmacs--terrify-ghost ghost))))))
