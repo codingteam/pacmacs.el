@@ -417,19 +417,6 @@
     (pacmacs--track-object-from-player terrified-ghost)
     (pacmacs--step-object terrified-ghost)))
 
-(defun pacmacs--create-game-object (row column list-name constructor)
-  (let ((game-object (funcall constructor row column)))
-    (add-to-list list-name game-object)
-    (pacmacs--put-object game-object)))
-
-(defun pacmacs--create-terrified-ghost (row column)
-  (pacmacs--create-game-object row column 'pacmacs--terrified-ghosts
-                               #'pacmacs--make-terrified-ghost))
-
-(defun pacmacs--create-ghost (row column)
-  (pacmacs--create-game-object row column 'pacmacs--ghosts
-                               #'pacmacs--make-ghost))
-
 (defun pacmacs--terrified-ghost-timed-out-p (terrified-ghost)
   (<= (plist-get terrified-ghost :terrified-timer) 0))
 
