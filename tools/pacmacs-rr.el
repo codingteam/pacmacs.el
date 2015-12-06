@@ -1,3 +1,38 @@
+;;; pacmacs-rr.el --- Pacman for Emacs -*- lexical-binding: t -*-
+
+;; Copyright (C) 2015 Codingteam
+
+;; Author: Codingteam <codingteam@conference.jabber.ru>
+;; Maintainer: Alexey Kutepov <reximkut@gmail.com>
+;; URL: http://github.com/rexim/pacmacs.el
+
+;; Permission is hereby granted, free of charge, to any person
+;; obtaining a copy of this software and associated documentation
+;; files (the "Software"), to deal in the Software without
+;; restriction, including without limitation the rights to use, copy,
+;; modify, merge, publish, distribute, sublicense, and/or sell copies
+;; of the Software, and to permit persons to whom the Software is
+;; furnished to do so, subject to the following conditions:
+
+;; The above copyright notice and this permission notice shall be
+;; included in all copies or substantial portions of the Software.
+
+;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+;; EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+;; MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+;; NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+;; BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+;; ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+;; CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+;; SOFTWARE.
+
+;;; Commentary:
+
+;; Additional module for recording and replaying integration test
+;; cases.
+
+;;; Code:
+
 (require 'pacmacs)
 
 (require 'dash)
@@ -7,6 +42,7 @@
 (defvar pacmacs--tick-counter 0)
 (defvar pacmacs--recorded-actions nil)
 (defvar pacmacs--tick-times nil)
+(defvar pacmacs-replay-finished-hook nil)
 
 (defun pacmacs--record-action (action-name)
   (add-to-list 'pacmacs--recorded-actions
@@ -62,12 +98,13 @@
                (pacmacs--measure-time
                 (pacmacs-tick)))
 
-  (if (not pacmacs--recorded-actions)
-      (pacmacs-quit)
-    (-let ((((action . tick-number) . _) pacmacs--recorded-actions))
-      (when (= tick-number pacmacs--tick-counter)
-        (funcall action)
-        (setq pacmacs--recorded-actions (cdr pacmacs--recorded-actions))))))
+  (if pacmacs--recorded-actions
+      (-let ((((action . tick-number) . _) pacmacs--recorded-actions))
+        (when (= tick-number pacmacs--tick-counter)
+          (funcall action)
+          (setq pacmacs--recorded-actions (cdr pacmacs--recorded-actions))))
+    (pacmacs-quit)
+    (run-hooks 'pacmacs-replay-finished-hook)))
 
 (define-derived-mode pacmacs-it-recorder-mode pacmacs-mode "pacmacs-it-recorder-mode"
   (define-key pacmacs-it-recorder-mode-map (kbd "<up>") 'pacmacs-record-up)
@@ -92,3 +129,7 @@
   (setq pacmacs--recorded-actions (pacmacs--load-test-case filename))
   (setq pacmacs--tick-counter 0)
   (setq pacmacs--tick-times nil))
+
+(provide 'pacmacs-rr)
+
+;;; pacmacs-rr.el ends here
