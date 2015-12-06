@@ -2,11 +2,17 @@
 
 Tools that help to develop the game
 
+## att.el ##
+
+Runs `./it-cases/it-case03.el` it case using `pacmacs-rr` module and
+outputs the ATT to `./att.txt` file.
+
 ## compile.el ##
 
 Compiles all the source code, treats warnings as errors and exits with
 non-zero exit code on any error (which `cask build` does not yet).
 
-## it-recorder.el ##
+## pacmacs-rr.el ##
 
-Tool for recording and replaying integration test cases.
+RR stands for Record and Replay. Additional module for recording and
+replaying integration test cases.
