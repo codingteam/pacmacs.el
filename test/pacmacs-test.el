@@ -83,3 +83,27 @@
      (mock (pacmacs-load-anim "Terrified-Ghost") => 'terrified-ghost-animation)
      (should (equal terrified-ghost
                     (pacmacs--terrify-ghost ghost))))))
+
+(ert-deftest pacmacs--unterrify-ghost-test ()
+  (let* ((pacmacs--ghost-terrified-time-ms 60065)
+         (terrified-ghost (list :property-1 1
+                                :property-2 2
+                                :direction 'right
+                                :current-animation 'terrified-ghost-animation
+                                :switch-direction-callback 'terrified-ghost-direction-switcher
+                                :type 'terrified-ghost
+                                :terrified-timer pacmacs--ghost-terrified-time-ms))
+         (ghost (list :property-1 1
+                      :property-2 2
+                      :direction 'right
+                      :current-animation 'terrified-ghost-animation
+                      :switch-direction-callback 'ghost-direction-switcher
+                      :type 'ghost
+                      :terrified-timer pacmacs--ghost-terrified-time-ms)))
+    (with-mock
+     (mock (pacmacs--switch-direction * 'right))
+     (mock (pacmacs--switch-direction-animation-callback "Red-Ghost")
+           => 'ghost-direction-switcher)
+
+     (should (equal ghost
+                    (pacmacs--unterrify-ghost terrified-ghost))))))
