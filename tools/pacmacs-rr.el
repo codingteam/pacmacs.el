@@ -42,6 +42,7 @@
 (defvar pacmacs--tick-counter 0)
 (defvar pacmacs--recorded-actions nil)
 (defvar pacmacs--tick-times nil)
+(defvar pacmacs-replay-finished-hook nil)
 
 (defun pacmacs--record-action (action-name)
   (add-to-list 'pacmacs--recorded-actions
@@ -97,12 +98,13 @@
                (pacmacs--measure-time
                 (pacmacs-tick)))
 
-  (if (not pacmacs--recorded-actions)
-      (pacmacs-quit)
-    (-let ((((action . tick-number) . _) pacmacs--recorded-actions))
-      (when (= tick-number pacmacs--tick-counter)
-        (funcall action)
-        (setq pacmacs--recorded-actions (cdr pacmacs--recorded-actions))))))
+  (if pacmacs--recorded-actions
+      (-let ((((action . tick-number) . _) pacmacs--recorded-actions))
+        (when (= tick-number pacmacs--tick-counter)
+          (funcall action)
+          (setq pacmacs--recorded-actions (cdr pacmacs--recorded-actions))))
+    (pacmacs-quit)
+    (run-hooks 'pacmacs-replay-finished-hook)))
 
 (define-derived-mode pacmacs-it-recorder-mode pacmacs-mode "pacmacs-it-recorder-mode"
   (define-key pacmacs-it-recorder-mode-map (kbd "<up>") 'pacmacs-record-up)
