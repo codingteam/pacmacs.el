@@ -4,7 +4,7 @@
 
 ;; Author: Codingteam <codingteam@conference.jabber.ru>
 ;; Maintainer: Alexey Kutepov <reximkut@gmail.com>
-;; URL: http://github.com/rexim/pacmacs.el
+;; URL: http://github.com/codingteam/pacmacs.el
 
 ;; Permission is hereby granted, free of charge, to any person
 ;; obtaining a copy of this software and associated documentation
