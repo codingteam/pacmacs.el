@@ -34,6 +34,10 @@
 
 (require 'dash)
 
+(defconst pacmacs--wall-palette ["#1111bb"
+                                 "#3333dd"
+                                 "#5555ff"])
+
 (defvar pacmacs--wall-blocks
   (make-hash-table))
 
@@ -46,17 +50,17 @@
 (defun pacmacs--put-bits-dot (bits row column weight)
   (dotimes (i weight)
     (dotimes (j weight)
-      (aset (aref bits (+ i row)) (+ j column) t))))
+      (aset (aref bits (+ i row)) (+ j column) 0))))
 
 (defun pacmacs--put-vertical-bar (bits column height weight)
   (dotimes (w weight)
     (dotimes (i height)
-      (aset (aref bits i) (+ column w) t))))
+      (aset (aref bits i) (+ column w) w))))
 
 (defun pacmacs--put-horizontal-bar (bits row width weight)
   (dotimes (w weight)
     (dotimes (i width)
-      (aset (aref bits (+ row w)) i t))))
+      (aset (aref bits (+ row w)) i w))))
 
 (defun pacmacs--bit-list-to-integer (bit-list)
   (let ((result 0))
@@ -65,19 +69,30 @@
                            (if bit 1 0))))
     result))
 
+(defun pacmacs--generate-xpm-palette (palette)
+  (let* ((n (length palette))
+         (palette-indices (number-sequence 0 (1- n))))
+    (->> (-map #'identity palette)
+         (-zip-with #'cons palette-indices)
+         (-map (-lambda ((index . color))
+                 (format "\"%c c %s\",\n" (+ index ?a) color)))
+         (apply #'concat))))
+
 (defun pacmacs--bits-to-xpm (bits width height)
   (concat
    "/* XPM */\n"
    "static char *tile[] = {\n"
    "/**/\n"
-   (format "\"%d %d 2 1\",\n" width height)
+   (format "\"%d %d %d 1\",\n" width height (1+ (length pacmacs--wall-palette)))
    "\"  c None\",\n"
-   "\". c #5555ff\",\n"
+   (pacmacs--generate-xpm-palette pacmacs--wall-palette)
    "/* pixels */\n"
    (mapconcat
     (lambda (row)
       (format "\"%s\""
-       (mapconcat (-lambda (bit) (if bit "." " ")) row "")))
+              (mapconcat (-lambda (bit)
+                           (if bit (format "%c" (+ bit ?a)) " "))
+                         row "")))
     bits
     ",\n")
    "\n};"))
