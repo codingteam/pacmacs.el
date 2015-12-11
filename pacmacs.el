@@ -450,8 +450,8 @@
 (defun pacmacs--unterrify-timed-out-ghosts ()
   (dolist (terrified-ghost (-filter #'pacmacs--terrified-ghost-timed-out-p
                                     pacmacs--terrified-ghosts))
-    (add-to-list 'pacmacs--ghosts
-                 (pacmacs--unterrify-ghost terrified-ghost)))
+    (push (pacmacs--unterrify-ghost terrified-ghost)
+          pacmacs--ghosts))
 
   (setq pacmacs--terrified-ghosts
         (-remove #'pacmacs--terrified-ghost-timed-out-p
@@ -697,19 +697,19 @@
      for line being the element of lines using (index row)
      do (cl-loop for x being the element of line using (index column)
                  do (cond ((char-equal x ?#)
-                           (add-to-list 'pacmacs--wall-cells (pacmacs--make-wall-cell row column)))
+                           (push (pacmacs--make-wall-cell row column) pacmacs--wall-cells))
 
                           ((char-equal x ?.)
-                           (add-to-list 'pacmacs--pills (pacmacs--make-regular-pill row column)))
+                           (push (pacmacs--make-regular-pill row column) pacmacs--pills))
 
                           ((char-equal x ?+)
-                           (add-to-list 'pacmacs--pills (pacmacs--make-big-pill row column)))
+                           (push (pacmacs--make-big-pill row column) pacmacs--pills))
 
                           ((char-equal x ?o)
                            (setq pacmacs--player-state (pacmacs--make-player row column)))
 
                           ((char-equal x ?g)
-                           (add-to-list 'pacmacs--ghosts (pacmacs--make-ghost row column))))))
+                           (push (pacmacs--make-ghost row column) pacmacs--ghosts)))))
 
     (pacmacs--fill-object-board)
 
