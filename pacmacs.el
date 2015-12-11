@@ -430,12 +430,6 @@
              pacmacs--ghost-terrified-time-ms)
   ghost)
 
-(defun pacmacs--reset-terrified-ghost (terrified-ghost)
-  (plist-put terrified-ghost
-             :terrified-timer pacmacs--ghost-terrified-time-ms)
-  (plist-put terrified-ghost
-             :current-animation (pacmacs-load-anim "Terrified-Ghost")))
-
 (defun pacmacs--unterrify-ghost (terrified-ghost)
   (plist-put terrified-ghost :switch-direction-callback
              (pacmacs--switch-direction-animation-callback "Red-Ghost"))
@@ -451,7 +445,7 @@
   (setq pacmacs--ghosts nil)
 
   (dolist (terrified-ghost pacmacs--terrified-ghosts)
-    (pacmacs--reset-terrified-ghost terrified-ghost)))
+    (pacmacs--terrify-ghost terrified-ghost)))
 
 (defun pacmacs--unterrify-timed-out-ghosts ()
   (dolist (terrified-ghost (-filter #'pacmacs--terrified-ghost-timed-out-p
