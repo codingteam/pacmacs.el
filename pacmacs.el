@@ -439,9 +439,12 @@
   terrified-ghost)
 
 (defun pacmacs--terrify-all-ghosts ()
+  (dolist (terrified-ghost pacmacs--terrified-ghosts)
+    (pacmacs--terrify-ghost terrified-ghost))
+
   (dolist (ghost pacmacs--ghosts)
-    (add-to-list 'pacmacs--terrified-ghosts
-                 (pacmacs--terrify-ghost ghost)))
+    (push (pacmacs--terrify-ghost ghost)
+          pacmacs--terrified-ghosts))
   (setq pacmacs--ghosts nil))
 
 (defun pacmacs--unterrify-timed-out-ghosts ()

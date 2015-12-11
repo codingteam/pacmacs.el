@@ -116,3 +116,13 @@
            (list :terrified-timer 0)))
   (should (pacmacs--terrified-ghost-timed-out-p
            (list :terrified-timer -1))))
+
+(ert-deftest pacmacs--terrify-all-ghosts-test ()
+  (let* ((pacmacs--terrified-ghosts (number-sequence 1 5))
+         (pacmacs--ghosts (number-sequence 1 6)))
+    (with-mock
+     (mock (pacmacs--terrify-ghost *) => 42 :times 11)
+     (pacmacs--terrify-all-ghosts)
+
+     (should (null pacmacs--ghosts))
+     (should (= 11 (length pacmacs--terrified-ghosts))))))
