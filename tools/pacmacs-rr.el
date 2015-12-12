@@ -45,8 +45,8 @@
 (defvar pacmacs-replay-finished-hook nil)
 
 (defun pacmacs--record-action (action-name)
-  (add-to-list 'pacmacs--recorded-actions
-               (cons action-name pacmacs--tick-counter)))
+  (push (cons action-name pacmacs--tick-counter)
+        pacmacs--recorded-actions))
 
 (defun pacmacs--reset-recorder ()
   (setq pacmacs--tick-counter 0)
@@ -94,9 +94,8 @@
 (defun pacmacs-replay-tick ()
   (cl-incf pacmacs--tick-counter)
 
-  (add-to-list 'pacmacs--tick-times
-               (pacmacs--measure-time
-                (pacmacs-tick)))
+  (push (pacmacs--measure-time (pacmacs-tick))
+        pacmacs--tick-times)
 
   (if pacmacs--recorded-actions
       (-let ((((action . tick-number) . _) pacmacs--recorded-actions))
