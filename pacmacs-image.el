@@ -43,6 +43,10 @@
 (defvar pacmacs--wall-blocks
   (make-hash-table))
 
+(defun pacmacs--clear-wall-cache ()
+  (interactive)
+  (clrhash pacmacs--wall-blocks))
+
 (defun pacmacs-load-image (filename)
   (create-image filename 'xpm nil :heuristic-mask t))
 
@@ -229,8 +233,6 @@
                  (create-image (pacmacs--bits-to-xpm wall-block width height palette)
                                'xpm t))
                pacmacs--wall-blocks))))
-
-;; (clrhash pacmacs--wall-blocks)
 
 (provide 'pacmacs-image)
 
