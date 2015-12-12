@@ -213,7 +213,7 @@
         cached-tile
       (puthash cache-index
                (let* ((wall-block (make-vector width nil))
-                      (weight 15)
+                      (weight 10)
                       (palette (pacmacs--color-hex-gradient
                                 pacmacs--wall-gradient-color-start
                                 pacmacs--wall-gradient-color-stop
