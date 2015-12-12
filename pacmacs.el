@@ -120,7 +120,7 @@
 
 (defun pacmacs--load-current-level ()
   (pacmacs--load-map (aref pacmacs-levels
-                          pacmacs-current-level)))
+                           pacmacs-current-level)))
 
 (defun pacmacs--load-next-level ()
   (setq pacmacs-current-level

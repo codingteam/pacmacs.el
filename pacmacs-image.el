@@ -33,10 +33,7 @@
 ;;; Code:
 
 (require 'dash)
-
-(defconst pacmacs--wall-palette ["#1111bb"
-                                 "#3333dd"
-                                 "#5555ff"])
+(require 'color)
 
 (defvar pacmacs--wall-blocks
   (make-hash-table))
@@ -78,14 +75,22 @@
                  (format "\"%c c %s\",\n" (+ index ?a) color)))
          (apply #'concat))))
 
-(defun pacmacs--bits-to-xpm (bits width height)
+(defun pacmacs--color-hex-gradient (start stop step-number)
+  (-map (-lambda (color)
+          (apply #'color-rgb-to-hex color))
+        (color-gradient
+         (color-name-to-rgb start)
+         (color-name-to-rgb stop)
+         step-number)))
+
+(defun pacmacs--bits-to-xpm (bits width height palette)
   (concat
    "/* XPM */\n"
    "static char *tile[] = {\n"
    "/**/\n"
-   (format "\"%d %d %d 1\",\n" width height (1+ (length pacmacs--wall-palette)))
+   (format "\"%d %d %d 1\",\n" width height (1+ (length palette)))
    "\"  c None\",\n"
-   (pacmacs--generate-xpm-palette pacmacs--wall-palette)
+   (pacmacs--generate-xpm-palette palette)
    "/* pixels */\n"
    (mapconcat
     (lambda (row)
@@ -121,7 +126,7 @@
         cached-tile
       (puthash cache-index
                (let ((wall-block (make-vector width nil))
-                     (weight 3))
+                     (weight 15))
 
                  (dotimes (i width)
                    (aset wall-block i (make-vector height nil)))
@@ -150,9 +155,18 @@
                  (when bottom
                    (pacmacs--put-horizontal-bar wall-block (- height weight) width weight))
 
-                 (create-image (pacmacs--bits-to-xpm wall-block width height)
+                 ;; (dotimes (row height)
+                 ;;   (dotimes (column width)
+                 ;;     (when (zerop (mod (+ row column) 2))
+                 ;;       (aset (aref wall-block row) column nil))))
+
+                 (create-image (pacmacs--bits-to-xpm wall-block width height
+                                                     (pacmacs--color-hex-gradient "#5555ff" "#000011"
+                                                                                  weight))
                                'xpm t))
                pacmacs--wall-blocks))))
+
+;; (clrhash pacmacs--wall-blocks)
 
 (provide 'pacmacs-image)
 
