@@ -66,15 +66,15 @@
    (mock (gethash * *) => nil)
    (mock (puthash * * *) => nil)
    (mock (create-image * * *) => nil)
-   (mock (pacmacs--bits-to-xpm [[nil t   t   t]
-                                [t   t   t   t]
-                                [t   t   t   t]
-                                [t   t   t   t]]
-                               4 4))
+   (mock (pacmacs--wall-tile-to-xpm [[nil t   t   t]
+                                     [t   t   t   t]
+                                     [t   t   t   t]
+                                     [t   t   t   t]]
+                                    4 4))
    (pacmacs--create-wall-tile 4 4 t t nil nil
                               nil nil nil nil)))
 
-(ert-deftest pacmacs--bits-to-xpm-test ()
+(ert-deftest pacmacs--wall-tile-to-xpm-test ()
   (should (string= (concat "/* XPM */\n"
                            "static char *tile[] = {\n"
                            "/**/\n\"2 2 2 1\",\n"

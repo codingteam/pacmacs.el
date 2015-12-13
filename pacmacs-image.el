@@ -92,7 +92,7 @@
          (color-name-to-rgb stop)
          step-number)))
 
-(defun pacmacs--bits-to-xpm (bits width height palette)
+(defun pacmacs--wall-tile-to-xpm (wall-tile width height palette)
   (concat
    "/* XPM */\n"
    "static char *tile[] = {\n"
@@ -107,7 +107,7 @@
               (mapconcat (-lambda (bit)
                            (if bit (format "%c" (+ bit ?a)) " "))
                          row "")))
-    bits
+    wall-tile
     ",\n")
    "\n};"))
 
@@ -229,7 +229,7 @@
                  (pacmacs--put-bars wall-tile width height pacmacs--wall-weight wall-bits)
                  (pacmacs--put-outer-corners wall-tile width height pacmacs--wall-weight wall-bits)
 
-                 (create-image (pacmacs--bits-to-xpm wall-tile width height palette)
+                 (create-image (pacmacs--wall-tile-to-xpm wall-tile width height palette)
                                'xpm t))
                pacmacs--wall-tiles-cache))))
 
