@@ -37,8 +37,7 @@
 
 (require 'pacmacs-vector)
 
-(defconst pacmacs--wall-gradient-color-start "#181818")
-(defconst pacmacs--wall-gradient-color-stop "#5555ff")
+(defconst pacmacs--wall-color "#5555ff")
 
 (defvar pacmacs--wall-blocks
   (make-hash-table))
@@ -219,8 +218,8 @@
                (let* ((wall-block (make-vector width nil))
                       (weight 10)
                       (palette (pacmacs--color-hex-gradient
-                                pacmacs--wall-gradient-color-start
-                                pacmacs--wall-gradient-color-stop
+                                (face-attribute 'default :background)
+                                pacmacs--wall-color
                                 weight)))
 
                  (dotimes (i width)
