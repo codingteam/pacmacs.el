@@ -53,7 +53,7 @@
 (defun pacmacs-insert-image (resource resource-vector)
   (insert-image resource " " nil resource-vector))
 
-(defun pacmacs--put-bits-dot (bits row column weight weights-to-color)
+(defun pacmacs--put-wall-tile-corner (bits row column weight weights-to-color)
   (dotimes (i weight)
     (dotimes (j weight)
       (aset (aref bits (+ i row)) (+ j column) (funcall weights-to-color i j)))))
@@ -150,20 +150,20 @@
   (-let (((left-upper right-upper left-bottom right-bottom)
           (pacmacs--wall-bits-get-corners wall-bits)))
     (when left-upper
-      (pacmacs--put-bits-dot wall-tile 0 0 weight
-                             (pacmacs--two-weights-to-color nil nil nil weight)))
+      (pacmacs--put-wall-tile-corner wall-tile 0 0 weight
+                                     (pacmacs--two-weights-to-color nil nil nil weight)))
 
     (when right-upper
-      (pacmacs--put-bits-dot wall-tile 0 (- width weight) weight
-                             (pacmacs--two-weights-to-color nil t nil weight)))
+      (pacmacs--put-wall-tile-corner wall-tile 0 (- width weight) weight
+                                     (pacmacs--two-weights-to-color nil t nil weight)))
 
     (when left-bottom
-      (pacmacs--put-bits-dot wall-tile (- height weight) 0 weight
-                             (pacmacs--two-weights-to-color t nil nil weight)))
+      (pacmacs--put-wall-tile-corner wall-tile (- height weight) 0 weight
+                                     (pacmacs--two-weights-to-color t nil nil weight)))
 
     (when right-bottom
-      (pacmacs--put-bits-dot wall-tile (- height weight) (- width weight) weight
-                             (pacmacs--two-weights-to-color t t nil weight)))))
+      (pacmacs--put-wall-tile-corner wall-tile (- height weight) (- width weight) weight
+                                     (pacmacs--two-weights-to-color t t nil weight)))))
 
 (defun pacmacs--put-bars (wall-tile width height weight wall-bits)
   (-let (((bottom right top left)
@@ -186,27 +186,26 @@
   (-let (((bottom right top left)
           (pacmacs--wall-bits-get-bars wall-bits)))
     (when (and left top) ;left-upper
-      (pacmacs--put-bits-dot wall-tile 0 0 weight
-                             (pacmacs--two-weights-to-color t t t weight)))
+      (pacmacs--put-wall-tile-corner wall-tile 0 0 weight
+                                     (pacmacs--two-weights-to-color t t t weight)))
 
     (when (and right top) ;right-upper
-      (pacmacs--put-bits-dot wall-tile 0 (- width weight) weight
-                             (pacmacs--two-weights-to-color t nil t weight)))
+      (pacmacs--put-wall-tile-corner wall-tile 0 (- width weight) weight
+                                     (pacmacs--two-weights-to-color t nil t weight)))
 
     (when (and left bottom) ;left-bottom
-      (pacmacs--put-bits-dot wall-tile (- height weight) 0 weight
-                             (pacmacs--two-weights-to-color nil t t weight)))
+      (pacmacs--put-wall-tile-corner wall-tile (- height weight) 0 weight
+                                     (pacmacs--two-weights-to-color nil t t weight)))
 
     (when (and right bottom) ;right-bottom
-      (pacmacs--put-bits-dot wall-tile (- height weight) (- width weight) weight
-                             (pacmacs--two-weights-to-color nil nil t weight)))
-    ))
+      (pacmacs--put-wall-tile-corner wall-tile (- height weight) (- width weight) weight
+                                     (pacmacs--two-weights-to-color nil nil t weight)))))
 
 (defun pacmacs--create-wall-tile (width height
-                                  bottom right
-                                  top left
-                                  left-upper right-upper
-                                  left-bottom right-bottom)
+                                        bottom right
+                                        top left
+                                        left-upper right-upper
+                                        left-bottom right-bottom)
   (let* ((wall-bits (list bottom right top left
                           left-upper right-upper
                           left-bottom right-bottom))

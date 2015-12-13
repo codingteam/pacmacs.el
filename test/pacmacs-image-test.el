@@ -10,7 +10,7 @@
      (mock (insert-image resource " " nil resource-vector) => 42 :times 1)
      (should (= 42 (pacmacs-insert-image resource resource-vector))))))
 
-(ert-deftest pacmacs--put-bits-dot-test ()
+(ert-deftest pacmacs--put-wall-tile-corner-test ()
   (let ((input-bits (pacmacs--construct-2d-bool-vector
                      '((nil nil nil)
                        (nil nil nil)
@@ -19,7 +19,7 @@
                         '((t   t   nil)
                           (t   t   nil)
                           (nil nil nil)))))
-    (pacmacs--put-bits-dot input-bits 0 0 2)
+    (pacmacs--put-wall-tile-corner input-bits 0 0 2)
     (should (equal expected-bits
                    input-bits))))
 
