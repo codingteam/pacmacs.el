@@ -40,12 +40,12 @@
 (defconst pacmacs--wall-color "#5555ff")
 (defconst pacmacs--wall-weight 10)
 
-(defvar pacmacs--wall-blocks
+(defvar pacmacs--wall-tiles-cache
   (make-hash-table))
 
-(defun pacmacs--clear-wall-cache ()
+(defun pacmacs--clear-wall-tiles-cache ()
   (interactive)
-  (clrhash pacmacs--wall-blocks))
+  (clrhash pacmacs--wall-tiles-cache))
 
 (defun pacmacs-load-image (filename)
   (create-image filename 'xpm nil :heuristic-mask t))
@@ -146,59 +146,59 @@
 (defun pacmacs--wall-bits-get-bars (wall-bits)
   (-take 4 wall-bits))
 
-(defun pacmacs--put-inner-corners (wall-block width height weight wall-bits)
+(defun pacmacs--put-inner-corners (wall-tile width height weight wall-bits)
   (-let (((left-upper right-upper left-bottom right-bottom)
           (pacmacs--wall-bits-get-corners wall-bits)))
     (when left-upper
-      (pacmacs--put-bits-dot wall-block 0 0 weight
+      (pacmacs--put-bits-dot wall-tile 0 0 weight
                              (pacmacs--two-weights-to-color nil nil nil weight)))
 
     (when right-upper
-      (pacmacs--put-bits-dot wall-block 0 (- width weight) weight
+      (pacmacs--put-bits-dot wall-tile 0 (- width weight) weight
                              (pacmacs--two-weights-to-color nil t nil weight)))
 
     (when left-bottom
-      (pacmacs--put-bits-dot wall-block (- height weight) 0 weight
+      (pacmacs--put-bits-dot wall-tile (- height weight) 0 weight
                              (pacmacs--two-weights-to-color t nil nil weight)))
 
     (when right-bottom
-      (pacmacs--put-bits-dot wall-block (- height weight) (- width weight) weight
+      (pacmacs--put-bits-dot wall-tile (- height weight) (- width weight) weight
                              (pacmacs--two-weights-to-color t t nil weight)))))
 
-(defun pacmacs--put-bars (wall-block width height weight wall-bits)
+(defun pacmacs--put-bars (wall-tile width height weight wall-bits)
   (-let (((bottom right top left)
           (pacmacs--wall-bits-get-bars wall-bits)))
     (when left
-      (pacmacs--put-vertical-bar wall-block 0 height weight #'identity))
+      (pacmacs--put-vertical-bar wall-tile 0 height weight #'identity))
 
     (when right
-      (pacmacs--put-vertical-bar wall-block (- width weight) height weight
+      (pacmacs--put-vertical-bar wall-tile (- width weight) height weight
                                  (pacmacs--inverted-weight-to-color weight)))
 
     (when top
-      (pacmacs--put-horizontal-bar wall-block 0 width weight #'identity))
+      (pacmacs--put-horizontal-bar wall-tile 0 width weight #'identity))
     
     (when bottom
-      (pacmacs--put-horizontal-bar wall-block (- height weight) width weight
+      (pacmacs--put-horizontal-bar wall-tile (- height weight) width weight
                                    (pacmacs--inverted-weight-to-color weight)))))
 
-(defun pacmacs--put-outer-corners (wall-block width height weight wall-bits)
+(defun pacmacs--put-outer-corners (wall-tile width height weight wall-bits)
   (-let (((bottom right top left)
           (pacmacs--wall-bits-get-bars wall-bits)))
     (when (and left top) ;left-upper
-      (pacmacs--put-bits-dot wall-block 0 0 weight
+      (pacmacs--put-bits-dot wall-tile 0 0 weight
                              (pacmacs--two-weights-to-color t t t weight)))
 
     (when (and right top) ;right-upper
-      (pacmacs--put-bits-dot wall-block 0 (- width weight) weight
+      (pacmacs--put-bits-dot wall-tile 0 (- width weight) weight
                              (pacmacs--two-weights-to-color t nil t weight)))
 
     (when (and left bottom) ;left-bottom
-      (pacmacs--put-bits-dot wall-block (- height weight) 0 weight
+      (pacmacs--put-bits-dot wall-tile (- height weight) 0 weight
                              (pacmacs--two-weights-to-color nil t t weight)))
 
     (when (and right bottom) ;right-bottom
-      (pacmacs--put-bits-dot wall-block (- height weight) (- width weight) weight
+      (pacmacs--put-bits-dot wall-tile (- height weight) (- width weight) weight
                              (pacmacs--two-weights-to-color nil nil t weight)))
     ))
 
@@ -213,25 +213,25 @@
          (cache-index (-> wall-bits
                           (pacmacs--normalize-wall-bits)
                           (pacmacs--bit-list-to-integer))))
-    (-if-let (cached-tile (gethash cache-index pacmacs--wall-blocks))
+    (-if-let (cached-tile (gethash cache-index pacmacs--wall-tiles-cache))
         cached-tile
       (puthash cache-index
-               (let* ((wall-block (make-vector width nil))
+               (let* ((wall-tile (make-vector width nil))
                       (palette (pacmacs--color-hex-gradient
                                 (face-attribute 'default :background)
                                 pacmacs--wall-color
                                 pacmacs--wall-weight)))
 
                  (dotimes (i width)
-                   (aset wall-block i (make-vector height nil)))
+                   (aset wall-tile i (make-vector height nil)))
 
-                 (pacmacs--put-inner-corners wall-block width height pacmacs--wall-weight wall-bits)
-                 (pacmacs--put-bars wall-block width height pacmacs--wall-weight wall-bits)
-                 (pacmacs--put-outer-corners wall-block width height pacmacs--wall-weight wall-bits)
+                 (pacmacs--put-inner-corners wall-tile width height pacmacs--wall-weight wall-bits)
+                 (pacmacs--put-bars wall-tile width height pacmacs--wall-weight wall-bits)
+                 (pacmacs--put-outer-corners wall-tile width height pacmacs--wall-weight wall-bits)
 
-                 (create-image (pacmacs--bits-to-xpm wall-block width height palette)
+                 (create-image (pacmacs--bits-to-xpm wall-tile width height palette)
                                'xpm t))
-               pacmacs--wall-blocks))))
+               pacmacs--wall-tiles-cache))))
 
 (provide 'pacmacs-image)
 
