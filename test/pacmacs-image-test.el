@@ -77,15 +77,18 @@
 (ert-deftest pacmacs--wall-tile-to-xpm-test ()
   (should (string= (concat "/* XPM */\n"
                            "static char *tile[] = {\n"
-                           "/**/\n\"2 2 2 1\",\n"
+                           "/**/\n\"2 2 3 1\",\n"
                            "\"  c None\",\n"
-                           "\". c #5555ff\",\n"
+                           "\"a c #khooy1\",\n"
+                           "\"b c #khooy2\",\n"
                            "/* pixels */\n"
-                           "\"..\",\n"
-                           "\"  \"\n};")
-                   (pacmacs--bits-to-xpm [[t t]
-                                          [nil nil]]
-                                         2 2))))
+                           "\"ab\",\n"
+                           "\"b \"\n};")
+                   (pacmacs--wall-tile-to-xpm [[0 1]
+                                               [1 nil]]
+                                              2 2
+                                              '("#khooy1"
+                                                "#khooy2")))))
 
 (ert-deftest pacmacs--normalize-wall-bits-test ()
   (should (equal '(nil nil nil nil t nil t nil)
