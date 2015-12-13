@@ -38,6 +38,7 @@
 (require 'pacmacs-vector)
 
 (defconst pacmacs--wall-color "#5555ff")
+(defconst pacmacs--wall-weight 10)
 
 (defvar pacmacs--wall-blocks
   (make-hash-table))
@@ -216,18 +217,17 @@
         cached-tile
       (puthash cache-index
                (let* ((wall-block (make-vector width nil))
-                      (weight 10)
                       (palette (pacmacs--color-hex-gradient
                                 (face-attribute 'default :background)
                                 pacmacs--wall-color
-                                weight)))
+                                pacmacs--wall-weight)))
 
                  (dotimes (i width)
                    (aset wall-block i (make-vector height nil)))
 
-                 (pacmacs--put-inner-corners wall-block width height weight wall-bits)
-                 (pacmacs--put-bars wall-block width height weight wall-bits)
-                 (pacmacs--put-outer-corners wall-block width height weight wall-bits)
+                 (pacmacs--put-inner-corners wall-block width height pacmacs--wall-weight wall-bits)
+                 (pacmacs--put-bars wall-block width height pacmacs--wall-weight wall-bits)
+                 (pacmacs--put-outer-corners wall-block width height pacmacs--wall-weight wall-bits)
 
                  (create-image (pacmacs--bits-to-xpm wall-block width height palette)
                                'xpm t))
