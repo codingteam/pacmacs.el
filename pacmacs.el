@@ -98,6 +98,8 @@
   (pacmacs-mode))
 
 (defun pacmacs--initialize-game (tick-function)
+  (pacmacs--clear-wall-cache)
+
   (switch-to-buffer pacmacs-buffer-name)
   (buffer-disable-undo pacmacs-buffer-name)
 
