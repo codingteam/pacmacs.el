@@ -6,9 +6,9 @@
 
 Pacman for Emacs
 
-<p align="center"><img src="http://i.imgur.com/CIf2XBc.png" href="http://i.imgur.com/CIf2XBc.png" /></p>
-<p align="center"><img src="http://i.imgur.com/BXjXKnU.png" href="http://i.imgur.com/BXjXKnU.png" /></p>
-<p align="center"><img src="http://i.imgur.com/nGhK9ih.png" href="http://i.imgur.com/nGhK9ih.png" /></p>
+<p align="center"><img src="http://i.imgur.com/QcNqAcL.png" href="http://i.imgur.com/QcNqAcL.png" /></p>
+<p align="center"><img src="http://i.imgur.com/sJBrzTe.png" href="http://i.imgur.com/sJBrzTe.png" /></p>
+<p align="center"><img src="http://i.imgur.com/WCuGfnk.png" href="http://i.imgur.com/WCuGfnk.png" /></p>
 
 ## Requirements ##
 
