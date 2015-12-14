@@ -10,42 +10,35 @@
      (mock (insert-image resource " " nil resource-vector) => 42 :times 1)
      (should (= 42 (pacmacs-insert-image resource resource-vector))))))
 
-(ert-deftest pacmacs--put-bits-dot-test ()
-  (let ((input-bits (pacmacs--construct-2d-bool-vector
-                     '((nil nil nil)
-                       (nil nil nil)
-                       (nil nil nil))))
-        (expected-bits (pacmacs--construct-2d-bool-vector
-                        '((t   t   nil)
-                          (t   t   nil)
-                          (nil nil nil)))))
-    (pacmacs--put-bits-dot input-bits 0 0 2)
-    (should (equal expected-bits
-                   input-bits))))
+(ert-deftest pacmacs--put-wall-tile-corner-test ()
+  (let ((input-wall-tile [[nil nil nil]
+                          [nil nil nil]
+                          [nil nil nil]])
+        (expected-wall-tile [[0   1   nil]
+                             [1   2   nil]
+                             [nil nil nil]]))
+    (pacmacs--put-wall-tile-corner input-wall-tile 0 0 2 #'+)
+    (should (equal expected-wall-tile input-wall-tile))))
 
 (ert-deftest pacmacs--put-vertical-bar-test ()
-  (let ((input-bits (pacmacs--construct-2d-bool-vector
-                     '((nil nil nil)
-                       (nil nil nil)
-                       (nil nil nil))))
-        (expected-bits (pacmacs--construct-2d-bool-vector
-                        '((t t nil)
-                          (t t nil)
-                          (t t nil)))))
-    (pacmacs--put-vertical-bar input-bits 0 3 2)
+  (let ((input-bits [[nil nil nil]
+                     [nil nil nil]
+                     [nil nil nil]])
+        (expected-bits [[0 1 nil]
+                        [0 1 nil]
+                        [0 1 nil]]))
+    (pacmacs--put-vertical-bar input-bits 0 3 2 #'identity)
     (should (equal (pacmacs--bits-to-lists expected-bits)
                    (pacmacs--bits-to-lists input-bits)))))
 
 (ert-deftest pacmacs--put-horizontal-bar-test ()
-  (let ((input-bits (pacmacs--construct-2d-bool-vector
-                     '((nil nil nil)
-                       (nil nil nil)
-                       (nil nil nil))))
-        (expected-bits (pacmacs--construct-2d-bool-vector
-                        '((t   t   t)
-                          (t   t   t)
-                          (nil nil nil)))))
-    (pacmacs--put-horizontal-bar input-bits 0 3 2)
+  (let ((input-bits [[nil nil nil]
+                     [nil nil nil]
+                     [nil nil nil]])
+        (expected-bits [[0   0   0]
+                        [1   1   1]
+                        [nil nil nil]]))
+    (pacmacs--put-horizontal-bar input-bits 0 3 2 #'identity)
     (should (equal (pacmacs--bits-to-lists expected-bits)
                    (pacmacs--bits-to-lists input-bits)))))
 
@@ -61,31 +54,38 @@
                            bit-list)))))))
 
 (ert-deftest pacmacs--create-wall-tile-test ()
-  (with-mock
-   (mock (pacmacs--bit-list-to-integer *) => 0)
-   (mock (gethash * *) => nil)
-   (mock (puthash * * *) => nil)
-   (mock (create-image * * *) => nil)
-   (mock (pacmacs--bits-to-xpm [[nil t   t   t]
-                                [t   t   t   t]
-                                [t   t   t   t]
-                                [t   t   t   t]]
-                               4 4))
-   (pacmacs--create-wall-tile 4 4 t t nil nil
-                              nil nil nil nil)))
+  (let ((pacmacs--wall-weight 3))
+    (with-mock
+     (mock (pacmacs--color-hex-gradient * * *) => '("khooy1" "khooy2" "khooy3"))
+     (mock (pacmacs--bit-list-to-integer *) => 0)
+     (mock (gethash * *) => nil)
+     (mock (puthash * * *) => nil)
+     (mock (create-image * * *) => nil)
+     (mock (pacmacs--wall-tile-to-xpm [[nil 2   1   0]
+                                       [2   2   1   0]
+                                       [1   1   1   0]
+                                       [0   0   0   0]]
+                                      4 4
+                                      '("khooy1" "khooy2" "khooy3")))
+     (pacmacs--create-wall-tile
+      4 4
+      '(t t nil nil nil nil nil nil)))))
 
-(ert-deftest pacmacs--bits-to-xpm-test ()
+(ert-deftest pacmacs--wall-tile-to-xpm-test ()
   (should (string= (concat "/* XPM */\n"
                            "static char *tile[] = {\n"
-                           "/**/\n\"2 2 2 1\",\n"
+                           "/**/\n\"2 2 3 1\",\n"
                            "\"  c None\",\n"
-                           "\". c #5555ff\",\n"
+                           "\"a c #khooy1\",\n"
+                           "\"b c #khooy2\",\n"
                            "/* pixels */\n"
-                           "\"..\",\n"
-                           "\"  \"\n};")
-                   (pacmacs--bits-to-xpm [[t t]
-                                          [nil nil]]
-                                         2 2))))
+                           "\"ab\",\n"
+                           "\"b \"\n};")
+                   (pacmacs--wall-tile-to-xpm [[0 1]
+                                               [1 nil]]
+                                              2 2
+                                              '("#khooy1"
+                                                "#khooy2")))))
 
 (ert-deftest pacmacs--normalize-wall-bits-test ()
   (should (equal '(nil nil nil nil t nil t nil)

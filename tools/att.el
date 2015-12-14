@@ -4,6 +4,8 @@
 (require 'pacmacs-rr)
 (require 'f)
 
+(toggle-debug-on-error)
+
 (defconst att-result-file-path "./att.txt")
 (defvar att-it-case-path "./it-cases/it-case03.el")
 

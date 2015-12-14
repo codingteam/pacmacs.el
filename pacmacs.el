@@ -98,6 +98,8 @@
   (pacmacs-mode))
 
 (defun pacmacs--initialize-game (tick-function)
+  (pacmacs--clear-wall-tiles-cache)
+
   (switch-to-buffer pacmacs-buffer-name)
   (buffer-disable-undo pacmacs-buffer-name)
 
@@ -120,7 +122,7 @@
 
 (defun pacmacs--load-current-level ()
   (pacmacs--load-map (aref pacmacs-levels
-                          pacmacs-current-level)))
+                           pacmacs-current-level)))
 
 (defun pacmacs--load-next-level ()
   (setq pacmacs-current-level
@@ -667,12 +669,12 @@
        (apply #'vector)))
 
 (defun pacmacs--wall-tile-at (row column)
-  (apply #'pacmacs--create-wall-tile
-         40 40
-         (-map (-lambda ((row . column))
-                 (not (pacmacs--wall-at-p row column)))
-               (append (pacmacs--possible-side-ways row column)
-                       (pacmacs--possible-diagonal-ways row column)))))
+  (pacmacs--create-wall-tile
+   40 40
+   (-map (-lambda ((row . column))
+           (not (pacmacs--wall-at-p row column)))
+         (append (pacmacs--possible-side-ways row column)
+                 (pacmacs--possible-diagonal-ways row column)))))
 
 (defun pacmacs--load-map (map-name)
   (let* ((lines (split-string (->> map-name

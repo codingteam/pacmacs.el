@@ -42,6 +42,12 @@
   (pacmacs--vector-components-operation
    vector1 vector2 #'-))
 
+(defun pacmacs--squared-distance (row1 column1 row2 column2)
+  (let ((d-row (- row2 row1))
+        (d-column (- column2 column1)))
+      (+ (* d-row d-row)
+         (* d-column d-column))))
+
 (provide 'pacmacs-vector)
 
 ;;; pacmacs-vector.el ends here

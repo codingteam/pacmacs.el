@@ -64,12 +64,6 @@ side-effects."
                                'down  (cons  1  0))))
     (plist-get direction-table direction)))
 
-(defun pacmacs--squared-distance (row1 column1 row2 column2)
-  (let ((d-row (- row2 row1))
-        (d-column (- column2 column1)))
-      (+ (* d-row d-row)
-         (* d-column d-column))))
-
 (defun pacmacs--direction-name (direction-vector)
   (let ((direction-table '((( 0 . -1) . left)
                            (( 0 .  1) . right)
