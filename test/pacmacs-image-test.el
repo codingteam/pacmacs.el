@@ -54,18 +54,21 @@
                            bit-list)))))))
 
 (ert-deftest pacmacs--create-wall-tile-test ()
-  (with-mock
-   (mock (pacmacs--bit-list-to-integer *) => 0)
-   (mock (gethash * *) => nil)
-   (mock (puthash * * *) => nil)
-   (mock (create-image * * *) => nil)
-   (mock (pacmacs--wall-tile-to-xpm [[nil t   t   t]
-                                     [t   t   t   t]
-                                     [t   t   t   t]
-                                     [t   t   t   t]]
-                                    4 4))
-   (pacmacs--create-wall-tile 4 4 t t nil nil
-                              nil nil nil nil)))
+  (let ((pacmacs--wall-weight 3))
+    (with-mock
+     (mock (pacmacs--color-hex-gradient * * *) => '("khooy1" "khooy2" "khooy3"))
+     (mock (pacmacs--bit-list-to-integer *) => 0)
+     (mock (gethash * *) => nil)
+     (mock (puthash * * *) => nil)
+     (mock (create-image * * *) => nil)
+     (mock (pacmacs--wall-tile-to-xpm [[nil 2   1   0]
+                                       [2   2   1   0]
+                                       [1   1   1   0]
+                                       [0   0   0   0]]
+                                      4 4
+                                      '("khooy1" "khooy2" "khooy3")))
+     (pacmacs--create-wall-tile 4 4 t t nil nil
+                                nil nil nil nil))))
 
 (ert-deftest pacmacs--wall-tile-to-xpm-test ()
   (should (string= (concat "/* XPM */\n"
