@@ -201,15 +201,12 @@
       (pacmacs--put-wall-tile-corner wall-tile (- height weight) (- width weight) weight
                                      (pacmacs--two-weights-to-color nil nil t weight)))))
 
-(defun pacmacs--create-wall-tile (width height
-                                        bottom right
-                                        top left
-                                        left-upper right-upper
-                                        left-bottom right-bottom)
-  (let* ((wall-bits (list bottom right top left
-                          left-upper right-upper
-                          left-bottom right-bottom))
-         (cache-index (-> wall-bits
+(defun pacmacs--create-wall-tile (width height wall-bits)
+  "Creates a wall tile based on the WALL-BITS.
+WALL-BITS go as follow (bottom right top left left-upper
+right-upper left-bottom right-bottom). WIDTH and HEIGHT are the
+size of the tile. All the created tiles are cached."
+  (let* ((cache-index (-> wall-bits
                           (pacmacs--normalize-wall-bits)
                           (pacmacs--bit-list-to-integer))))
     (-if-let (cached-tile (gethash cache-index pacmacs--wall-tiles-cache))

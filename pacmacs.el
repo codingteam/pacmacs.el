@@ -666,12 +666,12 @@
        (apply #'vector)))
 
 (defun pacmacs--wall-tile-at (row column)
-  (apply #'pacmacs--create-wall-tile
-         40 40
-         (-map (-lambda ((row . column))
-                 (not (pacmacs--wall-at-p row column)))
-               (append (pacmacs--possible-side-ways row column)
-                       (pacmacs--possible-diagonal-ways row column)))))
+  (pacmacs--create-wall-tile
+   40 40
+   (-map (-lambda ((row . column))
+           (not (pacmacs--wall-at-p row column)))
+         (append (pacmacs--possible-side-ways row column)
+                 (pacmacs--possible-diagonal-ways row column)))))
 
 (defun pacmacs--load-map (map-name)
   (let* ((lines (split-string (->> map-name

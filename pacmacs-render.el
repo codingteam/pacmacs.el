@@ -41,8 +41,7 @@
 (defun pacmacs--render-empty-cell ()
   (pacmacs-insert-image (pacmacs--create-wall-tile
                          40 40
-                         nil nil nil nil
-                         nil nil nil nil)
+                         (make-list 8 nil))
                         '(0 0 40 40)))
 
 (defun pacmacs--render-life-icon ()
