@@ -78,7 +78,7 @@
 (defun pacmacs--generate-xpm-palette (palette)
   (let* ((n (length palette))
          (palette-indices (number-sequence 0 (1- n))))
-    (->> (-map #'identity palette)
+    (->> palette
          (-zip-with #'cons palette-indices)
          (-map (-lambda ((index . color))
                  (format "\"%c c %s\",\n" (+ index ?a) color)))
