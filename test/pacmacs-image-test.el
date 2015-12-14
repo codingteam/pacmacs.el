@@ -67,8 +67,9 @@
                                        [0   0   0   0]]
                                       4 4
                                       '("khooy1" "khooy2" "khooy3")))
-     (pacmacs--create-wall-tile 4 4 t t nil nil
-                                nil nil nil nil))))
+     (pacmacs--create-wall-tile
+      4 4
+      '(t t nil nil nil nil nil nil)))))
 
 (ert-deftest pacmacs--wall-tile-to-xpm-test ()
   (should (string= (concat "/* XPM */\n"
