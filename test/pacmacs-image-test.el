@@ -32,15 +32,13 @@
                    (pacmacs--bits-to-lists input-bits)))))
 
 (ert-deftest pacmacs--put-horizontal-bar-test ()
-  (let ((input-bits (pacmacs--construct-2d-bool-vector
-                     '((nil nil nil)
-                       (nil nil nil)
-                       (nil nil nil))))
-        (expected-bits (pacmacs--construct-2d-bool-vector
-                        '((t   t   t)
-                          (t   t   t)
-                          (nil nil nil)))))
-    (pacmacs--put-horizontal-bar input-bits 0 3 2)
+  (let ((input-bits [[nil nil nil]
+                     [nil nil nil]
+                     [nil nil nil]])
+        (expected-bits [[0   0   0]
+                        [1   1   1]
+                        [nil nil nil]]))
+    (pacmacs--put-horizontal-bar input-bits 0 3 2 #'identity)
     (should (equal (pacmacs--bits-to-lists expected-bits)
                    (pacmacs--bits-to-lists input-bits)))))
 
