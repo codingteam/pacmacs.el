@@ -11,17 +11,14 @@
      (should (= 42 (pacmacs-insert-image resource resource-vector))))))
 
 (ert-deftest pacmacs--put-wall-tile-corner-test ()
-  (let ((input-bits (pacmacs--construct-2d-bool-vector
-                     '((nil nil nil)
-                       (nil nil nil)
-                       (nil nil nil))))
-        (expected-bits (pacmacs--construct-2d-bool-vector
-                        '((t   t   nil)
-                          (t   t   nil)
-                          (nil nil nil)))))
-    (pacmacs--put-wall-tile-corner input-bits 0 0 2)
-    (should (equal expected-bits
-                   input-bits))))
+  (let ((input-wall-tile [[nil nil nil]
+                          [nil nil nil]
+                          [nil nil nil]])
+        (expected-wall-tile [[0   1   nil]
+                             [1   2   nil]
+                             [nil nil nil]]))
+    (pacmacs--put-wall-tile-corner input-wall-tile 0 0 2 #'+)
+    (should (equal expected-wall-tile input-wall-tile))))
 
 (ert-deftest pacmacs--put-vertical-bar-test ()
   (let ((input-bits (pacmacs--construct-2d-bool-vector
