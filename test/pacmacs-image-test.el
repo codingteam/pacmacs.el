@@ -21,15 +21,13 @@
     (should (equal expected-wall-tile input-wall-tile))))
 
 (ert-deftest pacmacs--put-vertical-bar-test ()
-  (let ((input-bits (pacmacs--construct-2d-bool-vector
-                     '((nil nil nil)
-                       (nil nil nil)
-                       (nil nil nil))))
-        (expected-bits (pacmacs--construct-2d-bool-vector
-                        '((t t nil)
-                          (t t nil)
-                          (t t nil)))))
-    (pacmacs--put-vertical-bar input-bits 0 3 2)
+  (let ((input-bits [[nil nil nil]
+                     [nil nil nil]
+                     [nil nil nil]])
+        (expected-bits [[0 1 nil]
+                        [0 1 nil]
+                        [0 1 nil]]))
+    (pacmacs--put-vertical-bar input-bits 0 3 2 #'identity)
     (should (equal (pacmacs--bits-to-lists expected-bits)
                    (pacmacs--bits-to-lists input-bits)))))
 
