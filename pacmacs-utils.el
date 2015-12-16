@@ -76,12 +76,6 @@ side-effects."
   (when (string-match "\\(map[0-9]+\\)\\.txt" filename)
     (match-string 1 filename)))
 
-(defmacro pacmacs--measure-time (&rest body)
-  "Measure the time it takes to evaluate BODY."
-  `(let ((time (current-time)))
-     ,@body
-     (float-time (time-since time))))
-
 (provide 'pacmacs-utils)
 
 ;;; pacmacs.el ends here

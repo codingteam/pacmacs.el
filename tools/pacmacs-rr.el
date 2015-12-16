@@ -44,6 +44,12 @@
 (defvar pacmacs--tick-times nil)
 (defvar pacmacs-replay-finished-hook nil)
 
+(defmacro pacmacs--measure-time (&rest body)
+  "Measure the time it takes to evaluate BODY."
+  `(let ((time (current-time)))
+     ,@body
+     (float-time (time-since time))))
+
 (defun pacmacs--record-action (action-name)
   (push (cons action-name pacmacs--tick-counter)
         pacmacs--recorded-actions))
