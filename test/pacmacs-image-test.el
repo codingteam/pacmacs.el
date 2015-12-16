@@ -100,3 +100,12 @@
   (should (equal '(t t t t nil nil nil nil)
                  (pacmacs--normalize-wall-bits
                   '(t t t t t t t t)))))
+
+(ert-deftest pacmacs--color-hex-gradient ()
+  (with-mock
+   (mock (color-name-to-rgb *) => 'rgb :times 2)
+   (mock (color-gradient 'rgb 'rgb 5) => '((rgb) (rgb) (rgb) (rgb) (rgb)))
+   (mock (color-rgb-to-hex 'rgb) => 'hex :times 5)
+
+   (should (equal '(hex hex hex hex hex)
+                  (pacmacs--color-hex-gradient 'khooy 'khooy 5)))))
