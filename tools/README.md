@@ -2,6 +2,11 @@
 
 Tools that help to develop the game
 
+## pacmacs-rr.el ##
+
+RR stands for Record and Replay. Additional module for recording and
+replaying integration test cases.
+
 ## att.el ##
 
 Runs `./it-cases/it-case03.el` it case using `pacmacs-rr` module and
@@ -24,7 +29,3 @@ To run this script do
 
     $ emacs -Q --script ./tools/compile.el
 
-## pacmacs-rr.el ##
-
-RR stands for Record and Replay. Additional module for recording and
-replaying integration test cases.
