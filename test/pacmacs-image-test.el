@@ -109,3 +109,9 @@
 
    (should (equal '(hex hex hex hex hex)
                   (pacmacs--color-hex-gradient 'khooy 'khooy 5)))))
+
+(ert-deftest pacmacs--clear-wall-tiles-cache-test ()
+  (let ((pacmacs--wall-tiles-cache 42))
+    (with-mock
+     (mock (clrhash 42) :times 1)
+     (pacmacs--clear-wall-tiles-cache))))
