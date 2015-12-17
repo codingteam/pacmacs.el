@@ -7,6 +7,12 @@ Tools that help to develop the game
 Runs `./it-cases/it-case03.el` it case using `pacmacs-rr` module and
 outputs the ATT to `./att.txt` file.
 
+### Usage ###
+
+To run this script do
+
+    $ cask exec emacs -Q --load ./tools/att.el
+
 ## compile.el ##
 
 Compiles all the source code, treats warnings as errors and exits with
