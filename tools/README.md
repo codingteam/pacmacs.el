@@ -12,6 +12,12 @@ outputs the ATT to `./att.txt` file.
 Compiles all the source code, treats warnings as errors and exits with
 non-zero exit code on any error (which `cask build` does not yet).
 
+### Usage ###
+
+To run this script do
+
+    $ emacs -Q --script ./tools/compile.el
+
 ## pacmacs-rr.el ##
 
 RR stands for Record and Replay. Additional module for recording and
