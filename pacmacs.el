@@ -91,6 +91,9 @@
   (setq cursor-type nil)
   (setq truncate-lines t))
 
+(define-derived-mode pacmacs-game-over-mode text-mode "pacmacs-game-over-mode"
+  )
+
 ;;;###autoload
 (defun pacmacs-start ()
   (interactive)
