@@ -116,6 +116,7 @@
                                      tick-function))))
 
 (defun pacmacs-destroy ()
+  "Destroys the game timer without killing the game buffer."
   (when pacmacs-timer
     (cancel-timer pacmacs-timer)
     (setq pacmacs-timer nil)))
