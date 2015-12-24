@@ -558,8 +558,13 @@
 
 (defun pacmacs--switch-to-game-over-state ()
   (setq pacmacs-game-state 'game-over)
+
   (pacmacs--load-map "game-over")
-  (pacmacs--register-new-score pacmacs-score))
+  (pacmacs-destroy)
+  (pacmacs--render-state)
+
+  (pacmacs-game-over-mode)
+  (read-only-mode 0))
 
 (defun pacmacs--switch-to-play-state ()
   (setq pacmacs-game-state 'play)
