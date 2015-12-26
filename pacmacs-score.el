@@ -36,6 +36,8 @@
 (require 'dash)
 (require 'dash-functional)
 
+(defconst pacmacs--max-score-nick-size 8)
+(defconst pacmacs--max-score-table-size 10)
 (defconst pacmacs--score-file-name "~/.pacmacs-score")
 (defconst pacmacs--score-buffer-name "*Pacmacs Score*")
 
@@ -94,7 +96,7 @@
   (->> (pacmacs--read-score-table)
        (cons (cons nickname score))
        (pacmacs--sort-score-table)
-       (-take 10)
+       (-take pacmacs--max-score-table-size)
        (pacmacs--write-score-table)))
 
 (defun pacmacs--register-new-score (score)
