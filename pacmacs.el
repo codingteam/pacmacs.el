@@ -627,9 +627,12 @@
 
         (when (equal pacmacs-game-state 'game-over)
           (setq pacmacs-game-over-state-rendered t)
-          (-> (pacmacs--read-score-table)
-              (pacmacs--sort-score-table)
-              (pacmacs--render-score-table)))
+          (let* ((score-table (pacmacs--sort-score-table
+                               (pacmacs--read-score-table)))
+                 (new-score-position (pacmacs--position-of-new-score
+                                      score-table
+                                      pacmacs-score)))
+            (pacmacs--render-score-table score-table)))
         (goto-char 0)))))
 
 (defun pacmacs--unpaused-play-state-p ()
