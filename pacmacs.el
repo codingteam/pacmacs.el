@@ -80,6 +80,8 @@
 
 (defvar pacmacs-waiting-counter 0)
 
+(defvar pacmacs-game-over-state-rendered nil)
+
 (define-derived-mode pacmacs-mode special-mode "pacmacs-mode"
   (define-key pacmacs-mode-map (kbd "<up>") 'pacmacs-up)
   (define-key pacmacs-mode-map (kbd "<down>") 'pacmacs-down)
@@ -106,6 +108,7 @@
   (switch-to-buffer pacmacs-buffer-name)
   (buffer-disable-undo pacmacs-buffer-name)
 
+  (setq pacmacs-game-over-state-rendered nil)
   (setq pacmacs-lives 3)
   (setq pacmacs-score 0)
   (setq pacmacs-levels (pacmacs--get-list-of-levels))
@@ -557,14 +560,14 @@
                (pacmacs-load-anim "Red-Ghost-Win"))))
 
 (defun pacmacs--switch-to-game-over-state ()
-  (setq pacmacs-game-state 'game-over)
-
   (pacmacs--load-map "game-over")
   (pacmacs-destroy)
+  (setq pacmacs-game-state 'game-over)
   (pacmacs--render-state)
 
   (pacmacs-game-over-mode)
-  (read-only-mode 0))
+  (read-only-mode 0)
+  (put-text-property (point-min) (point-max) 'read-only t))
 
 (defun pacmacs--switch-to-play-state ()
   (setq pacmacs-game-state 'play)
@@ -597,34 +600,37 @@
     (pacmacs--put-object wall)))
 
 (defun pacmacs--render-state ()
-  (with-current-buffer pacmacs-buffer-name
-    (let ((inhibit-read-only t))
-      (erase-buffer)
+  (when (or (not (equal pacmacs-game-state 'game-over))
+            (not pacmacs-game-over-state-rendered))
+    (with-current-buffer pacmacs-buffer-name
+      (let ((inhibit-read-only t))
+        (erase-buffer)
 
-      (insert (format "Score: %d\n\n" pacmacs-score))
+        (insert (format "Score: %d\n\n" pacmacs-score))
 
-      (when pacmacs-debug-output
-        (pacmacs--render-track-board pacmacs--track-board))
+        (when pacmacs-debug-output
+          (pacmacs--render-track-board pacmacs--track-board))
 
-      (plist-bind ((width :width)
-                   (height :height))
-          pacmacs--object-board
-        (dotimes (row height)
-          (dotimes (column width)
-            (let ((anim-object (car (pacmacs--cell-wrapped-get pacmacs--object-board
-                                                               row column))))
-              (pacmacs--render-object anim-object)))
-          (insert "\n")))
-      (insert "\n")
-      (dotimes (i pacmacs-lives)
-        (ignore i)
-        (pacmacs--render-life-icon))
+        (plist-bind ((width :width)
+                     (height :height))
+            pacmacs--object-board
+          (dotimes (row height)
+            (dotimes (column width)
+              (let ((anim-object (car (pacmacs--cell-wrapped-get pacmacs--object-board
+                                                                 row column))))
+                (pacmacs--render-object anim-object)))
+            (insert "\n")))
+        (insert "\n")
+        (dotimes (i pacmacs-lives)
+          (ignore i)
+          (pacmacs--render-life-icon))
 
-      (when (equal pacmacs-game-state 'game-over)
-        (-> (pacmacs--read-score-table)
-            (pacmacs--sort-score-table)
-            (pacmacs--render-score-table)))
-      (goto-char 0))))
+        (when (equal pacmacs-game-state 'game-over)
+          (setq pacmacs-game-over-state-rendered t)
+          (-> (pacmacs--read-score-table)
+              (pacmacs--sort-score-table)
+              (pacmacs--render-score-table)))
+        (goto-char 0)))))
 
 (defun pacmacs--unpaused-play-state-p ()
   (and (equal pacmacs-game-state 'play)
