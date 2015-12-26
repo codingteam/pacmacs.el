@@ -70,6 +70,11 @@
         (-lambda ((_ . score1) (_ . score2))
           (> score1 score2))))
 
+(defun pacmacs--position-of-new-score (score-table new-score)
+  (->> score-table
+       (-take-while (-lambda ((_ . score)) (< new-score score)))
+       (length)))
+
 (defun pacmacs--render-score-table (score-table)
   (let ((max-nickname-length
          (->> score-table
