@@ -52,6 +52,7 @@
 (defconst pacmacs-tick-duration-ms 100)
 (defconst pacmacs--ghost-blinking-threshold-ms 2500)
 (defconst pacmacs--ghost-terrified-time-ms 5000)
+(defconst pacmacs--score-table-render-offset 3)
 
 (defvar pacmacs-debug-output nil)
 
@@ -567,7 +568,31 @@
 
   (pacmacs-game-over-mode)
   (read-only-mode 0)
-  (put-text-property (point-min) (point-max) 'read-only t))
+  
+  (with-current-buffer pacmacs-buffer-name
+    (goto-char (point-max))
+
+    (let* ((score-table (pacmacs--sort-score-table
+                         (pacmacs--read-score-table)))
+           (new-score-position (pacmacs--position-of-new-score
+                                score-table
+                                pacmacs-score)))
+      (->> score-table
+           (-take new-score-position)
+           (pacmacs--render-score-table))
+      (pacmacs--render-score-record (cons "" pacmacs-score))
+      (->> score-table
+           (-drop new-score-position)
+           (pacmacs--render-score-table))
+
+      (plist-bind ((width :width)
+                   (height :height))
+          pacmacs--object-board
+        (goto-line (+ height pacmacs--score-table-render-offset (1+ new-score-position)))
+        (put-text-property (point-min) (point-max) 'read-only t)
+        (let ((inhibit-read-only t))
+          (remove-text-properties (point) (+ (point) pacmacs--max-score-nick-size) '(read-only nil)))
+        (overwrite-mode 1)))))
 
 (defun pacmacs--switch-to-play-state ()
   (setq pacmacs-game-state 'play)
@@ -626,13 +651,8 @@
           (pacmacs--render-life-icon))
 
         (when (equal pacmacs-game-state 'game-over)
-          (setq pacmacs-game-over-state-rendered t)
-          (let* ((score-table (pacmacs--sort-score-table
-                               (pacmacs--read-score-table)))
-                 (new-score-position (pacmacs--position-of-new-score
-                                      score-table
-                                      pacmacs-score)))
-            (pacmacs--render-score-table score-table)))
+          (setq pacmacs-game-over-state-rendered t))
+        
         (goto-char 0)))))
 
 (defun pacmacs--unpaused-play-state-p ()
