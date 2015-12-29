@@ -78,19 +78,7 @@
        (length)))
 
 (defun pacmacs--render-score-table (score-table)
-  (let ((max-nickname-length
-         (->> score-table
-              (-map (-compose #'length #'car))
-              (apply #'max))))
-    (insert "Best Scores:\n------------\n")
-    (-each score-table
-      (-lambda ((nickname . score))
-        (insert (format "%s%s %d\n"
-                        nickname
-                        (make-string (- max-nickname-length
-                                        (length nickname))
-                                     ?\s)
-                        score))))))
+  (-each score-table #'pacmacs--render-score-record))
 
 (defun pacmacs--add-entry-to-score-table (nickname score)
   (->> (pacmacs--read-score-table)
@@ -102,6 +90,15 @@
 (defun pacmacs--register-new-score (score)
   (let ((nickname (read-from-minibuffer "Nickname: ")))
     (pacmacs--add-entry-to-score-table nickname score)))
+
+(defun pacmacs--render-score-record (record)
+  (-let (((nickname . score) record))
+    (insert (format "%s%s %d\n"
+                    nickname
+                    (make-string (- pacmacs--max-score-nick-size
+                                    (length nickname))
+                                 ?\s)
+                    score))))
 
 (provide 'pacmacs-score)
 
