@@ -111,7 +111,7 @@
 
   (setq pacmacs-game-over-state-rendered nil)
   (setq pacmacs-lives 3)
-  (setq pacmacs-score 0)
+  (setq pacmacs-score 4000)
   (setq pacmacs-levels (pacmacs--get-list-of-levels))
   (setq pacmacs-current-level 0)
 
@@ -592,14 +592,15 @@
                                              (pacmacs--add-entry-to-score-table
                                               nickname
                                               pacmacs-score)
-                                             (widget-delete widget)
-                                             (let ((inhibit-read-only t))
-                                               (insert (format "%s"
-                                                               (make-string
-                                                                (max 0
-                                                                     (- pacmacs--max-score-nick-size
-                                                                        (length nickname)))
-                                                                ?\s))))))
+                                             (widget-value-set widget
+                                                               (format "%s%s"
+                                                                       nickname
+                                                                       (make-string
+                                                                        (max 0
+                                                                             (- pacmacs--max-score-nick-size
+                                                                                (length nickname)))
+                                                                        ?\s)))
+                                             (widget-delete widget)))
 
                                  ""))
             (insert (format " %d\n" pacmacs-score))
