@@ -106,6 +106,8 @@
 (defun pacmacs--initialize-game (tick-function)
   (pacmacs--clear-wall-tiles-cache)
 
+  (when (get-buffer pacmacs-buffer-name)
+    (kill-buffer pacmacs-buffer-name))
   (switch-to-buffer pacmacs-buffer-name)
   (buffer-disable-undo pacmacs-buffer-name)
 
