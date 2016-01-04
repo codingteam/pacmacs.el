@@ -150,3 +150,10 @@
                        :column 20
                        :type 'wall)
                  (pacmacs--make-wall-cell 10 20))))
+
+(ert-deftest pacmacs--step-ghosts-test ()
+  (let ((pacmacs--ghosts (make-list 10 'ghost)))
+    (with-mock
+     (mock (pacmacs--track-object-to-player 'ghost) :times 10)
+     (mock (pacmacs--step-object 'ghost) :times 10)
+     (pacmacs--step-ghosts))))
