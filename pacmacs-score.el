@@ -87,10 +87,6 @@
        (-take pacmacs--max-score-table-size)
        (pacmacs--write-score-table)))
 
-(defun pacmacs--register-new-score (score)
-  (let ((nickname (read-from-minibuffer "Nickname: ")))
-    (pacmacs--add-entry-to-score-table nickname score)))
-
 (defun pacmacs--render-score-record (record)
   (-let (((nickname . score) record))
     (insert (format "%s%s %d\n"
