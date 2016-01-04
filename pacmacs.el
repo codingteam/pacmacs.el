@@ -606,7 +606,8 @@
                          (height :height))
                 pacmacs--object-board
               (goto-line (+ height pacmacs--score-table-render-offset (1+ new-score-position)))))
-        (pacmacs--render-score-table score-table))
+        (pacmacs--render-score-table score-table)
+        (goto-char (point-min)))
       (use-local-map widget-keymap)
       (widget-setup))))
 
