@@ -81,8 +81,6 @@
 
 (defvar pacmacs-waiting-counter 0)
 
-(defvar pacmacs-game-over-state-rendered nil)
-
 (define-derived-mode pacmacs-mode special-mode "pacmacs-mode"
   (define-key pacmacs-mode-map (kbd "<up>") 'pacmacs-up)
   (define-key pacmacs-mode-map (kbd "<down>") 'pacmacs-down)
@@ -111,7 +109,6 @@
   (switch-to-buffer pacmacs-buffer-name)
   (buffer-disable-undo pacmacs-buffer-name)
 
-  (setq pacmacs-game-over-state-rendered nil)
   (setq pacmacs-lives 3)
   (setq pacmacs-score 0)
   (setq pacmacs-levels (pacmacs--get-list-of-levels))
