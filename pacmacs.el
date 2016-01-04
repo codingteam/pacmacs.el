@@ -113,7 +113,7 @@
 
   (setq pacmacs-game-over-state-rendered nil)
   (setq pacmacs-lives 3)
-  (setq pacmacs-score 4000)
+  (setq pacmacs-score 0)
   (setq pacmacs-levels (pacmacs--get-list-of-levels))
   (setq pacmacs-current-level 0)
 
