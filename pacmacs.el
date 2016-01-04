@@ -559,13 +559,29 @@
     (plist-put ghost :current-animation
                (pacmacs-load-anim "Red-Ghost-Win"))))
 
+(defun pacmacs--align-score-record-nickname (nickname)
+  (let* ((padding-size (max 0 (- pacmacs--max-score-nick-size
+                                 (length nickname))))
+         (padding (make-string padding-size ?\s)))
+    (concat nickname padding)))
+
+(defun pacmacs--make-submit-nickname-action (score)
+  (lambda (widget &optional event)
+    (ignore event)
+    (let ((nickname (widget-value widget)))
+      (pacmacs--add-entry-to-score-table nickname score)
+      (widget-value-set widget (pacmacs--align-score-record-nickname nickname))
+      (widget-delete widget))))
+
 (defun pacmacs--switch-to-game-over-state ()
   (pacmacs--load-map "game-over")
   (pacmacs-destroy)
   (setq pacmacs-game-state 'game-over)
   (pacmacs--render-state)
 
+  (fundamental-mode)
   (read-only-mode 0)
+
   (with-current-buffer pacmacs-buffer-name
     (goto-char (point-max))
 
@@ -581,23 +597,7 @@
                  (pacmacs--render-score-table))
             (widget-create 'editable-field
                            :size pacmacs--max-score-nick-size
-                           :action (lambda (widget &optional event)
-                                     (ignore event)
-                                     (let ((nickname (widget-value widget)))
-                                       (pacmacs--add-entry-to-score-table
-                                        nickname
-                                        pacmacs-score)
-                                       (widget-value-set widget
-                                                         (format "%s%s"
-                                                                 nickname
-                                                                 (make-string
-                                                                  (max 0
-                                                                       (- pacmacs--max-score-nick-size
-                                                                          (length nickname)))
-                                                                  ?\s)))
-                                       (widget-delete widget)))
-
-                           "")
+                           :action (pacmacs--make-submit-nickname-action pacmacs-score))
             (insert (format " %d\n" pacmacs-score))
             (->> score-table
                  (-drop new-score-position)
@@ -605,7 +605,8 @@
 
             (plist-bind ((height :height))
                 pacmacs--object-board
-              (forward-line (+ height pacmacs--score-table-render-offset (1+ new-score-position)))))
+              (goto-char (point-min))
+              (forward-line (+ height pacmacs--score-table-render-offset new-score-position))))
         (pacmacs--render-score-table score-table)
         (goto-char (point-min)))
       (use-local-map widget-keymap)
