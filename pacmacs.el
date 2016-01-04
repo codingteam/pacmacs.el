@@ -39,6 +39,8 @@
 (require 'cl-lib)
 (require 'dash)
 (require 'f)
+(require 'widget)
+(require 'wid-edit)
 
 (require 'pacmacs-anim)
 (require 'pacmacs-board)
@@ -571,41 +573,39 @@
                          (pacmacs--read-score-table)))
            (new-score-position (pacmacs--position-of-new-score
                                 score-table
-                                pacmacs-score))
-           (nickname-widget nil))
+                                pacmacs-score)))
       (if (< new-score-position pacmacs--max-score-table-size)
           (progn
             (->> score-table
                  (-take new-score-position)
                  (pacmacs--render-score-table))
-            (setq nickname-widget
-                  (widget-create 'editable-field
-                                 :size pacmacs--max-score-nick-size
-                                 :action (lambda (widget &optional event)
-                                           (let ((nickname (widget-value widget)))
-                                             (pacmacs--add-entry-to-score-table
-                                              nickname
-                                              pacmacs-score)
-                                             (widget-value-set widget
-                                                               (format "%s%s"
-                                                                       nickname
-                                                                       (make-string
-                                                                        (max 0
-                                                                             (- pacmacs--max-score-nick-size
-                                                                                (length nickname)))
-                                                                        ?\s)))
-                                             (widget-delete widget)))
+            (widget-create 'editable-field
+                           :size pacmacs--max-score-nick-size
+                           :action (lambda (widget &optional event)
+                                     (ignore event)
+                                     (let ((nickname (widget-value widget)))
+                                       (pacmacs--add-entry-to-score-table
+                                        nickname
+                                        pacmacs-score)
+                                       (widget-value-set widget
+                                                         (format "%s%s"
+                                                                 nickname
+                                                                 (make-string
+                                                                  (max 0
+                                                                       (- pacmacs--max-score-nick-size
+                                                                          (length nickname)))
+                                                                  ?\s)))
+                                       (widget-delete widget)))
 
-                                 ""))
+                           "")
             (insert (format " %d\n" pacmacs-score))
             (->> score-table
                  (-drop new-score-position)
                  (pacmacs--render-score-table))
 
-            (plist-bind ((width :width)
-                         (height :height))
+            (plist-bind ((height :height))
                 pacmacs--object-board
-              (goto-line (+ height pacmacs--score-table-render-offset (1+ new-score-position)))))
+              (forward-line (+ height pacmacs--score-table-render-offset (1+ new-score-position)))))
         (pacmacs--render-score-table score-table)
         (goto-char (point-min)))
       (use-local-map widget-keymap)
