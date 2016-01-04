@@ -143,3 +143,10 @@
    (funcall (pacmacs--make-submit-nickname-action 'score)
             'widget
             'khooy)))
+
+(ert-deftest pacmacs--make-wall-cell-test ()
+  (should (equal (list :current-animation nil
+                       :row 10
+                       :column 20
+                       :type 'wall)
+                 (pacmacs--make-wall-cell 10 20))))
