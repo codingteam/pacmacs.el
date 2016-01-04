@@ -126,3 +126,9 @@
 
      (should (null pacmacs--ghosts))
      (should (= 11 (length pacmacs--terrified-ghosts))))))
+
+(ert-deftest pacmacs--align-score-record-nickname-test ()
+  (let ((pacmacs--max-score-nick-size 5)
+        (nickname "abc"))
+    (should (equal "abc  "
+                   (pacmacs--align-score-record-nickname nickname)))))
