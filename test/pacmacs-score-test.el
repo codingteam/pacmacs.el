@@ -15,9 +15,7 @@
                        ("hello" . 30)
                        ("world" . 20)
                        ("bar" . 10)))
-        (expected-string (concat ;"Best Scores:\n"
-                                 ;"------------\n"
-                                 "foo      40\n"
+        (expected-string (concat "foo      40\n"
                                  "hello    30\n"
                                  "world    20\n"
                                  "bar      10\n")))
