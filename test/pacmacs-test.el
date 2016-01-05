@@ -126,3 +126,34 @@
 
      (should (null pacmacs--ghosts))
      (should (= 11 (length pacmacs--terrified-ghosts))))))
+
+(ert-deftest pacmacs--align-score-record-nickname-test ()
+  (let ((pacmacs--max-score-nick-size 5)
+        (nickname "abc"))
+    (should (equal "abc  "
+                   (pacmacs--align-score-record-nickname nickname)))))
+
+(ert-deftest pacmacs--make-submit-nickname-action-test ()
+  (with-mock
+   (mock (widget-value 'widget) => 'nickname)
+   (mock (pacmacs--add-entry-to-score-table 'nickname 'score))
+   (mock (pacmacs--align-score-record-nickname 'nickname) => 'aligned-nickname)
+   (mock (widget-value-set 'widget 'aligned-nickname))
+   (mock (widget-delete 'widget))
+   (funcall (pacmacs--make-submit-nickname-action 'score)
+            'widget
+            'khooy)))
+
+(ert-deftest pacmacs--make-wall-cell-test ()
+  (should (equal (list :current-animation nil
+                       :row 10
+                       :column 20
+                       :type 'wall)
+                 (pacmacs--make-wall-cell 10 20))))
+
+(ert-deftest pacmacs--step-ghosts-test ()
+  (let ((pacmacs--ghosts (make-list 10 'ghost)))
+    (with-mock
+     (mock (pacmacs--track-object-to-player 'ghost) :times 10)
+     (mock (pacmacs--step-object 'ghost) :times 10)
+     (pacmacs--step-ghosts))))

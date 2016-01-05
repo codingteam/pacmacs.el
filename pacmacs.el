@@ -39,6 +39,8 @@
 (require 'cl-lib)
 (require 'dash)
 (require 'f)
+(require 'widget)
+(require 'wid-edit)
 
 (require 'pacmacs-anim)
 (require 'pacmacs-board)
@@ -52,6 +54,7 @@
 (defconst pacmacs-tick-duration-ms 100)
 (defconst pacmacs--ghost-blinking-threshold-ms 2500)
 (defconst pacmacs--ghost-terrified-time-ms 5000)
+(defconst pacmacs--score-table-render-offset 3)
 
 (defvar pacmacs-debug-output nil)
 
@@ -100,6 +103,8 @@
 (defun pacmacs--initialize-game (tick-function)
   (pacmacs--clear-wall-tiles-cache)
 
+  (when (get-buffer pacmacs-buffer-name)
+    (kill-buffer pacmacs-buffer-name))
   (switch-to-buffer pacmacs-buffer-name)
   (buffer-disable-undo pacmacs-buffer-name)
 
@@ -116,6 +121,7 @@
                                      tick-function))))
 
 (defun pacmacs-destroy ()
+  "Destroys the game timer without killing the game buffer."
   (when pacmacs-timer
     (cancel-timer pacmacs-timer)
     (setq pacmacs-timer nil)))
@@ -392,7 +398,8 @@
                                (pacmacs--load-next-level)
                                (pacmacs--switch-to-prepare-state)))))
 
-  (pacmacs--render-state))
+  (when (not (equal pacmacs-game-state 'game-over))
+    (pacmacs--render-state)))
 
 (defun pacmacs--step-ghosts ()
   (dolist (ghost pacmacs--ghosts)
@@ -552,10 +559,58 @@
     (plist-put ghost :current-animation
                (pacmacs-load-anim "Red-Ghost-Win"))))
 
+(defun pacmacs--align-score-record-nickname (nickname)
+  (let* ((padding-size (max 0 (- pacmacs--max-score-nick-size
+                                 (length nickname))))
+         (padding (make-string padding-size ?\s)))
+    (concat nickname padding)))
+
+(defun pacmacs--make-submit-nickname-action (score)
+  (lambda (widget &optional event)
+    (ignore event)
+    (let ((nickname (widget-value widget)))
+      (pacmacs--add-entry-to-score-table nickname score)
+      (widget-value-set widget (pacmacs--align-score-record-nickname nickname))
+      (widget-delete widget))))
+
 (defun pacmacs--switch-to-game-over-state ()
-  (setq pacmacs-game-state 'game-over)
   (pacmacs--load-map "game-over")
-  (pacmacs--register-new-score pacmacs-score))
+  (pacmacs-destroy)
+  (setq pacmacs-game-state 'game-over)
+  (pacmacs--render-state)
+
+  (fundamental-mode)
+  (read-only-mode 0)
+
+  (with-current-buffer pacmacs-buffer-name
+    (goto-char (point-max))
+
+    (let* ((score-table (pacmacs--sort-score-table
+                         (pacmacs--read-score-table)))
+           (new-score-position (pacmacs--position-of-new-score
+                                score-table
+                                pacmacs-score)))
+      (if (< new-score-position pacmacs--max-score-table-size)
+          (progn
+            (->> score-table
+                 (-take new-score-position)
+                 (pacmacs--render-score-table))
+            (widget-create 'editable-field
+                           :size pacmacs--max-score-nick-size
+                           :action (pacmacs--make-submit-nickname-action pacmacs-score))
+            (insert (format " %d\n" pacmacs-score))
+            (->> score-table
+                 (-drop new-score-position)
+                 (pacmacs--render-score-table))
+
+            (plist-bind ((height :height))
+                pacmacs--object-board
+              (goto-char (point-min))
+              (forward-line (+ height pacmacs--score-table-render-offset new-score-position))))
+        (pacmacs--render-score-table score-table)
+        (goto-char (point-min)))
+      (use-local-map widget-keymap)
+      (widget-setup))))
 
 (defun pacmacs--switch-to-play-state ()
   (setq pacmacs-game-state 'play)
@@ -610,11 +665,6 @@
       (dotimes (i pacmacs-lives)
         (ignore i)
         (pacmacs--render-life-icon))
-
-      (when (equal pacmacs-game-state 'game-over)
-        (-> (pacmacs--read-score-table)
-            (pacmacs--sort-score-table)
-            (pacmacs--render-score-table)))
       (goto-char 0))))
 
 (defun pacmacs--unpaused-play-state-p ()
