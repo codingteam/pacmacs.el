@@ -58,11 +58,13 @@
     (-> pacmacs--score-file-name
         (f-read-text)
         (read-from-string)
-        (car))))
+        (car)
+        (pacmacs--sort-score-table))))
 
 (defun pacmacs--write-score-table (score-table)
   (with-temp-buffer
     (-> score-table
+        (pacmacs--sort-score-table)
         (pp-to-string)
         (insert))
     (write-file pacmacs--score-file-name)))
