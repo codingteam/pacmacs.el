@@ -50,23 +50,23 @@
     (let ((inhibit-read-only t))
       (erase-buffer)
       (-> (pacmacs--read-score-table)
-          (pacmacs--sort-score-table)
           (pacmacs--render-score-table)))))
 
 (defun pacmacs--read-score-table ()
   (when (file-exists-p pacmacs--score-file-name)
-    (-> pacmacs--score-file-name
-        (f-read-text)
-        (read-from-string)
-        (car)
-        (pacmacs--sort-score-table))))
+    (->> pacmacs--score-file-name
+         (f-read-text)
+         (read-from-string)
+         (car)
+         (pacmacs--sort-score-table))))
 
 (defun pacmacs--write-score-table (score-table)
   (with-temp-buffer
-    (-> score-table
-        (pacmacs--sort-score-table)
-        (pp-to-string)
-        (insert))
+    (->> score-table
+         (pacmacs--sort-score-table)
+         (-take pacmacs--max-score-table-size)
+         (pp-to-string)
+         (insert))
     (write-file pacmacs--score-file-name)))
 
 (defun pacmacs--sort-score-table (score-table)
@@ -85,8 +85,6 @@
 (defun pacmacs--add-entry-to-score-table (nickname score)
   (->> (pacmacs--read-score-table)
        (cons (cons nickname score))
-       (pacmacs--sort-score-table)
-       (-take pacmacs--max-score-table-size)
        (pacmacs--write-score-table)))
 
 (defun pacmacs--render-score-record (record)

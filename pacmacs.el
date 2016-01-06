@@ -585,8 +585,7 @@
   (with-current-buffer pacmacs-buffer-name
     (goto-char (point-max))
 
-    (let* ((score-table (pacmacs--sort-score-table
-                         (pacmacs--read-score-table)))
+    (let* ((score-table (pacmacs--read-score-table))
            (new-score-position (pacmacs--position-of-new-score
                                 score-table
                                 pacmacs-score)))
