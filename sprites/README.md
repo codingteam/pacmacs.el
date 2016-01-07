@@ -2,7 +2,7 @@
 
 ## Modifying or adding sprites ##
 
-Do not modify any *.xpm or *.json file directly. Use
+Do not modify any \*.xpm or \*.json file directly. Use
 [Aseprite][Aseprite] program to modify `src/*.ase` and then `$ make`
 to regenerate sprites.
 
