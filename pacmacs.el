@@ -123,6 +123,12 @@
   (setq pacmacs-lives 3)
   (setq pacmacs-score 0)
   (setq pacmacs-levels (pacmacs--get-list-of-levels))
+
+  (when (zerop (length pacmacs-levels))
+    (error (concat "`%s' doesn't contain levels. Nothing to play. "
+                   "Customize `pacmacs-levels-folder' accordingly")
+           (pacmacs--get-levels-folder)))
+
   (setq pacmacs-current-level 0)
 
   (pacmacs--load-current-level)
@@ -707,8 +713,17 @@
   (when (equal pacmacs-game-state 'play)
     (setq pacmacs-play-pause (not pacmacs-play-pause))))
 
+(defun pacmacs--get-levels-folder ()
+  (if pacmacs-levels-folder
+      pacmacs-levels-folder
+    (pacmacs--find-resource-file "./maps/")))
+
 (defun pacmacs--get-list-of-levels ()
-  (->> (directory-files (pacmacs--find-resource-file "./maps/"))
+  (->> (condition-case err
+           (directory-files (pacmacs--get-levels-folder))
+         (file-error (error (concat "Error during loading levels: `%s'. "
+                                    "Customize `pacmacs-levels-folder' accordingly.")
+                            err)))
        (-map #'pacmacs--levelname-from-filename)
        (-remove #'null)
        (-sort #'string-lessp)
