@@ -83,6 +83,18 @@
 
 (defvar pacmacs-waiting-counter 0)
 
+(defgroup pacmacs nil
+  "Customizations for Pacmacs game."
+  :prefix "pacmacs-"
+  :group 'wp
+  :link '(url-link "https://github.com/codingteam/pacmacs.el"))
+
+(defcustom pacmacs-levels-folder nil
+  "A folder from where the Pacmacs game loads its levels."
+  :group 'pacmacs
+  :type '(radio (const :tag "Default path")
+                (directory :tag "Custom path")))
+
 (define-derived-mode pacmacs-mode special-mode "pacmacs-mode"
   (define-key pacmacs-mode-map (kbd "<up>") 'pacmacs-up)
   (define-key pacmacs-mode-map (kbd "<down>") 'pacmacs-down)
