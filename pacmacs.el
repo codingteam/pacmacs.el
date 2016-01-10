@@ -592,7 +592,7 @@
       (widget-delete widget))))
 
 (defun pacmacs--switch-to-game-over-state ()
-  (pacmacs--load-map "game-over")
+  (pacmacs--load-map-sign "game-over")
   (pacmacs-destroy)
   (setq pacmacs-game-state 'game-over)
   (pacmacs--render-state)
@@ -738,9 +738,18 @@
                  (pacmacs--possible-diagonal-ways row column)))))
 
 (defun pacmacs--load-map (map-name)
-  (let* ((lines (split-string (->> map-name
-                                   (format "%s/%s.txt" (pacmacs--get-levels-folder))
-                                   (f-read-text))
+  (->> map-name
+       (format "%s/%s.txt" (pacmacs--get-levels-folder))
+       (pacmacs--load-map-file)))
+
+(defun pacmacs--load-map-sign (sign-name)
+  (->> sign-name
+       (format "./signs/%s.txt")
+       (pacmacs--find-resource-file)
+       (pacmacs--load-map-file)))
+
+(defun pacmacs--load-map-file (map-file-name)
+  (let* ((lines (split-string (f-read-text map-file-name)
                               "\n" t))
          (board-width (apply 'max (mapcar #'length lines)))
          (board-height (length lines)))
