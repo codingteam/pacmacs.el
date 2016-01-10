@@ -739,7 +739,7 @@
 
 (defun pacmacs--load-map (map-name)
   (let* ((lines (split-string (->> map-name
-                                   (format "./maps/%s.txt")
+                                   (format "%s/%s.txt" (pacmacs--get-levels-folder))
                                    (pacmacs--find-resource-file)
                                    (f-read-text))
                               "\n" t))
