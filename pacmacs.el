@@ -740,7 +740,6 @@
 (defun pacmacs--load-map (map-name)
   (let* ((lines (split-string (->> map-name
                                    (format "%s/%s.txt" (pacmacs--get-levels-folder))
-                                   (pacmacs--find-resource-file)
                                    (f-read-text))
                               "\n" t))
          (board-width (apply 'max (mapcar #'length lines)))
