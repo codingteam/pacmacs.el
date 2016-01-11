@@ -792,6 +792,7 @@
                    (pacmacs-make-anim (list (pacmacs-make-frame '(0 0 40 40) 100))
                                       (pacmacs--wall-tile-at row column)))))))
 
+
 (provide 'pacmacs)
 
 ;;; pacmacs.el ends here
