@@ -5,6 +5,7 @@
 
 (files "*.el"
        ("maps" "maps/*.txt")
+       ("signs" "signs/*.txt")
        ("sprites" "sprites/*.json")
        ("sprites" "sprites/*.xpm"))
 

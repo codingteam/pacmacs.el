@@ -83,6 +83,18 @@
 
 (defvar pacmacs-waiting-counter 0)
 
+(defgroup pacmacs nil
+  "Customizations for Pacmacs game."
+  :prefix "pacmacs-"
+  :group 'wp
+  :link '(url-link "https://github.com/codingteam/pacmacs.el"))
+
+(defcustom pacmacs-levels-folder nil
+  "A folder from where the Pacmacs game loads its levels."
+  :group 'pacmacs
+  :type '(radio (const :tag "Default path")
+                (directory :tag "Custom path")))
+
 (define-derived-mode pacmacs-mode special-mode "pacmacs-mode"
   (define-key pacmacs-mode-map (kbd "<up>") 'pacmacs-up)
   (define-key pacmacs-mode-map (kbd "<down>") 'pacmacs-down)
@@ -111,6 +123,12 @@
   (setq pacmacs-lives 3)
   (setq pacmacs-score 0)
   (setq pacmacs-levels (pacmacs--get-list-of-levels))
+
+  (when (zerop (length pacmacs-levels))
+    (error (concat "`%s' doesn't contain levels. Nothing to play. "
+                   "Customize `pacmacs-levels-folder' accordingly")
+           (pacmacs--get-levels-folder)))
+
   (setq pacmacs-current-level 0)
 
   (pacmacs--load-current-level)
@@ -574,7 +592,7 @@
       (widget-delete widget))))
 
 (defun pacmacs--switch-to-game-over-state ()
-  (pacmacs--load-map "game-over")
+  (pacmacs--load-map-sign "game-over")
   (pacmacs-destroy)
   (setq pacmacs-game-state 'game-over)
   (pacmacs--render-state)
@@ -695,8 +713,17 @@
   (when (equal pacmacs-game-state 'play)
     (setq pacmacs-play-pause (not pacmacs-play-pause))))
 
+(defun pacmacs--get-levels-folder ()
+  (if pacmacs-levels-folder
+      pacmacs-levels-folder
+    (pacmacs--find-resource-file "./maps/")))
+
 (defun pacmacs--get-list-of-levels ()
-  (->> (directory-files (pacmacs--find-resource-file "./maps/"))
+  (->> (condition-case err
+           (directory-files (pacmacs--get-levels-folder))
+         (file-error (error (concat "Error during loading levels: `%s'. "
+                                    "Customize `pacmacs-levels-folder' accordingly.")
+                            err)))
        (-map #'pacmacs--levelname-from-filename)
        (-remove #'null)
        (-sort #'string-lessp)
@@ -711,10 +738,18 @@
                  (pacmacs--possible-diagonal-ways row column)))))
 
 (defun pacmacs--load-map (map-name)
-  (let* ((lines (split-string (->> map-name
-                                   (format "./maps/%s.txt")
-                                   (pacmacs--find-resource-file)
-                                   (f-read-text))
+  (->> map-name
+       (format "%s/%s.txt" (pacmacs--get-levels-folder))
+       (pacmacs--load-map-file)))
+
+(defun pacmacs--load-map-sign (sign-name)
+  (->> sign-name
+       (format "./signs/%s.txt")
+       (pacmacs--find-resource-file)
+       (pacmacs--load-map-file)))
+
+(defun pacmacs--load-map-file (map-file-name)
+  (let* ((lines (split-string (f-read-text map-file-name)
                               "\n" t))
          (board-width (apply 'max (mapcar #'length lines)))
          (board-height (length lines)))
