@@ -743,17 +743,21 @@
 (defun pacmacs-score-awesome ()
   (interactive)
 
-  (switch-to-buffer-other-window pacmacs--score-buffer-name)
+  (switch-to-buffer pacmacs--score-buffer-name)
 
-  (pacmacs-game-over-mode)
+  (text-mode)
+  (read-only-mode 1)
 
-  (pacmacs--load-map-sign "score")
-  (pacmacs--render-state pacmacs--score-buffer-name)
+  (pacmacs--load-map-sign "scores")
 
   (with-current-buffer pacmacs--score-buffer-name
     (let ((inhibit-read-only t))
-      (-> (pacmacs--read-score-table)
-          (pacmacs--render-score-table)))))
+      (erase-buffer)
+      (pacmacs--render-board)
+      (let ((inhibit-read-only t))
+        (-> (pacmacs--read-score-table)
+            (pacmacs--render-score-table))))
+    (goto-char (point-min))))
 
 (defun pacmacs--wall-tile-at (row column)
   (pacmacs--create-wall-tile
