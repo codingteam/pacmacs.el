@@ -598,6 +598,7 @@
   (pacmacs--render-state)
 
   (fundamental-mode)
+  (setq truncate-lines t)
   (read-only-mode 0)
 
   (with-current-buffer pacmacs-buffer-name
