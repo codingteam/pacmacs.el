@@ -95,7 +95,7 @@
   :type '(radio (const :tag "Default path")
                 (directory :tag "Custom path")))
 
-(define-derived-mode pacmacs-mode special-mode "pacmacs-mode"
+(define-derived-mode pacmacs-mode special-mode "Pacmacs"
   (define-key pacmacs-mode-map (kbd "<up>") 'pacmacs-up)
   (define-key pacmacs-mode-map (kbd "<down>") 'pacmacs-down)
   (define-key pacmacs-mode-map (kbd "<left>") 'pacmacs-left)
@@ -103,6 +103,11 @@
   (define-key pacmacs-mode-map (kbd "q") 'pacmacs-quit)
   (define-key pacmacs-mode-map (kbd "SPC") 'pacmacs-pause)
   (add-hook 'kill-buffer-hook 'pacmacs-destroy nil t)
+  (setq cursor-type nil)
+  (setq truncate-lines t))
+
+(define-derived-mode pacmacs-game-over-mode special-mode "Pacmacs Game Over"
+  (define-key pacmacs-game-over-mode-map (kbd "q") 'pacmacs-quit)
   (setq cursor-type nil)
   (setq truncate-lines t))
 
@@ -589,7 +594,8 @@
     (let ((nickname (widget-value widget)))
       (pacmacs--add-entry-to-score-table nickname score)
       (widget-value-set widget (pacmacs--align-score-record-nickname nickname))
-      (widget-delete widget))))
+      (widget-delete widget)
+      (pacmacs-game-over-mode))))
 
 (defun pacmacs--switch-to-game-over-state ()
   (pacmacs--load-map-sign "game-over")
@@ -624,11 +630,12 @@
             (plist-bind ((height :height))
                 pacmacs--object-board
               (goto-char (point-min))
-              (forward-line (+ height pacmacs--score-table-render-offset new-score-position))))
+              (forward-line (+ height pacmacs--score-table-render-offset new-score-position)))
+            (use-local-map widget-keymap)
+            (widget-setup))
         (pacmacs--render-score-table score-table)
-        (goto-char (point-min)))
-      (use-local-map widget-keymap)
-      (widget-setup))))
+        (goto-char (point-min))
+        (pacmacs-game-over-mode)))))
 
 (defun pacmacs--switch-to-play-state ()
   (setq pacmacs-game-state 'play)
