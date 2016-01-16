@@ -677,7 +677,7 @@
   (when pacmacs-debug-output
     (pacmacs--render-track-board pacmacs--track-board))
 
-  (pacmacs--render-object-board)
+  (pacmacs--render-object-board pacmacs--object-board)
 
   (dotimes (i pacmacs-lives)
     (ignore i)
@@ -743,7 +743,7 @@
   (with-current-buffer pacmacs--score-buffer-name
     (let ((inhibit-read-only t))
       (erase-buffer)
-      (pacmacs--render-object-board)
+      (pacmacs--render-object-board pacmacs--object-board)
       (let ((inhibit-read-only t))
         (-> (pacmacs--read-score-table)
             (pacmacs--render-score-table))))

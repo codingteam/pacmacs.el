@@ -75,13 +75,13 @@
             (insert "."))))
       (insert "\n"))))
 
-(defun pacmacs--render-object-board ()
+(defun pacmacs--render-object-board (object-board)
   (plist-bind ((width :width)
                (height :height))
-      pacmacs--object-board
+      object-board
     (dotimes (row height)
       (dotimes (column width)
-        (let ((anim-object (car (pacmacs--cell-wrapped-get pacmacs--object-board
+        (let ((anim-object (car (pacmacs--cell-wrapped-get object-board
                                                            row column))))
           (pacmacs--render-object anim-object)))
       (insert "\n")))
