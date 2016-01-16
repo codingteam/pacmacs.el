@@ -747,6 +747,7 @@
 
   (text-mode)
   (read-only-mode 1)
+  (setq truncate-lines t)
 
   (pacmacs--load-map-sign "scores")
 
