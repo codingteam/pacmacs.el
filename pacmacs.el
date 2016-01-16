@@ -671,7 +671,7 @@
   (dolist (wall pacmacs--wall-cells)
     (pacmacs--put-object wall)))
 
-(defun pacmacs--render-board ()
+(defun pacmacs--render-object-board ()
   (plist-bind ((width :width)
                (height :height))
       pacmacs--object-board
@@ -689,7 +689,7 @@
   (when pacmacs-debug-output
     (pacmacs--render-track-board pacmacs--track-board))
 
-  (pacmacs--render-board)
+  (pacmacs--render-object-board)
 
   (dotimes (i pacmacs-lives)
     (ignore i)
@@ -755,7 +755,7 @@
   (with-current-buffer pacmacs--score-buffer-name
     (let ((inhibit-read-only t))
       (erase-buffer)
-      (pacmacs--render-board)
+      (pacmacs--render-object-board)
       (let ((inhibit-read-only t))
         (-> (pacmacs--read-score-table)
             (pacmacs--render-score-table))))
