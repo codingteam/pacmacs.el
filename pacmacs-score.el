@@ -80,7 +80,9 @@
        (length)))
 
 (defun pacmacs--render-score-table (score-table)
-  (-each score-table #'pacmacs--render-score-record))
+  (if score-table
+      (-each score-table #'pacmacs--render-score-record)
+    (insert "(there are no records yet)")))
 
 (defun pacmacs--add-entry-to-score-table (nickname score)
   (->> (pacmacs--read-score-table)
