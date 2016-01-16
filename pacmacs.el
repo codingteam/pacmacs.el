@@ -748,6 +748,7 @@
   (text-mode)
   (read-only-mode 1)
   (setq truncate-lines t)
+  (setq cursor-type nil)
 
   (pacmacs--load-map-sign "scores")
 
