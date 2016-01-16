@@ -75,6 +75,18 @@
             (insert "."))))
       (insert "\n"))))
 
+(defun pacmacs--render-object-board ()
+  (plist-bind ((width :width)
+               (height :height))
+      pacmacs--object-board
+    (dotimes (row height)
+      (dotimes (column width)
+        (let ((anim-object (car (pacmacs--cell-wrapped-get pacmacs--object-board
+                                                           row column))))
+          (pacmacs--render-object anim-object)))
+      (insert "\n")))
+  (insert "\n"))
+
 (provide 'pacmacs-render)
 
 ;;; pacmacs-render.el ends here
