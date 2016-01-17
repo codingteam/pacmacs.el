@@ -81,8 +81,10 @@
 
 (defun pacmacs--render-score-page (render-score-sign)
   (funcall render-score-sign)
-  (-> (pacmacs--read-score-table)
-      (pacmacs--render-score-table)))
+  (let ((score-table (pacmacs--read-score-table)))
+    (if score-table
+        (pacmacs--render-score-table score-table)
+      (insert "(there are not records yet)"))))
 
 (defun pacmacs--render-score-table (score-table)
   (-each score-table #'pacmacs--render-score-record))

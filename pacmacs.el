@@ -111,6 +111,13 @@
   (setq cursor-type nil)
   (setq truncate-lines t))
 
+(define-derived-mode pacmacs-scores-mode special-mode "Pacmacs Scores"
+  (define-key pacmacs-game-over-mode-map (kbd "q")
+    (-partial #'pacmacs--kill-buffer-and-its-window
+              pacmacs--score-buffer-name))
+  (setq cursor-type nil)
+  (setq truncate-lines t))
+
 ;;;###autoload
 (defun pacmacs-start ()
   (interactive)
@@ -731,12 +738,7 @@
   (interactive)
 
   (switch-to-buffer pacmacs--score-buffer-name)
-
-  (text-mode)
-  (read-only-mode 1)
-  (setq truncate-lines t)
-  (setq cursor-type nil)
-
+  (pacmacs-scores-mode)
   (pacmacs--load-map-sign "scores")
 
   (with-render-target pacmacs--score-buffer-name
