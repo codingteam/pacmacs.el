@@ -38,6 +38,12 @@
 
 (defvar pacmacs--life-icon nil)
 
+(defmacro with-render-target (render-target-buffer &rest body)
+  (declare (indent 1) (debug (sexp &rest form)))
+  `(with-current-buffer ,render-target-buffer
+     (let ((inhibit-read-only t))
+       ,@body)))
+
 (defun pacmacs--render-empty-cell ()
   (pacmacs-insert-image (pacmacs--create-wall-tile
                          40 40

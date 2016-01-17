@@ -422,11 +422,10 @@
                                (pacmacs--switch-to-prepare-state)))))
 
   (when (not (equal pacmacs-game-state 'game-over))
-    (with-current-buffer pacmacs-buffer-name
-      (let ((inhibit-read-only t))
-        (erase-buffer)
-        (pacmacs--render-state)
-        (goto-char (point-min))))))
+    (with-render-target pacmacs-buffer-name
+      (erase-buffer)
+      (pacmacs--render-state)
+      (goto-char (point-min)))))
 
 (defun pacmacs--step-ghosts ()
   (dolist (ghost pacmacs--ghosts)
@@ -740,11 +739,11 @@
 
   (pacmacs--load-map-sign "scores")
 
-  (with-current-buffer pacmacs--score-buffer-name
-    (let ((inhibit-read-only t))
-      (erase-buffer)
-      (pacmacs--render-score-page (-partial #'pacmacs--render-object-board
-                                            pacmacs--object-board)))
+  (with-render-target pacmacs--score-buffer-name
+    (erase-buffer)
+    (pacmacs--render-score-page
+     (-partial #'pacmacs--render-object-board
+               pacmacs--object-board))
     (goto-char (point-min))))
 
 (defun pacmacs--wall-tile-at (row column)
