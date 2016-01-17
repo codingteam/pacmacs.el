@@ -734,7 +734,8 @@
        (-sort #'string-lessp)
        (apply #'vector)))
 
-(defun pacmacs-score-awesome ()
+;;;###autoload
+(defun pacmacs-score ()
   (interactive)
 
   (switch-to-buffer pacmacs--score-buffer-name)

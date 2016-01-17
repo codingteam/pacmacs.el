@@ -41,17 +41,6 @@
 (defconst pacmacs--score-file-name "~/.pacmacs-score")
 (defconst pacmacs--score-buffer-name "*Pacmacs Score*")
 
-(defun pacmacs-score ()
-  (interactive)
-  (switch-to-buffer-other-window pacmacs--score-buffer-name)
-  (text-mode)
-  (read-only-mode)
-  (with-current-buffer pacmacs--score-buffer-name
-    (let ((inhibit-read-only t))
-      (erase-buffer)
-      (-> (pacmacs--read-score-table)
-          (pacmacs--render-score-table)))))
-
 (defun pacmacs--read-score-table ()
   (when (file-exists-p pacmacs--score-file-name)
     (->> pacmacs--score-file-name
