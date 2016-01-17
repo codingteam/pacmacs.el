@@ -79,6 +79,11 @@
        (-take-while (-lambda ((_ . score)) (< new-score score)))
        (length)))
 
+(defun pacmacs--render-score-page (render-score-sign)
+  (funcall render-score-sign)
+  (-> (pacmacs--read-score-table)
+      (pacmacs--render-score-table)))
+
 (defun pacmacs--render-score-table (score-table)
   (if score-table
       (-each score-table #'pacmacs--render-score-record)

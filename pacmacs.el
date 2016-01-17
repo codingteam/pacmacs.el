@@ -743,10 +743,8 @@
   (with-current-buffer pacmacs--score-buffer-name
     (let ((inhibit-read-only t))
       (erase-buffer)
-      (pacmacs--render-object-board pacmacs--object-board)
-      (let ((inhibit-read-only t))
-        (-> (pacmacs--read-score-table)
-            (pacmacs--render-score-table))))
+      (pacmacs--render-score-page (-partial #'pacmacs--render-object-board
+                                            pacmacs--object-board)))
     (goto-char (point-min))))
 
 (defun pacmacs--wall-tile-at (row column)
