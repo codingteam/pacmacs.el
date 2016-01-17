@@ -106,12 +106,12 @@
   (setq cursor-type nil)
   (setq truncate-lines t))
 
-(define-derived-mode pacmacs-game-over-mode special-mode "Pacmacs Game Over"
+(define-derived-mode pacmacs-game-over-mode special-mode "Pacmacs-Game-Over"
   (define-key pacmacs-game-over-mode-map (kbd "q") 'pacmacs-quit)
   (setq cursor-type nil)
   (setq truncate-lines t))
 
-(define-derived-mode pacmacs-scores-mode special-mode "Pacmacs Scores"
+(define-derived-mode pacmacs-scores-mode special-mode "Pacmacs-Scores"
   (define-key pacmacs-game-over-mode-map (kbd "q")
     (-partial #'pacmacs--kill-buffer-and-its-window
               pacmacs--score-buffer-name))
