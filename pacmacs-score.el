@@ -41,17 +41,6 @@
 (defconst pacmacs--score-file-name "~/.pacmacs-score")
 (defconst pacmacs--score-buffer-name "*Pacmacs Score*")
 
-(defun pacmacs-score ()
-  (interactive)
-  (switch-to-buffer-other-window pacmacs--score-buffer-name)
-  (text-mode)
-  (read-only-mode)
-  (with-current-buffer pacmacs--score-buffer-name
-    (let ((inhibit-read-only t))
-      (erase-buffer)
-      (-> (pacmacs--read-score-table)
-          (pacmacs--render-score-table)))))
-
 (defun pacmacs--read-score-table ()
   (when (file-exists-p pacmacs--score-file-name)
     (->> pacmacs--score-file-name
@@ -78,6 +67,13 @@
   (->> score-table
        (-take-while (-lambda ((_ . score)) (< new-score score)))
        (length)))
+
+(defun pacmacs--render-score-page (render-score-sign)
+  (funcall render-score-sign)
+  (let ((score-table (pacmacs--read-score-table)))
+    (if score-table
+        (pacmacs--render-score-table score-table)
+      (insert "(there are not records yet)"))))
 
 (defun pacmacs--render-score-table (score-table)
   (-each score-table #'pacmacs--render-score-record))

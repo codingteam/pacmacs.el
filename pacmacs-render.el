@@ -38,6 +38,12 @@
 
 (defvar pacmacs--life-icon nil)
 
+(defmacro with-render-target (render-target-buffer &rest body)
+  (declare (indent 1) (debug (sexp &rest form)))
+  `(with-current-buffer ,render-target-buffer
+     (let ((inhibit-read-only t))
+       ,@body)))
+
 (defun pacmacs--render-empty-cell ()
   (pacmacs-insert-image (pacmacs--create-wall-tile
                          40 40
@@ -62,18 +68,30 @@
         (pacmacs--render-anim anim))
     (pacmacs--render-empty-cell)))
 
-(defun pacmacs--render-track-board (track-board)
+(defun pacmacs--render-track-cell (track-cell)
+  (insert "\t")
+  (if track-cell
+      (insert (int-to-string track-cell))
+    (insert ".")))
+
+(defun pacmacs--render-board (board cell-renderer)
   (plist-bind ((width :width)
                (height :height))
-      track-board
+      board
     (dotimes (row height)
       (dotimes (column width)
-        (let ((x (pacmacs--cell-wrapped-get track-board row column)))
-          (insert "\t")
-          (if x
-              (insert (int-to-string x))
-            (insert "."))))
+        (let ((cell (pacmacs--cell-wrapped-get board row column)))
+          (funcall cell-renderer cell)))
       (insert "\n"))))
+
+(defun pacmacs--render-track-board (track-board)
+  (pacmacs--render-board track-board
+                         #'pacmacs--render-track-cell))
+
+(defun pacmacs--render-object-board (object-board)
+  (pacmacs--render-board object-board
+                         (-compose #'pacmacs--render-object #'car))
+  (insert "\n"))
 
 (provide 'pacmacs-render)
 
