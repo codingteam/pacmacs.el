@@ -93,7 +93,8 @@
 
 (defun pacmacs--render-object-board (object-board)
   (pacmacs--render-board object-board
-                         #'pacmacs--render-first-object-in-list))
+                         #'pacmacs--render-first-object-in-list)
+  (insert "\n"))
 
 (provide 'pacmacs-render)
 
