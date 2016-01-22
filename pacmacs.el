@@ -118,6 +118,10 @@
   (setq cursor-type nil)
   (setq truncate-lines t))
 
+(defun pacmacs-toggle-debug-output ()
+  (interactive)
+  (setq pacmacs-debug-output (not pacmacs-debug-output)))
+
 ;;;###autoload
 (defun pacmacs-start ()
   (interactive)
