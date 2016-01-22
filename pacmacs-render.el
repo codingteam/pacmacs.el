@@ -68,30 +68,32 @@
         (pacmacs--render-anim anim))
     (pacmacs--render-empty-cell)))
 
-(defun pacmacs--render-track-board (track-board)
+(defun pacmacs--render-first-object-in-list (anim-objects)
+  (pacmacs--render-object (car anim-objects)))
+
+(defun pacmacs--render-track-cell (track-cell)
+  (insert "\t")
+  (if track-cell
+      (insert (int-to-string track-cell))
+    (insert ".")))
+
+(defun pacmacs--render-board (board cell-renderer)
   (plist-bind ((width :width)
                (height :height))
-      track-board
+      board
     (dotimes (row height)
       (dotimes (column width)
-        (let ((x (pacmacs--cell-wrapped-get track-board row column)))
-          (insert "\t")
-          (if x
-              (insert (int-to-string x))
-            (insert "."))))
+        (let ((cell (pacmacs--cell-wrapped-get board row column)))
+          (funcall cell-renderer cell)))
       (insert "\n"))))
 
+(defun pacmacs--render-track-board (track-board)
+  (pacmacs--render-board track-board
+                         #'pacmacs--render-track-cell))
+
 (defun pacmacs--render-object-board (object-board)
-  (plist-bind ((width :width)
-               (height :height))
-      object-board
-    (dotimes (row height)
-      (dotimes (column width)
-        (let ((anim-object (car (pacmacs--cell-wrapped-get object-board
-                                                           row column))))
-          (pacmacs--render-object anim-object)))
-      (insert "\n")))
-  (insert "\n"))
+  (pacmacs--render-board object-board
+                         #'pacmacs--render-first-object-in-list))
 
 (provide 'pacmacs-render)
 
