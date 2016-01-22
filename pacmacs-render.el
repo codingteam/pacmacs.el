@@ -68,9 +68,6 @@
         (pacmacs--render-anim anim))
     (pacmacs--render-empty-cell)))
 
-(defun pacmacs--render-first-object-in-list (anim-objects)
-  (pacmacs--render-object (car anim-objects)))
-
 (defun pacmacs--render-track-cell (track-cell)
   (insert "\t")
   (if track-cell
@@ -93,7 +90,7 @@
 
 (defun pacmacs--render-object-board (object-board)
   (pacmacs--render-board object-board
-                         #'pacmacs--render-first-object-in-list)
+                         (-compose #'pacmacs--render-object #'car))
   (insert "\n"))
 
 (provide 'pacmacs-render)
