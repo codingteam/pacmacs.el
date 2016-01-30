@@ -36,6 +36,7 @@
 (require 'color)
 
 (require 'pacmacs-vector)
+(require 'pacmacs-image)
 
 (defconst pacmacs--wall-color "#5555ff")
 (defconst pacmacs--wall-weight 10)
@@ -68,15 +69,6 @@
       (setq result (logior (lsh result 1)
                            (if bit 1 0))))
     result))
-
-(defun pacmacs--generate-xpm-palette (palette)
-  (let* ((n (length palette))
-         (palette-indices (number-sequence 0 (1- n))))
-    (->> palette
-         (-zip-with #'cons palette-indices)
-         (-map (-lambda ((index . color))
-                 (format "\"%c c %s\",\n" (+ index ?a) color)))
-         (apply #'concat))))
 
 (defun pacmacs--color-hex-gradient (start stop step-number)
   (-map (-lambda (color)
