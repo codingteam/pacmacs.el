@@ -35,8 +35,11 @@
 (require 'json)
 (require 'dash)
 
-(require 'pacmacs-image)
+(require 'pacmacs-walls)
 (require 'pacmacs-utils)
+
+(defun pacmacs-load-image (filename)
+  (create-image filename 'xpm nil :heuristic-mask t))
 
 (defun pacmacs-make-anim (frames sprite-sheet)
   (list :frames frames

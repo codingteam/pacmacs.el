@@ -1,4 +1,4 @@
-;;; pacmacs-image.el --- Pacman for Emacs -*- lexical-binding: t -*-
+;;; pacmacs-walls.el --- Pacman for Emacs -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2015 Codingteam
 
@@ -46,12 +46,6 @@
 (defun pacmacs--clear-wall-tiles-cache ()
   (interactive)
   (clrhash pacmacs--wall-tiles-cache))
-
-(defun pacmacs-load-image (filename)
-  (create-image filename 'xpm nil :heuristic-mask t))
-
-(defun pacmacs-insert-image (resource resource-vector)
-  (insert-image resource " " nil resource-vector))
 
 (defun pacmacs--put-wall-tile-corner (bits row column weight weights-to-color)
   (dotimes (i weight)
@@ -229,6 +223,6 @@ size of the tile. All the created tiles are cached."
                                'xpm t))
                pacmacs--wall-tiles-cache))))
 
-(provide 'pacmacs-image)
+(provide 'pacmacs-walls)
 
 ;;; pacmacs-anim.el ends here
