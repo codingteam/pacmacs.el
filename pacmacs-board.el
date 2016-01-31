@@ -1,6 +1,6 @@
 ;;; pacmacs-board.el --- Pacman for Emacs -*- lexical-binding: t -*-
 
-;; Copyright (C) 2015 Codingteam
+;; Copyright (C) 2015-2016 Codingteam
 
 ;; Author: Codingteam <codingteam@conference.jabber.ru>
 ;; Maintainer: Alexey Kutepov <reximkut@gmail.com>

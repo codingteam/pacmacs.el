@@ -2,7 +2,7 @@ All the source code of this game is distributed under the MIT license.
 
 # The MIT License #
 
-Copyright (C) 2015 Codingteam
+Copyright (C) 2015-2016 Codingteam
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
