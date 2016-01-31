@@ -32,7 +32,7 @@
 
 ;;; Code:
 
-(require 'pacmacs-image)
+(require 'pacmacs-walls)
 (require 'pacmacs-anim)
 (require 'pacmacs-board)
 
@@ -43,6 +43,9 @@
   `(with-current-buffer ,render-target-buffer
      (let ((inhibit-read-only t))
        ,@body)))
+
+(defun pacmacs-insert-image (resource resource-vector)
+  (insert-image resource " " nil resource-vector))
 
 (defun pacmacs--render-empty-cell ()
   (pacmacs-insert-image (pacmacs--create-wall-tile

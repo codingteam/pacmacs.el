@@ -44,7 +44,7 @@
 
 (require 'pacmacs-anim)
 (require 'pacmacs-board)
-(require 'pacmacs-image)
+(require 'pacmacs-walls)
 (require 'pacmacs-utils)
 (require 'pacmacs-render)
 (require 'pacmacs-score)

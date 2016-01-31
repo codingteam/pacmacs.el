@@ -1,15 +1,3 @@
-(ert-deftest pacmacs-load-image-test ()
-  (with-mock
-   (mock (create-image "pew" 'xpm nil :heuristic-mask t) => 42 :times 1)
-   (should (= 42 (pacmacs-load-image "pew")))))
-
-(ert-deftest pacmacs-insert-image-test ()
-  (let ((resource "khooy")
-        (resource-vector "pew"))
-    (with-mock
-     (mock (insert-image resource " " nil resource-vector) => 42 :times 1)
-     (should (= 42 (pacmacs-insert-image resource resource-vector))))))
-
 (ert-deftest pacmacs--put-wall-tile-corner-test ()
   (let ((input-wall-tile [[nil nil nil]
                           [nil nil nil]

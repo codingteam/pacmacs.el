@@ -1,3 +1,8 @@
+(ert-deftest pacmacs-load-image-test ()
+  (with-mock
+   (mock (create-image "pew" 'xpm nil :heuristic-mask t) => 42 :times 1)
+   (should (= 42 (pacmacs-load-image "pew")))))
+
 (ert-deftest pacmacs-make-anim-test ()
   (should (equal (list :frames (list 1 2 3 4 5)
                        :current-frame 0
