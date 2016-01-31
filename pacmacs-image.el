@@ -34,14 +34,17 @@
 
 (require 'pacmacs-utils)
 
-(defun pacmacs--make-image (width height &optional name)
+(defun pacmacs--make-image-data (width height)
   (let ((data (make-vector height nil)))
     (dotimes (i height)
       (aset data i (make-vector width nil)))
-    (list :width width
-          :height height
-          :data data
-          :name name)))
+    data))
+
+(defun pacmacs--make-image (width height &optional name)
+  (list :width width
+        :height height
+        :data (pacmacs--make-image-data width height)
+        :name name))
 
 (defun pacmacs--get-image-pixel (image x y)
   (plist-bind ((data :data))
@@ -52,6 +55,12 @@
   (plist-bind ((data :data))
       image
     (aset (aref data y) x color)))
+
+(defun pacmacs--image-width (image)
+  (plist-get image :width))
+
+(defun pacmacs--image-height (image)
+  (plist-get image :height))
 
 (defun pacmacs--palette-from-image (image)
   (plist-bind ((width :width)
@@ -84,6 +93,40 @@
   (->> palette
        (pacmacs--make-palette-char-map)
        (pacmacs--render-xpm-palette)))
+
+(defun pacmacs--make-image-from-data (raw-data)
+  (let* ((height (length raw-data))
+         (width (->> raw-data
+                     (-map #'length)
+                     (apply #'max)))
+         (data (pacmacs--make-image-data width height)))
+    (dotimes (y (length raw-data))
+      (dotimes (x (length (aref raw-data y)))
+        (let ((color (aref (aref raw-data y) x)))
+          (aset (aref data y) x color))))
+    (list :width width
+          :height height
+          :data data
+          :name nil)))
+
+(defun pacmacs--draw-image (canvas-image image x y)
+  (plist-bind ((image-width :width)
+               (image-height :height)
+               (image-data :data))
+      image
+    (plist-bind ((canvas-width :width)
+                 (canvas-height :height)
+                 (canvas-data :data))
+        canvas-image
+      (dotimes (image-y (length image-data))
+        (dotimes (image-x (length (aref image-data image-y)))
+          (let ((image-color (aref (aref image-data image-y) image-x))
+                (canvas-x (+ image-x x))
+                (canvas-y (+ image-y y)))
+            (when (and (<= 0 canvas-x (1- canvas-width))
+                       (<= 0 canvas-y (1- canvas-height)))
+              (aset (aref canvas-data canvas-y) canvas-x
+                    image-color))))))))
 
 (defun pacmacs--image-to-xpm (image)
   (plist-bind ((width :width)
