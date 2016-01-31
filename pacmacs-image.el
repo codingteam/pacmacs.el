@@ -43,15 +43,15 @@
           :data data
           :name name)))
 
-(defun pacmacs--get-image-pixel (image row column)
+(defun pacmacs--get-image-pixel (image x y)
   (plist-bind ((data :data))
       image
-    (aref (aref data row) column)))
+    (aref (aref data y) x)))
 
-(defun pacmacs--set-image-pixel (image row column color)
+(defun pacmacs--set-image-pixel (image x y color)
   (plist-bind ((data :data))
       image
-    (aset (aref data row) column color)))
+    (aset (aref data y) x color)))
 
 (defun pacmacs--palette-from-image (image)
   (plist-bind ((width :width)
@@ -59,9 +59,9 @@
                (data :data))
       image
     (let ((palette '()))
-      (dotimes (row height)
-        (dotimes (column width)
-          (let ((pixel (aref (aref data row) column)))
+      (dotimes (y height)
+        (dotimes (x width)
+          (let ((pixel (aref (aref data y) x)))
             (when pixel
               (push pixel palette)
               (delete-dups palette)))))
