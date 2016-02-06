@@ -1,16 +1,23 @@
-PILL=Pill.json Pill.xpm
+TXTS=Big-Pill.txt Blinking-Terrified-Ghost.txt Pacman-Chomping-Down.txt Pacman-Chomping-Left.txt Pacman-Chomping-Right.txt Pacman-Chomping-Up.txt Pacman-Death.txt Pill.txt Red-Ghost-Down.txt Red-Ghost-Left.txt Red-Ghost-Right.txt Red-Ghost-Up.txt Red-Ghost-Win.txt Terrified-Ghost.txt
+PILL=Pill.json Pill.xpm Pill.txt
 BIG_PILL=Big-Pill.json Big-Pill.xpm
 PACMAN_DEATH=Pacman-Death.json Pacman-Death.xpm
 TERRIFIED_GHOST=Terrified-Ghost.json Terrified-Ghost.xpm
 BLINKING_TERRIFIED_GHOST=Blinking-Terrified-Ghost.json Blinking-Terrified-Ghost.xpm
 
-all: $(PILL) $(BIG_PILL) $(PACMAN_DEATH) $(TERRIFIED_GHOST) $(BLINKING_TERRIFIED_GHOST) Makefile
+all: $(TXTS) $(PILL) $(BIG_PILL) $(PACMAN_DEATH) $(TERRIFIED_GHOST) $(BLINKING_TERRIFIED_GHOST) Makefile
+
+%.txt: %.xpm
+	convert $< $@
 
 Pill.json: Pill.raw.json
 	jq ".meta.image |= \"Pill.xpm\"" Pill.raw.json > Pill.json
 
 Pill.xpm: Pill.png
 	convert Pill.png Pill.xpm
+
+Pill.txt: Pill.png
+	convert Pill.png Pill.txt
 
 Pill.raw%json Pill%png: src/Pill.ase
 	aseprite -b src/Pill.ase --sheet Pill$*png --data Pill.raw$*json
