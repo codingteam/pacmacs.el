@@ -137,13 +137,13 @@
                                "\\([[:digit:]]+\\),\\([[:digit:]]+\\),"
                                "\\([[:digit:]]+\\)")))
     (if (string-match header-regexp header)
-        (list (string-to-int (match-string 1 header))
-              (string-to-int (match-string 2 header))
-              (string-to-int (match-string 3 header)))
+        (list (string-to-number (match-string 1 header))
+              (string-to-number (match-string 2 header))
+              (string-to-number (match-string 3 header)))
       (error "Incorrect ImageMagick pixel enumeration header: %s" header))))
 
 (defun pacmacs--match-int (num s)
-  (string-to-int (match-string num s)))
+  (string-to-number (match-string num s)))
 
 (defun pacmacs--parse-im-enum-pixel (pixel colorspace)
   (let ((pixel-regexp (concat "\\([[:digit:]]+\\),\\([[:digit:]]+\\):[[:space:]]*"
@@ -152,8 +152,8 @@
                               "[[:space:]]*\\([[:digit:]]+\\),"
                               "[[:space:]]*\\([[:digit:]]+\\))")))
     (if (string-match pixel-regexp pixel)
-        (list (string-to-int (match-string 1 pixel))
-              (string-to-int (match-string 2 pixel))
+        (list (string-to-number (match-string 1 pixel))
+              (string-to-number (match-string 2 pixel))
               (let ((r (pacmacs--match-int 3 pixel))
                     (g (pacmacs--match-int 4 pixel))
                     (b (pacmacs--match-int 5 pixel))
