@@ -118,8 +118,8 @@
                  (canvas-height :height)
                  (canvas-data :data))
         canvas-image
-      (dotimes (image-y (length image-data))
-        (dotimes (image-x (length (aref image-data image-y)))
+      (dotimes (image-y image-height)
+        (dotimes (image-x image-width)
           (let ((image-color (aref (aref image-data image-y) image-x))
                 (canvas-x (+ image-x x))
                 (canvas-y (+ image-y y)))
