@@ -32,6 +32,9 @@
 
 ;;; Code:
 
+(require 'f)
+(require 'color)
+
 (require 'pacmacs-utils)
 
 (defun pacmacs--make-image-data (width height)
@@ -127,6 +130,54 @@
                        (<= 0 canvas-y (1- canvas-height)))
               (aset (aref canvas-data canvas-y) canvas-x
                     image-color))))))))
+
+
+(defun pacmacs--parse-im-enum-header (header)
+  (let ((header-regexp (concat "# ImageMagick pixel enumeration: "
+                               "\\([[:digit:]]+\\),\\([[:digit:]]+\\),"
+                               "\\([[:digit:]]+\\)")))
+    (if (string-match header-regexp header)
+        (list (string-to-int (match-string 1 header))
+              (string-to-int (match-string 2 header))
+              (string-to-int (match-string 3 header)))
+      (error "Incorrect ImageMagick pixel enumeration header: %s" header))))
+
+(defun pacmacs--match-int (num s)
+  (string-to-int (match-string num s)))
+
+(defun pacmacs--parse-im-enum-pixel (pixel colorspace)
+  (let ((pixel-regexp (concat "\\([[:digit:]]+\\),\\([[:digit:]]+\\):[[:space:]]*"
+                              "([[:space:]]*\\([[:digit:]]+\\),"
+                              "[[:space:]]*\\([[:digit:]]+\\),"
+                              "[[:space:]]*\\([[:digit:]]+\\),"
+                              "[[:space:]]*\\([[:digit:]]+\\))")))
+    (if (string-match pixel-regexp pixel)
+        (list (string-to-int (match-string 1 pixel))
+              (string-to-int (match-string 2 pixel))
+              (let ((r (pacmacs--match-int 3 pixel))
+                    (g (pacmacs--match-int 4 pixel))
+                    (b (pacmacs--match-int 5 pixel))
+                    (a (pacmacs--match-int 6 pixel))
+                    (k (/ 1.0 colorspace)))
+                (if (zerop a)
+                    nil
+                  (color-rgb-to-hex (* r k)
+                                    (* g k)
+                                    (* b k)))))
+      (error "Incorrect ImageMagick pixel enumeration pixel: %s" pixel))))
+
+(defun pacmacs--read-im-enum-image (filename)
+  (-let* (((header-raw . data-raw) (-> filename
+                                       (f-read-text)
+                                       (split-string "\n" t)))
+          (header (pacmacs--parse-im-enum-header header-raw)))
+    (-let (((width height colorspace) header))
+      (let ((image (pacmacs--make-image width height)))
+        (-each data-raw
+          (-lambda (pixel-raw)
+            (-let (((x y color) (pacmacs--parse-im-enum-pixel pixel-raw colorspace)))
+              (pacmacs--set-image-pixel image x y color))))
+        image))))
 
 (defun pacmacs--image-to-xpm (image)
   (plist-bind ((width :width)
