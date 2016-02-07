@@ -99,6 +99,19 @@
               (aset (aref canvas-data canvas-y) canvas-x
                     image-color))))))))
 
+(defun pacmacs--draw-image-slice (canvas-image image x y slice)
+  (-let (((slice-x slice-y slice-width slice-height) slice))
+    (plist-bind ((image-data :data))
+        image
+      (plist-bind ((canvas-data :data))
+          canvas-image
+        (dotimes (image-y slice-height)
+          (dotimes (image-x slice-width)
+            (let ((image-color (aref (aref image-data (+ slice-y image-y)) (+ slice-x image-x)))
+                  (canvas-x (+ image-x x))
+                  (canvas-y (+ image-y y)))
+              (aset (aref canvas-data canvas-y) canvas-x image-color))))))))
+
 (provide 'pacmacs-image)
 
 ;;; pacmacs-image.el ends here
