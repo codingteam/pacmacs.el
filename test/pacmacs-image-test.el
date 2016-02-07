@@ -119,7 +119,7 @@
     (should-error (pacmacs--parse-im-enum-header "khooy") :type 'error)))
 
 (ert-deftest pacmacs--parse-im-enum-pixel-test ()
-  (let ((input-pixel "60,16: (255,255,255,255)  #khooy")
+  (let ((input-pixel "60,16: ( 255,  255,   255,    255)  #khooy")
         (expected-result (list 60 16 "#ffffff")))
     (should (equal expected-result
                    (pacmacs--parse-im-enum-pixel input-pixel 255)))
