@@ -27,3 +27,4 @@
 
 (add-to-list 'load-path ".")
 (load "pacmacs.el")
+(load "pacmacs-im-enum.el")

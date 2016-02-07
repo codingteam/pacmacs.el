@@ -76,6 +76,9 @@ side-effects."
   (when (string-match "\\(map[0-9]+\\)\\.txt" filename)
     (match-string 1 filename)))
 
+(defun pacmacs--match-int (num s)
+  (string-to-number (match-string num s)))
+
 (provide 'pacmacs-utils)
 
 ;;; pacmacs.el ends here
