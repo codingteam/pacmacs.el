@@ -16,9 +16,6 @@ Pill.json: Pill.raw.json
 Pill.xpm: Pill.png
 	convert Pill.png Pill.xpm
 
-Pill.txt: Pill.png
-	convert Pill.png Pill.txt
-
 Pill.raw%json Pill%png: src/Pill.ase
 	aseprite -b src/Pill.ase --sheet Pill$*png --data Pill.raw$*json
 
