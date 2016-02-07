@@ -112,14 +112,18 @@
   (-let (((slice-x slice-y slice-width slice-height) slice))
     (plist-bind ((image-data :data))
         image
-      (plist-bind ((canvas-data :data))
+      (plist-bind ((canvas-width :width)
+                   (canvas-height :height)
+                   (canvas-data :data))
           canvas-image
         (dotimes (image-y slice-height)
           (dotimes (image-x slice-width)
             (let ((image-color (aref (aref image-data (+ slice-y image-y)) (+ slice-x image-x)))
                   (canvas-x (+ image-x x))
                   (canvas-y (+ image-y y)))
-              (aset (aref canvas-data canvas-y) canvas-x image-color))))))))
+              (when (and (<= 0 canvas-x (1- canvas-width))
+                         (<= 0 canvas-y (1- canvas-height)))
+                (aset (aref canvas-data canvas-y) canvas-x image-color)))))))))
 
 (provide 'pacmacs-image)
 
