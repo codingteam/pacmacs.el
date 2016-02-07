@@ -36,7 +36,7 @@
 (require 'color)
 
 (require 'pacmacs-vector)
-(require 'pacmacs-image)
+(require 'pacmacs-xpm)
 
 (defconst pacmacs--wall-color "#5555ff")
 (defconst pacmacs--wall-weight 10)

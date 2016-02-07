@@ -65,38 +65,6 @@
 (defun pacmacs--image-height (image)
   (plist-get image :height))
 
-(defun pacmacs--palette-from-image (image)
-  (plist-bind ((width :width)
-               (height :height)
-               (data :data))
-      image
-    (let ((palette '()))
-      (dotimes (y height)
-        (dotimes (x width)
-          (let ((pixel (aref (aref data y) x)))
-            (when pixel
-              (push pixel palette)
-              (delete-dups palette)))))
-      palette)))
-
-(defun pacmacs--make-palette-char-map (palette)
-  (let* ((n (length palette))
-         (palette-indices (number-sequence 0 (1- n))))
-    (->> (-zip-with #'cons palette palette-indices)
-         (-map (-lambda ((color . index))
-                 (cons color (+ index ?a)))))))
-
-(defun pacmacs--render-xpm-palette (palette-char-map)
-  (->> palette-char-map
-       (-map (-lambda ((color . char))
-               (format "\"%c c %s\",\n" char color)))
-       (apply #'concat)))
-
-(defun pacmacs--generate-xpm-palette (palette)
-  (->> palette
-       (pacmacs--make-palette-char-map)
-       (pacmacs--render-xpm-palette)))
-
 (defun pacmacs--make-image-from-data (raw-data)
   (let* ((height (length raw-data))
          (width (->> raw-data
@@ -179,32 +147,7 @@
               (pacmacs--set-image-pixel image x y color))))
         image))))
 
-(defun pacmacs--image-to-xpm (image)
-  (plist-bind ((width :width)
-               (height :height)
-               (data :data)
-               (name :name))
-      image
-    (let* ((palette (pacmacs--palette-from-image image))
-           (palette-char-map (pacmacs--make-palette-char-map palette)))
-      (concat
-       "/* XPM */\n"
-       "static char *" (if name name "image") "[] = {\n"
-       "/**/\n"
-       (format "\"%d %d %d 1\",\n" width height (1+ (length palette)))
-       "\"  c None\",\n"
-       (pacmacs--render-xpm-palette palette-char-map)
-       "/* pixels */\n"
-       (mapconcat
-        (lambda (row)
-          (format "\"%s\""
-                  (mapconcat (-lambda (color)
-                               (let ((char (cdr (assoc color palette-char-map))))
-                                 (if char (format "%c" char) " ")))
-                             row "")))
-        data
-        ",\n")
-       "\n};"))))
+
 
 (provide 'pacmacs-image)
 
