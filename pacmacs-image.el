@@ -65,6 +65,15 @@
 (defun pacmacs--image-height (image)
   (plist-get image :height))
 
+(defun pacmacs--fill-image (image color)
+  (plist-bind ((width :width)
+               (height :height)
+               (data :data))
+      image
+    (dotimes (y height)
+      (dotimes (x width)
+        (aset (aref data y) x color)))))
+
 (defun pacmacs--make-image-from-data (raw-data)
   (let* ((height (length raw-data))
          (width (->> raw-data

@@ -79,3 +79,13 @@
         (let ((color (aref (aref expected-canvas-data y) x)))
           (should (equal color
                          (pacmacs--get-image-pixel canvas-image x y))))))))
+
+(ert-deftest pacmacs--fill-image-test ()
+  (let* ((width 2)
+         (height 2)
+         (image (pacmacs--make-image width height))
+         (color "red"))
+    (pacmacs--fill-image image color)
+    (dotimes (y height)
+      (dotimes (x width)
+        (should (equal color (pacmacs--get-image-pixel image x y)))))))
