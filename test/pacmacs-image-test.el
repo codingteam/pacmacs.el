@@ -19,13 +19,6 @@
     (should (equal 10 (pacmacs--image-width image)))
     (should (equal 20 (pacmacs--image-height image)))))
 
-(ert-deftest pacmacs--make-image-data-test ()
-  (let ((expected-data [[nil nil nil]
-                        [nil nil nil]
-                        [nil nil nil]])
-        (actual-data (pacmacs--make-image-data 3 3)))
-    (should (equal actual-data expected-data))))
-
 (ert-deftest pacmacs--make-image-from-data-test ()
   (let* ((input-data [["red" "blue" nil]
                       ["green"]

@@ -37,16 +37,10 @@
 
 (require 'pacmacs-utils)
 
-(defun pacmacs--make-image-data (width height)
-  (let ((data (make-vector height nil)))
-    (dotimes (i height)
-      (aset data i (make-vector width nil)))
-    data))
-
 (defun pacmacs--make-image (width height &optional name)
   (list :width width
         :height height
-        :data (pacmacs--make-image-data width height)
+        :data (pacmacs--make-2d-vector width height)
         :name name))
 
 (defun pacmacs--get-image-pixel (image x y)
@@ -79,7 +73,7 @@
          (width (->> raw-data
                      (-map #'length)
                      (apply #'max)))
-         (data (pacmacs--make-image-data width height)))
+         (data (pacmacs--make-2d-vector width height)))
     (dotimes (y (length raw-data))
       (dotimes (x (length (aref raw-data y)))
         (let ((color (aref (aref raw-data y) x)))
