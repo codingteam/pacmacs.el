@@ -34,18 +34,10 @@
 
 (require 'dash)
 (require 'pacmacs-image)
+(require 'pacmacs-utils)
 
 (defconst pacmacs--canvas-tile-width 40)
 (defconst pacmacs--canvas-tile-height 40)
-
-(defun pacmacs--make-tiles-grid (grid-width grid-height)
-  (let ((grid (make-vector grid-height nil)))
-    (dotimes (row grid-height)
-      (->> (pacmacs--make-image pacmacs--canvas-tile-width
-                                pacmacs--canvas-tile-height)
-           (make-vector grid-width)
-           (aset grid row)))
-    grid))
 
 (defun pacmacs--make-canvas (width height)
   (when (or (not (zerop (mod width pacmacs--canvas-tile-width))))
@@ -62,7 +54,7 @@
           :height height
           :grid-width grid-width
           :grid-height grid-height
-          :tiles (pacmacs--make-tiles-grid grid-width grid-height))))
+          :raw-tiles (pacmacs--make-2d-vector grid-width grid-height))))
 
 (defun pacmacs--canvas-width (canvas)
   (plist-get canvas :width))
