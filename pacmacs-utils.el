@@ -79,6 +79,12 @@ side-effects."
 (defun pacmacs--match-int (num s)
   (string-to-number (match-string num s)))
 
+(defun pacmacs--make-2d-vector (width height &optional value)
+  (let ((result (make-vector height nil)))
+    (dotimes (row height)
+      (aset result row (make-vector width value)))
+    result))
+
 (provide 'pacmacs-utils)
 
 ;;; pacmacs.el ends here
