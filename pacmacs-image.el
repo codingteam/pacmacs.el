@@ -83,41 +83,41 @@
           :data data
           :name nil)))
 
-(defun pacmacs--draw-image (canvas-image image x y)
+(defun pacmacs--draw-image (dest-image image x y)
   (plist-bind ((image-width :width)
                (image-height :height)
                (image-data :data))
       image
-    (plist-bind ((canvas-width :width)
-                 (canvas-height :height)
-                 (canvas-data :data))
-        canvas-image
+    (plist-bind ((dest-width :width)
+                 (dest-height :height)
+                 (dest-data :data))
+        dest-image
       (dotimes (image-y image-height)
         (dotimes (image-x image-width)
           (let ((image-color (aref (aref image-data image-y) image-x))
-                (canvas-x (+ image-x x))
-                (canvas-y (+ image-y y)))
-            (when (and (<= 0 canvas-x (1- canvas-width))
-                       (<= 0 canvas-y (1- canvas-height)))
-              (aset (aref canvas-data canvas-y) canvas-x
+                (dest-x (+ image-x x))
+                (dest-y (+ image-y y)))
+            (when (and (<= 0 dest-x (1- dest-width))
+                       (<= 0 dest-y (1- dest-height)))
+              (aset (aref dest-data dest-y) dest-x
                     image-color))))))))
 
-(defun pacmacs--draw-image-slice (canvas-image image x y slice)
+(defun pacmacs--draw-image-slice (dest-image image x y slice)
   (-let (((slice-x slice-y slice-width slice-height) slice))
     (plist-bind ((image-data :data))
         image
-      (plist-bind ((canvas-width :width)
-                   (canvas-height :height)
-                   (canvas-data :data))
-          canvas-image
+      (plist-bind ((dest-width :width)
+                   (dest-height :height)
+                   (dest-data :data))
+          dest-image
         (dotimes (image-y slice-height)
           (dotimes (image-x slice-width)
             (let ((image-color (aref (aref image-data (+ slice-y image-y)) (+ slice-x image-x)))
-                  (canvas-x (+ image-x x))
-                  (canvas-y (+ image-y y)))
-              (when (and (<= 0 canvas-x (1- canvas-width))
-                         (<= 0 canvas-y (1- canvas-height)))
-                (aset (aref canvas-data canvas-y) canvas-x image-color)))))))))
+                  (dest-x (+ image-x x))
+                  (dest-y (+ image-y y)))
+              (when (and (<= 0 dest-x (1- dest-width))
+                         (<= 0 dest-y (1- dest-height)))
+                (aset (aref dest-data dest-y) dest-x image-color)))))))))
 
 (provide 'pacmacs-image)
 

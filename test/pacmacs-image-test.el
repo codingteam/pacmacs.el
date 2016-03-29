@@ -36,42 +36,42 @@
         (should (equal color (pacmacs--get-image-pixel image x y)))))))
 
 (ert-deftest pacmacs--draw-image-test ()
-  (let ((canvas-image (pacmacs--make-image 5 5))
+  (let ((dest-image (pacmacs--make-image 5 5))
         (image (pacmacs--make-image-from-data
                 [["red" "blue" "red"]
                  ["blue" "green" "blue"]
                  ["red" "blue" "red"]]))
-        (expected-canvas-data [["red" "blue" "red" nil   nil]
-                               ["blue" "green" "blue" nil   nil]
-                               ["red" "blue" "red" nil   nil]
-                               [nil   nil   nil   "red" "blue"]
-                               [nil   nil   nil   "blue" "green"]]))
-    (pacmacs--draw-image canvas-image image 0 0)
-    (pacmacs--draw-image canvas-image image 3 3)
-    (dotimes (y (length expected-canvas-data))
-      (dotimes (x (length (aref expected-canvas-data y)))
-        (let ((color (aref (aref expected-canvas-data y) x)))
+        (expected-dest-data [["red" "blue" "red" nil   nil]
+                             ["blue" "green" "blue" nil   nil]
+                             ["red" "blue" "red" nil   nil]
+                             [nil   nil   nil   "red" "blue"]
+                             [nil   nil   nil   "blue" "green"]]))
+    (pacmacs--draw-image dest-image image 0 0)
+    (pacmacs--draw-image dest-image image 3 3)
+    (dotimes (y (length expected-dest-data))
+      (dotimes (x (length (aref expected-dest-data y)))
+        (let ((color (aref (aref expected-dest-data y) x)))
           (should (equal color
-                         (pacmacs--get-image-pixel canvas-image x y))))))))
+                         (pacmacs--get-image-pixel dest-image x y))))))))
 
 (ert-deftest pacmacs--draw-image-slice-test ()
-  (let ((canvas-image (pacmacs--make-image 5 5))
+  (let ((dest-image (pacmacs--make-image 5 5))
         (image (pacmacs--make-image-from-data
                 [["red" "blue" "red"]
                  ["blue" "green" "blue"]
                  ["red" "blue" "red"]]))
-        (expected-canvas-data [["green" "blue" nil nil nil]
-                               ["blue" "red" nil nil nil]
-                               [nil "blue" "red" nil nil]
-                               [nil "green" "blue" nil nil]
-                               [nil nil nil nil nil]]))
-    (pacmacs--draw-image-slice canvas-image image 0 0 '(1 1 2 2))
-    (pacmacs--draw-image-slice canvas-image image 1 2 '(1 0 2 2))
-    (dotimes (y (length expected-canvas-data))
-      (dotimes (x (length (aref expected-canvas-data y)))
-        (let ((color (aref (aref expected-canvas-data y) x)))
+        (expected-dest-data [["green" "blue" nil nil nil]
+                             ["blue" "red" nil nil nil]
+                             [nil "blue" "red" nil nil]
+                             [nil "green" "blue" nil nil]
+                             [nil nil nil nil nil]]))
+    (pacmacs--draw-image-slice dest-image image 0 0 '(1 1 2 2))
+    (pacmacs--draw-image-slice dest-image image 1 2 '(1 0 2 2))
+    (dotimes (y (length expected-dest-data))
+      (dotimes (x (length (aref expected-dest-data y)))
+        (let ((color (aref (aref expected-dest-data y) x)))
           (should (equal color
-                         (pacmacs--get-image-pixel canvas-image x y))))))))
+                         (pacmacs--get-image-pixel dest-image x y))))))))
 
 (ert-deftest pacmacs--fill-image-test ()
   (let* ((width 2)
