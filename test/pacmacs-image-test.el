@@ -35,25 +35,6 @@
       (-lambda ((x y color))
         (should (equal color (pacmacs--get-image-pixel image x y)))))))
 
-(ert-deftest pacmacs--draw-image-test ()
-  (let ((dest-image (pacmacs--make-image 5 5))
-        (image (pacmacs--make-image-from-data
-                [["red" "blue" "red"]
-                 ["blue" "green" "blue"]
-                 ["red" "blue" "red"]]))
-        (expected-dest-data [["red" "blue" "red" nil   nil]
-                             ["blue" "green" "blue" nil   nil]
-                             ["red" "blue" "red" nil   nil]
-                             [nil   nil   nil   "red" "blue"]
-                             [nil   nil   nil   "blue" "green"]]))
-    (pacmacs--draw-image dest-image image 0 0)
-    (pacmacs--draw-image dest-image image 3 3)
-    (dotimes (y (length expected-dest-data))
-      (dotimes (x (length (aref expected-dest-data y)))
-        (let ((color (aref (aref expected-dest-data y) x)))
-          (should (equal color
-                         (pacmacs--get-image-pixel dest-image x y))))))))
-
 (ert-deftest pacmacs--draw-image-slice-test ()
   (let ((dest-image (pacmacs--make-image 5 5))
         (image (pacmacs--make-image-from-data

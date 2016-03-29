@@ -83,25 +83,6 @@
           :data data
           :name nil)))
 
-(defun pacmacs--draw-image (dest-image image x y)
-  (plist-bind ((image-width :width)
-               (image-height :height)
-               (image-data :data))
-      image
-    (plist-bind ((dest-width :width)
-                 (dest-height :height)
-                 (dest-data :data))
-        dest-image
-      (dotimes (image-y image-height)
-        (dotimes (image-x image-width)
-          (let ((image-color (aref (aref image-data image-y) image-x))
-                (dest-x (+ image-x x))
-                (dest-y (+ image-y y)))
-            (when (and (<= 0 dest-x (1- dest-width))
-                       (<= 0 dest-y (1- dest-height)))
-              (aset (aref dest-data dest-y) dest-x
-                    image-color))))))))
-
 (defun pacmacs--draw-image-slice (dest-image image x y slice)
   (-let (((slice-x slice-y slice-width slice-height) slice))
     (plist-bind ((image-data :data))
