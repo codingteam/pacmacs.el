@@ -60,9 +60,21 @@
         (grid-height (/ height pacmacs--canvas-tile-height)))
     (list :width width
           :height height
-          :grid-width width
-          :grid-height height
+          :grid-width grid-width
+          :grid-height grid-height
           :tiles (pacmacs--make-tiles-grid grid-width grid-height))))
+
+(defun pacmacs--canvas-width (canvas)
+  (plist-get canvas :width))
+
+(defun pacmacs--canvas-height (canvas)
+  (plist-get canvas :height))
+
+(defun pacmacs--canvas-grid-width (canvas)
+  (plist-get canvas :grid-width))
+
+(defun pacmacs--canvas-grid-height (canvas)
+  (plist-get canvas :grid-height))
 
 (require 'pacmacs-image)
 
