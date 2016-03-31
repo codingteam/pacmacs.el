@@ -96,15 +96,13 @@ side-effects."
     (let ((result-x1 (max src-x 0))
           (result-y1 (max src-y 0))
           (result-x2 (min (1- (+ src-x src-width))
-                          (1- dest-width)))dest-widt
+                          (1- dest-width)))
           (result-y2 (min (1- (+ src-y src-height))
                           (1- dest-height))))
       (list result-x1
             result-y1
             (1+ (- result-x2 result-x1))
             (1+ (- result-y2 result-y1))))))
-
-(pacmacs--intersect-rectangles 4 5 2 1 5 4)
 
 (provide 'pacmacs-utils)
 
