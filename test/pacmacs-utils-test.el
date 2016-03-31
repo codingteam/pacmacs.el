@@ -18,13 +18,3 @@
   (should (equal [[42 42 42]
                   [42 42 42]]
                  (pacmacs--make-2d-vector 3 2 42))))
-
-(ert-deftest pacmacs--intersect-rectangles-test ()
-  (should (not (pacmacs--intersect-rectangles 5 4 -3 -4 3 4)))
-  (should (not (pacmacs--intersect-rectangles 5 4 5 4 2 3)))
-  (should (equal '(2 1 3 3)
-                 (pacmacs--intersect-rectangles 5 4 2 1 5 4)))
-  (should (equal '(1 1 2 2)
-                 (pacmacs--intersect-rectangles 5 4 1 1 2 2)))
-  (should (equal '(0 0 1 1)
-                 (pacmacs--intersect-rectangles 5 4 -2 -3 3 4))))

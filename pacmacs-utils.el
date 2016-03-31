@@ -85,25 +85,6 @@ side-effects."
       (aset result row (make-vector width value)))
     result))
 
-(defun pacmacs--intersect-rectangles (dest-width
-                                      dest-height
-                                      src-x src-y
-                                      src-width src-height)
-  (when (and (< src-x dest-width)
-             (< src-y dest-height)
-             (> (+ src-x src-width) 0)
-             (> (+ src-y src-height) 0))
-    (let ((result-x1 (max src-x 0))
-          (result-y1 (max src-y 0))
-          (result-x2 (min (1- (+ src-x src-width))
-                          (1- dest-width)))
-          (result-y2 (min (1- (+ src-y src-height))
-                          (1- dest-height))))
-      (list result-x1
-            result-y1
-            (1+ (- result-x2 result-x1))
-            (1+ (- result-y2 result-y1))))))
-
 (provide 'pacmacs-utils)
 
 ;;; pacmacs.el ends here
