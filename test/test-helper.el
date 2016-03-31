@@ -29,3 +29,4 @@
 (load "pacmacs.el")
 (load "pacmacs-im-enum.el")
 (load "pacmacs-canvas.el")
+(load "pacmacs-geometry.el")

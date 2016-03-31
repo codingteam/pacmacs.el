@@ -49,7 +49,7 @@
 
 (defun pacmacs--rect-luc (rect)
   "Returns coordinates of the left-upper corner of the rectangle."
-  (-let (((rect-x rect-y rect-width rect-height) rect))
+  (-let (((rect-x rect-y _ _) rect))
     (list rect-x rect-y)))
 
 (defun pacmacs--point-to-rect (lu-point rb-point)
