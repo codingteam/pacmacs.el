@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/codingteam/pacmacs.el.svg?branch=master)](https://travis-ci.org/codingteam/pacmacs.el)
-[![Coverage Status](https://coveralls.io/repos/codingteam/pacmacs.el/badge.svg?branch=master&service=github)](https://coveralls.io/github/codingteam/pacmacs.el?branch=master)
+[![Build Status](https://travis-ci.org/codingteam/pacmacs.el.svg?branch=feature/one-canvas-technique-41)](https://travis-ci.org/codingteam/pacmacs.el)
+[![Coverage Status](https://coveralls.io/repos/codingteam/pacmacs.el/badge.svg?branch=feature/one-canvas-technique-41&service=github)](https://coveralls.io/github/codingteam/pacmacs.el?branch=feature/one-canvas-technique-41)
 [![MELPA](http://melpa.org/packages/pacmacs-badge.svg)](http://melpa.org/#/pacmacs)
 
 # Pacmacs #
