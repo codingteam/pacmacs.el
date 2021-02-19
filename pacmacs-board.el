@@ -33,7 +33,6 @@
 ;;; Code:
 
 (require 'dash)
-(require 'dash-functional)
 (require 'pacmacs-utils)
 
 (defun pacmacs--make-board (width height)

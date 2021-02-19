@@ -6,7 +6,7 @@
 ;; Maintainer: Alexey Kutepov <reximkut@gmail.com>
 ;; URL: http://github.com/codingteam/pacmacs.el
 ;; Version: 0.0.1
-;; Package-Requires: ((emacs "24.4") (dash "2.11.0") (dash-functional "1.2.0") (cl-lib "0.5") (f "0.18.0"))
+;; Package-Requires: ((emacs "24.4") (dash "2.18.0") (cl-lib "0.5") (f "0.18.0"))
 
 ;; Permission is hereby granted, free of charge, to any person
 ;; obtaining a copy of this software and associated documentation
