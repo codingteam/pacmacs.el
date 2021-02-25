@@ -2,7 +2,6 @@
 
 (let ((bundle (cask-initialize default-directory)))
   (require 'dash)
-  (require 'dash-functional)
   (require 'f)
   (require 'bytecomp)
   (let* ((byte-compile-error-on-warn t)

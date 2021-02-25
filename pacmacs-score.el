@@ -34,7 +34,6 @@
 
 (require 'f)
 (require 'dash)
-(require 'dash-functional)
 
 (defconst pacmacs--max-score-nick-size 8)
 (defconst pacmacs--max-score-table-size 10)
