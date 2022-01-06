@@ -5,7 +5,7 @@
 ;; Author: Codingteam <codingteam@conference.jabber.ru>
 ;; Maintainer: Alexey Kutepov <reximkut@gmail.com>
 ;; URL: http://github.com/codingteam/pacmacs.el
-;; Version: 0.0.1
+;; Version: 0.1
 ;; Package-Requires: ((emacs "24.4") (dash "2.18.0") (cl-lib "0.5") (f "0.18.0"))
 
 ;; Permission is hereby granted, free of charge, to any person
